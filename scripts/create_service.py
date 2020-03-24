@@ -24,10 +24,10 @@ WantedBy=multi-user.target
 if __name__ == '__main__':
     p = argparse.ArgumentParser(
         description='Simplebot service creator')
-    p.add_argument("--name", help="Service name", required=True)
-    p.add_argument("--user", help="User that will run the service",
+    p.add_argument('-n', '--name', help='Service name', required=True)
+    p.add_argument('-u', '--user', help='User that will run the service',
                    required=True)
-    p.add_argument("--cmd", help="Command that will start the bot",
+    p.add_argument('-c', '--cmd', help='Command that will start the bot',
                    required=True)
     args = p.parse_args()
 
