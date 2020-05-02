@@ -137,7 +137,7 @@ class DeltaBot:
             return False
 
     def start(self):
-        self.account.start_threads()
+        self.account.start()
         try:
             while True:
                 try:
@@ -159,7 +159,7 @@ class DeltaBot:
                 except Exception as ex:
                     self.logger.exception(ex)
         finally:
-            self.account.stop_threads()
+            self.account.shutdown()
 
     def get_contact(self, addr=None):
         if addr is None:
