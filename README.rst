@@ -1,17 +1,7 @@
-.. image:: artwork/simplebot-banner.png
-  :align: center
-  :alt: SimpleBot Logo
+Deltabot Quickstart: implement and run a chat bot with Python
+=============================================================
 
-
-SimpleBot
-=========
-
-A simple "deltabot" that depends on plugins to add functionality.
-It works as part of a group or in 1:1 chats in `Delta Chat`_
-applications. SimpleBot supports `Autocrypt <https://autocrypt.org/>`_ end-to-end encryption
-but note that the operator of the bot service can look into
-messages that are sent to it. See also: https://github.com/Simon-Laux/ZHV/
-
+Deltabot allows to implement and run chat bots for `Delta Chat`_.
 
 Install
 -------
@@ -20,49 +10,67 @@ To install it run the following command (preferably in a ``virtualenv``):
 
 .. code-block:: bash
 
-   $ pip3 install simplebot
-
-Then install `some plugins <https://pypi.org/search/?q=simplebot&o=&c=Environment+%3A%3A+Plugins>`_
+   $ pip3 install deltabot
 
 
-Starting the bot
-----------------
+Init and run a bare bot
+-----------------------
 
-First you need to provide an emailaddress and a password
-to allow the bot to receive and send messages for that
-address:
+Configure an e-mail address for your chat bot (using example credentials)::
 
-.. code-block:: bash
+    deltabot init tmp.vd9dd@testrun.org OzrSxdx5hiaD
 
-   $ simplebot init "email@example.org" "password123"
+Now start the bot::
 
-This command will try to contact the imap/smtp servers
-for ``example.org`` and logging in with the given e-mail
-address and password.  Once this successfully completes,
-initialization is done and tested.
+    deltabot serve
 
-You can then let the bot listen continously:
+Within an Delta Chat app, you may now send a chat `/help` message to
+`tmp.vd9dd@testrun.org` and should get a short list of available
+commands in the reply.
 
-.. code-block:: bash
 
-   $ simplebot serve
+Try out an example "calculator" bot (TOBEDONE)
+----------------------------------------------
 
-It will listen for incoming messages and handle them with installed plugins.
+Here is a complete "calculator" chat bot for performing additions::
 
-Install `Delta Chat`_ and add your bot's email address as a contact and
-start chatting with it! You can also add the bot as a member to a group chat.
+    # contents of example/mycalc.py
+
+
+Test the "mycalc bot"::
+
+    $ deltabot test example/mycalc.py
+
+Register the new "mycalc bot"::
+
+    $ deltabot add-module example/mycalc.py
+
+Now start serving the chat bot::
+
+    $ deltabot serve
+
+and text a `/mycalc 23+20-1` message, and see the result message arriving back.
+
+Writing setuptools plugins
+--------------------------
+
+You can implement your plugin as a proper python package or wheel
+by using setuptools.  Have a look in the `examples/deltachat_echo`
+example directory which contains a complete example.
+
+
+note for users
+--------------
+
+Deltabot uses `Autocrypt <https://autocrypt.org/>`_ end-to-end encryption
+but note that the operator of the bot service can look into
+messages that are sent to it.
 
 
 Plugins
 -------
 
 See: https://github.com/SimpleBot-Inc/simplebot_plugins
-
-
-License
-=======
-
-This project is **free software**, licensed under the **GPL3** License - see the `LICENSE <https://github.com/SimpleBot-Inc/simplebot/blob/master/LICENSE>`_ file for more details.
 
 
 .. _Delta Chat: https://delta.chat

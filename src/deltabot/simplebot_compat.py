@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from abc import ABC
 from enum import IntEnum
 import configparser
@@ -6,13 +5,12 @@ import os
 import sqlite3
 import zipfile
 import zlib
-
-from .deltabot import DeltaBot, Command, Filter
 import html2text
 import pkg_resources
+from .bot import DeltaBot, Filter
+from . import __version__
 
 
-__version__ = '0.10.0'
 html2text.config.WRAP_LINKS = False
 
 
@@ -41,14 +39,10 @@ class Plugin(ABC):
 
     @classmethod
     def deactivate(cls):
-        """Deactivate the plugin, this method is called before the plugin is disabled/removed, do clean up here."""
+        """Deactivate the plugin, this method is called before the plugin
+        is disabled/removed, do clean up here."""
         cls.bot.remove_commands(cls.commands)
         cls.bot.remove_filters(cls.filters)
-
-
-class PluginCommand(Command):
-    def __call__(self, ctx):
-        return self._action(ctx)
 
 
 class PluginFilter(Filter):
@@ -115,12 +109,17 @@ class SimpleBot(DeltaBot):
         self._cdl = set()
         self._cpl = set()
 
-        self.buildin_commands = [
-            PluginCommand('/settings', ['<property>', '<value>'],
-                          'Set your preferences, "property" can be "locale"(values: en, es, de, etc) or "mode"(values: text, md, html, html.zip, text/html.zip)', self._settings_cmd),
-            PluginCommand('/start', [], 'Show an information message', self._start_cmd)]
-        self.add_commands(self.buildin_commands)
-
+        self.register_command(
+            name="/settings", args=['<property>', '<value>'],
+            description="Set key value setting",
+            func=self._settings_cmd
+        )
+        self.register_command(
+            name="/start", args=[],
+            description="Show an information message",
+            func=self._start_cmd
+        )
+        self.plugins = []   # self.load_plugins()
         self.load_plugins()
 
     def start(self):
@@ -132,17 +131,17 @@ class SimpleBot(DeltaBot):
 
     def send_html(self, chat, html, basename, text, mode):
         if mode in (Mode.HTMLZIP, Mode.TEXT_HTMLZIP):
-            file_path = self.get_blobpath(basename+'.html.zip')
+            file_path = self.get_blobpath(basename + '.html.zip')
             zlib.Z_DEFAULT_COMPRESSION = 9
             with zipfile.ZipFile(file_path, 'w', compression=zipfile.ZIP_DEFLATED) as fd:
                 fd.writestr('index.html', html)
             self.send_file(chat, file_path, text)
         else:
             if mode == Mode.MD:
-                file_path = self.get_blobpath(basename+'.md')
+                file_path = self.get_blobpath(basename + '.md')
                 html = html2text.html2text(html)
             else:
-                file_path = self.get_blobpath(basename+'.html')
+                file_path = self.get_blobpath(basename + '.html')
             with open(file_path, 'w') as fd:
                 fd.write(html)
             self.send_file(chat, file_path, text)
@@ -153,7 +152,7 @@ class SimpleBot(DeltaBot):
 
         basename = basename.split('.', 1)
         if len(basename) == 2:
-            basename, extension = basename[0], '.'+basename[1]
+            basename, extension = basename[0], '.' + basename[1]
         else:
             basename, extension = basename[0], ''
 
@@ -177,8 +176,11 @@ class SimpleBot(DeltaBot):
 
         botcfg = self.get_config(__name__)
         botcfg.setdefault(
-            'start_msg', 'This is SimpleBot, a free software bot for the Delta Chat aplication.\n\nSource code: https://github.com/SimpleBot-Inc/simplebot')
-        botcfg.setdefault('displayname', 'SimpleBot🤖')
+            'start_msg', 'This is deltabot, a bot '
+            'for the Delta Chat application.\n\n'
+            'Source code: https://github.com/deltachat-bot/deltabot'
+        )
+        botcfg.setdefault('displayname', '🤖deltabot🤖')
         botcfg.setdefault('avatar', '1')
         botcfg.setdefault('mdns_enabled', '0')
         botcfg.setdefault('mvbox_move', '0')
@@ -209,15 +211,17 @@ class SimpleBot(DeltaBot):
         self.account.set_config('mvbox_move', botcfg['mvbox_move'])
         self.account.set_config('e2ee_enabled', botcfg['e2ee_enabled'])
 
-    def _start_cmd(self, ctx):
+    def _start_cmd(self, command):
         botcfg = self.get_config(__name__)
-        self.get_chat(ctx.msg).send_text(botcfg['start_msg'])
+        command.message.chat.send_text(botcfg['start_msg'])
 
-    def _settings_cmd(self, ctx):
-        prop, value = ctx.text.split(maxsplit=1)
+    def _settings_cmd(self, command):
+        """Set your preferences, "property" can be "locale"(values: en, es, de, etc)
+        or "mode"(values: text, md, html, html.zip, text/html.zip)"""
+        prop, value = command.args.split(maxsplit=1)
         prop = prop.lower()
         value = value.rstrip()
-        addr = ctx.msg.get_sender_contact().addr
+        addr = command.msg.get_sender_contact().addr
         if prop == 'locale':
             row = self._db.execute(
                 'SELECT locale FROM preferences WHERE addr=?', (addr,)).fetchone()
@@ -240,8 +244,8 @@ class SimpleBot(DeltaBot):
             elif value == 'md':
                 mode = Mode.MD
             else:
-                self.get_chat(ctx.msg).send_text(
-                    'Invalid value: {}'.format(value))
+                command.msg.send_text(
+                    'Invalid value: {!r}'.format(value))
                 return
             row = self._db.execute(
                 'SELECT mode FROM preferences WHERE addr=?', (addr,)).fetchone()
@@ -253,8 +257,8 @@ class SimpleBot(DeltaBot):
                 self._db.execute(
                     'INSERT INTO preferences VALUES (?,?,?)', (addr, None, mode))
         else:
-            self.get_chat(ctx.msg).send_text(
-                'Unknow property: {}'.format(prop))
+            command.msg.chat.send_text(
+                'Unknown property: {!r}'.format(prop))
 
     def get_config(self, section):
         if not self._cfg.has_section(section):
@@ -405,7 +409,7 @@ class SimpleBot(DeltaBot):
 
     def load_plugins(self):
         self.plugins = []
-        plugins = self.get_config(__name__).get('plugins', '').split()
+        plugins = self.get_config("simplebot").get('plugins', '').split()
         for ep in pkg_resources.iter_entry_points('simplebot.plugins'):
             if plugins and ep.module_name not in plugins:
                 continue

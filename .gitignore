@@ -1,4 +1,5 @@
 .pytest_cache
+.eggs
 *.pyc
 __pycache__
 muacrypt.egg-info
