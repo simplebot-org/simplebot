@@ -76,7 +76,7 @@ class CommandDef:
     """ Definition of a '/COMMAND' with args. """
     def __init__(self, cmd, short, long, func):
         if cmd[0] != CMD_PREFIX:
-            raise ValueError("cmd {!r} must start with {!}".format(cmd, CMD_PREFIX))
+            raise ValueError("cmd {!r} must start with {!r}".format(cmd, CMD_PREFIX))
         self.cmd = cmd
         self.long = long
         self.short = short

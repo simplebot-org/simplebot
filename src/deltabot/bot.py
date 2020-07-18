@@ -101,11 +101,9 @@ class DeltaBot:
         ref can be a Message, Contact, email address string or chat-id integer.
         """
         if isinstance(ref, dc.message.Message):
-            return self.account.create_chat_by_message(ref)
-        elif isinstance(ref, dc.contact.Contact):
-            return self.account.create_chat_by_contact(ref)
-        elif isinstance(ref, str) and '@' in ref:
-            return self.account.create_contact(ref).get_chat()
+            return self.account._create_chat_by_message_id(ref.id)
+        elif isinstance(ref, (dc.contact.Contact, str)):
+            return self.account.create_chat(ref)
         elif type(ref) is int:
             try:
                 return self.account.get_chat_by_id(ref)
@@ -131,10 +129,11 @@ class DeltaBot:
         """ perform initial email/password bot account configuration.  """
         # XXX support reconfiguration (changed password at least)
         assert not self.is_configured()
-        assert not self.account._threads.is_started()
-        with self.account.temp_plugin(ConfigureTracker()) as configtracker:
+        assert not self.account.is_started()
+        tracker = ConfigureTracker(self.account)
+        with self.account.temp_plugin(tracker) as configtracker:
             self.account.update_config(dict(addr=email, mail_pw=password))
-            self.account.start()
+            self.account.configure()
             try:
                 configtracker.wait_finish()
             except configtracker.ConfigureFailed as ex:
@@ -143,7 +142,6 @@ class DeltaBot:
             else:
                 success = True
                 self.logger.info('Successfully configured {}'.format(email))
-            self.account.shutdown()
             return success
 
     #
@@ -154,8 +152,8 @@ class DeltaBot:
         addr = self.account.get_config("addr")
         self.logger.info("bot connected at: {}".format(addr))
         self._eventhandler.start()
-        if not self.account._threads.is_started():
-            self.account.start()
+        if not self.account.is_started():
+            self.account.start_io()
 
     def wait_shutdown(self):
         """ Wait and block until bot account is shutdown. """
@@ -225,7 +223,7 @@ class IncomingEventHandler:
     def ac_incoming_message(self, message):
         # we always accept incoming messages to remove the need  for
         # bot authors to having to deal with deaddrop/contact requests.
-        message.accept_sender_contact()
+        message.get_sender_contact().create_chat()
         self.logger.info("incoming message from {} id={} chat={} text={!r}".format(
             message.get_sender_contact().addr,
             message.id, message.chat.id, message.text[:50]))

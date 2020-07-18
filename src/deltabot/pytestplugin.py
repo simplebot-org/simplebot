@@ -60,8 +60,8 @@ def mocker(mock_bot):
             msg = Message.new_empty(self.account, "text")
             msg.set_text(text)
             name, routeable_addr = parseaddr(addr)
-            contact = self.account.create_contact(email=routeable_addr, name=name)
-            chat = self.account.create_chat_by_contact(contact)
+            contact = self.account.create_contact(routeable_addr, name=name)
+            chat = self.account.create_chat(contact)
             msg_in = chat.prepare_message(msg)
             return msg_in
 
@@ -97,7 +97,7 @@ class BotTester:
         self.bot = bot
         bot_addr = bot.account.get_config("addr")
         self.bot_contact = self.send_account.create_contact(bot_addr)
-        self.bot_chat = self.send_account.create_chat_by_contact(self.bot_contact)
+        self.bot_chat = self.send_account.create_chat(self.bot_contact)
         self._replies = Queue()
 
     @account_hookimpl

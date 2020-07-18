@@ -29,8 +29,8 @@ def deltabot_init_parser(parser):
 @deltabot_hookimpl
 def deltabot_init(bot, args):
     if args.show_ffi:
-        from deltachat.eventlogger import FFIEventLogger
-        log = FFIEventLogger(bot.account, "bot")
+        from deltachat.events import FFIEventLogger
+        log = FFIEventLogger(bot.account)
         bot.account.add_account_plugin(log)
 
 
