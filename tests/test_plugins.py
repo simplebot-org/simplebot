@@ -32,3 +32,25 @@ def test_setuptools_plugin(monkeypatch, request):
     )
     _ = request.getfixturevalue("mock_bot")
     assert l == [("deltabot.plugins", None)]
+
+
+def test_deltabot_init_db_is_first(monkeypatch, request):
+    l = []
+
+    class MyPlugin:
+        @deltabot.hookimpl
+        def deltabot_init(self, bot):
+            bot.set("hello", "world")
+            assert bot.get("hello") == "world"
+            l.append(1)
+
+    def load_setuptools_entrypoints(self, group, name=None):
+        self.register(MyPlugin())
+
+    monkeypatch.setattr(
+        pluggy.manager.PluginManager,
+        "load_setuptools_entrypoints",
+        load_setuptools_entrypoints
+    )
+    _ = request.getfixturevalue("mock_bot")
+    assert l == [1]

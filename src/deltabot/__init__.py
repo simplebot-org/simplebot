@@ -9,3 +9,7 @@ try:
 except DistributionNotFound:
     # package is not installed
     __version__ = "0.0.0.dev0-unknown"
+
+
+# for nice access via deltabot.hookimpl
+hookimpl = deltabot_hookimpl

@@ -4,7 +4,7 @@ import sqlite3
 from deltabot.hookspec import deltabot_hookimpl
 
 
-@deltabot_hookimpl
+@deltabot_hookimpl(tryfirst=True)
 def deltabot_init(bot):
     db_path = os.path.join(os.path.dirname(bot.account.db_path), "bot.db")
     bot.plugins.add_module("db", DBManager(db_path))
