@@ -1,4 +1,8 @@
 
+import io
+
+import pytest
+
 from deltabot.bot import Replies
 
 
@@ -50,22 +54,53 @@ class TestSettings:
 
 
 class TestReplies:
-    def test_two_text(self, mock_bot):
-        r = Replies(mock_bot.account)
-        r.add(text="hello")
-        r.add(text="world")
-        l = list(r.get_reply_messages())
+
+    @pytest.fixture
+    def replies(self, mock_bot, mocker):
+        incoming_message = mocker.make_incoming_message("0")
+        return Replies(incoming_message, mock_bot.logger)
+
+    def test_two_text(self, replies):
+        replies.add(text="hello")
+        replies.add(text="world")
+        l = replies.send_reply_messages()
         assert len(l) == 2
         assert l[0].text == "hello"
         assert l[1].text == "world"
 
-    def test_file(self, mock_bot, tmpdir):
+    def test_filename(self, replies, tmpdir):
         p = tmpdir.join("textfile")
         p.write("content")
-        r = Replies(mock_bot.account)
-        r.add(text="hello", filename=p.strpath)
-        l = list(r.get_reply_messages())
+        replies.add(text="hello", filename=p.strpath)
+        l = replies.send_reply_messages()
         assert len(l) == 1
         assert l[0].text == "hello"
         s = open(l[0].filename).read()
         assert s == "content"
+
+    def test_file_content(self, replies):
+        bytefile = io.BytesIO(b'bytecontent')
+        replies.add(text="hello", filename="something.txt", bytefile=bytefile)
+
+        l = replies.send_reply_messages()
+        assert len(l) == 1
+        assert l[0].text == "hello"
+        assert l[0].filename.endswith(".txt")
+        assert "something" in l[0].filename
+        s = open(l[0].filename, "rb").read()
+        assert s == b"bytecontent"
+
+    def test_chat_incoming_default(self, replies):
+        replies.add(text="hello")
+        l = replies.send_reply_messages()
+        assert len(l) == 1
+        assert l[0].text == "hello"
+        assert l[0].chat == replies.incoming_message.chat
+
+    def test_different_chat(self, replies, mock_bot):
+        chat = mock_bot.account.create_group_chat("new group")
+        replies.add(text="this", chat=chat)
+        l = replies.send_reply_messages()
+        assert len(l) == 1
+        assert l[0].text == "this"
+        assert l[0].chat.id == chat.id

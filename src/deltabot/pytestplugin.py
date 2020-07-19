@@ -67,9 +67,9 @@ def mocker(mock_bot):
 
         def run_command(self, text):
             msg = self.make_incoming_message(text)
-            replies = Replies(self.account)
+            replies = Replies(msg, self.bot.logger)
             self.bot.commands.deltabot_incoming_message(message=msg, replies=replies)
-            l = list(replies.get_reply_messages())
+            l = replies.send_reply_messages()
             if not l:
                 raise ValueError("no reply for command {!r}".format(text))
             if len(l) > 1:
@@ -102,12 +102,18 @@ class BotTester:
 
     @account_hookimpl
     def ac_incoming_message(self, message):
-        if message.chat == self.bot_chat:
-            self._replies.put(message)
+        message.get_sender_contact().create_chat()
+        print("queuing ac_incoming message {}".format(message))
+        self._replies.put(message)
 
     def send_command(self, text):
         self.bot_chat.send_text(text)
-        return self._replies.get(timeout=30)
+        return self.get_next_incoming()
+
+    def get_next_incoming(self):
+        reply = self._replies.get(timeout=30)
+        print("get_next_incoming got reply text: {}".format(reply.text))
+        return reply
 
 
 @pytest.fixture

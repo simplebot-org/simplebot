@@ -1,4 +1,5 @@
 
+import inspect
 from collections import OrderedDict
 
 
@@ -20,7 +21,7 @@ class Commands:
         self.bot.plugins.add_module("commands", self)
 
     def register(self, name, func):
-        short, long = parse_command_docstring(func)
+        short, long = parse_command_docstring(func, args=["command", "replies"])
         cmd_def = CommandDef(name, short=short, long=long, func=func)
         if name in self._cmd_defs:
             raise ValueError("command {!r} already registered".format(name))
@@ -49,17 +50,20 @@ class Commands:
         payload = parts[0] if parts else ""
         cmd = IncomingCommand(bot=self.bot, cmd_def=cmd_def, payload=payload, message=message)
         self.bot.logger.info("processing command {}".format(cmd))
-        res = cmd.cmd_def.func(cmd)
-        if res:
-            replies.add(text=res)
-            return True
+        try:
+            res = cmd.cmd_def.func(command=cmd, replies=replies)
+        except Exception as ex:
+            self.logger.exception(ex)
+        else:
+            assert res is None, res
+        return True
 
     @deltabot_hookimpl
     def deltabot_init(self, bot):
         assert bot == self.bot
         self.register("/help", self.command_help)
 
-    def command_help(self, command):
+    def command_help(self, command, replies):
         """ reply with help message about available commands. """
         l = []
         l.append("**commands**")
@@ -69,7 +73,7 @@ class Commands:
         pm = self.bot.plugins._pm
         plugins = [pm.get_name(plug) for plug, dist in pm.list_plugin_distinfo()]
         l.append("enabled plugins: {}".format(" ".join(plugins)))
-        return "\n".join(l)
+        replies.add(text="\n".join(l))
 
 
 class CommandDef:
@@ -103,10 +107,14 @@ class IncomingCommand:
         return self.payload.split()
 
 
-def parse_command_docstring(func):
+def parse_command_docstring(func, args):
     description = func.__doc__
     if not description:
         raise ValueError("command {!r} needs to have a docstring".format(func))
+    funcargs = set(inspect.getargs(func.__code__).args)
+    for arg in args:
+        if arg not in funcargs:
+            raise ValueError("{!r} needs to accept {!r} argument".format(func, arg))
 
     lines = description.strip().split("\n")
     return lines.pop(0), "\n".join(lines).strip()

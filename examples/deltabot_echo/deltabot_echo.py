@@ -10,7 +10,7 @@ def deltabot_init(bot):
     bot.commands.register(name="/echo", func=process_command_echo)
 
 
-def process_command_echo(command):
+def process_command_echo(command, replies):
     """ Echoes back received message.
 
     To use it you can simply send a message starting with
@@ -19,7 +19,7 @@ def process_command_echo(command):
     message = command.message
     contact = message.get_sender_contact()
     sender = 'From: {} <{}>'.format(contact.display_name, contact.addr)
-    return "{}\n{!r}".format(sender, command.payload)
+    replies.add(text="{}\n{!r}".format(sender, command.payload))
 
 
 def test_mock_echo(mocker):

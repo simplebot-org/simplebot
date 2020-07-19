@@ -34,6 +34,12 @@ class DeltaBotSpecs:
         This allows "late" plugins to still register commands and filters.
         """
 
+    @deltabot_hookspec()
+    def deltabot_start(self, bot):
+        """ called when a bot starts listening to incoming messages and performing
+        outstanding processing of fresh messages.
+        """
+
     @deltabot_hookspec
     def deltabot_shutdown(self, bot):
         """ shutdown all resources of the bot. """
@@ -42,7 +48,33 @@ class DeltaBotSpecs:
     def deltabot_incoming_message(self, message, bot, replies):
         """ process an incoming fresh message.
 
+        :param message: The original system message that reports the addition.
         :param replies: call replies.add() to schedule a reply.
+        """
+
+    @deltabot_hookspec(firstresult=True)
+    def deltabot_member_added(self, chat, contact, actor, message, replies):
+        """ When a member has been added by an actor.
+
+        :param chat: Chat where contact was added.
+        :param contact: Contact that was added.
+        :param actor: Who added the contact (None if it was our self-addr)
+        :param message: The original system message that reports the addition.
+        :param replies: Can be used to register replies without directly trying to send out.
+        """
+
+    @deltabot_hookspec(firstresult=True)
+    def deltabot_member_removed(self, chat, contact, actor, message, replies):
+        """ When a member has been removed by an actor.
+
+        When a member left a chat, the contact and the actor will be the
+        same Contact object.
+
+        :param chat: Chat where contact was removed.
+        :param contact: Contact that was removed.
+        :param actor: Who removed the contact (None if it was our self-addr)
+        :param message: The original system message that reports the removal.
+        :param replies: Can be used to register replies without directly trying to send out.
         """
 
     @deltabot_hookspec(firstresult=True)

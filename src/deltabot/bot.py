@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import os
 import threading
-from queue import Queue
+import tempfile
+import shutil
 
 import deltachat as dc
 from deltachat import account_hookimpl
 from deltachat import Message, Contact
 from deltachat.tracker import ConfigureTracker
+from deltachat.message import parse_system_add_remove
 
 from .commands import Commands
 from .filters import Filters
@@ -149,8 +152,9 @@ class DeltaBot:
     #
     def start(self):
         """ Start bot threads and processing messages. """
+        self.plugins.hook.deltabot_start(bot=self)
         addr = self.account.get_config("addr")
-        self.logger.info("bot connected at: {}".format(addr))
+        self.logger.info("bot listening at: {}".format(addr))
         self._eventhandler.start()
         if not self.account.is_started():
             self.account.start_io()
@@ -173,25 +177,42 @@ class CheckAll:
 
     def perform(self):
         logger = self.bot.logger
+        logger.info("CheckAll perform-loop start")
         for message in self.bot.account.get_fresh_messages():
             try:
-                replies = Replies(message.account)
+                replies = Replies(message, logger=logger)
                 logger.info("processing incoming fresh message id={}".format(message.id))
-                self.bot.plugins.hook.deltabot_incoming_message(
-                    message=message,
-                    bot=self.bot,
-                    replies=replies
-                )
-                for msg in replies.get_reply_messages():
-                    msg = message.chat.send_msg(msg)
-                    logger.info("reply id={} chat={} sent with text: {!r}".format(
-                        msg.id, msg.chat, msg.text[:50]
-                    ))
+                if message.is_system_message():
+                    self.handle_system_message(message, replies)
+                else:
+                    self.bot.plugins.hook.deltabot_incoming_message(
+                        message=message,
+                        bot=self.bot,
+                        replies=replies
+                    )
+                replies.send_reply_messages()
             except Exception as ex:
                 logger.exception("processing message={} failed: {}".format(
                     message.id, ex))
             logger.info("processing message id={} FINISHED".format(message.id))
             message.mark_seen()
+        logger.info("CheckAll perform-loop finish")
+
+    def handle_system_message(self, message, replies):
+        logger = self.bot.logger
+        res = parse_system_add_remove(message.text)
+        if res is None:
+            logger.info("ignoring system message id={} text: {}".format(
+                message.id, message.text))
+            return
+
+        action, affected, actor = res
+        hook_name = "deltabot_member_{}".format(action)
+        meth = getattr(self.bot.plugins.hook, hook_name)
+        logger.info("calling hook {}".format(hook_name))
+        meth(message=message, replies=replies, chat=message.chat,
+             actor=self.bot.account.create_contact(actor),
+             contact=self.bot.account.create_contact(affected))
 
 
 class IncomingEventHandler:
@@ -200,36 +221,50 @@ class IncomingEventHandler:
         self.logger = bot.logger
         self.plugins = bot.plugins
         self.bot.account.add_account_plugin(self)
-        self._checks = Queue()
-        self._checks.put(CheckAll(bot))
+        self._needs_check = threading.Event()
+        self._running = True
 
     def start(self):
+        self.logger.info("starting bot-event-handler THREAD")
         self._thread = t = threading.Thread(target=self.event_worker, name="bot-event-handler")
         t.setDaemon(1)
         t.start()
 
     def stop(self):
-        self._checks.put(None)
+        self._running = False
+        self._needs_check.set()
+        self._thread.join(timeout=10)
 
     def event_worker(self):
         self.logger.debug("event-worker startup")
-        while 1:
-            check = self._checks.get()
-            if check is None:
-                break
-            check.perform()
+        while self._running:
+            self._needs_check.wait()
+            self._needs_check.clear()
+            CheckAll(self.bot).perform()
 
     @account_hookimpl
     def ac_incoming_message(self, message):
         # we always accept incoming messages to remove the need  for
         # bot authors to having to deal with deaddrop/contact requests.
-        message.get_sender_contact().create_chat()
+        message.create_chat()
         self.logger.info("incoming message from {} id={} chat={} text={!r}".format(
             message.get_sender_contact().addr,
             message.id, message.chat.id, message.text[:50]))
 
         # message is now in fresh state, schedule a check
-        self._checks.put(CheckAll(self.bot))
+        self._needs_check.set()
+
+    @account_hookimpl
+    def ac_chat_modified(self):
+        self._needs_check.set()
+
+    @account_hookimpl
+    def ac_member_removed(self):
+        self._needs_check.set()
+
+    @account_hookimpl
+    def ac_member_added(self):
+        self._needs_check.set()
 
     @account_hookimpl
     def ac_message_delivered(self, message):
@@ -238,23 +273,55 @@ class IncomingEventHandler:
 
 
 class Replies:
-    def __init__(self, account):
-        self.account = account
+    def __init__(self, message, logger):
+        self.incoming_message = message
+        self.logger = logger
         self._replies = []
 
-    def add(self, text=None, filename=None):
+    def add(self, text=None, filename=None, bytefile=None, chat=None):
         """ Add a text or file-based reply. """
-        self._replies.append((text, filename))
+        if bytefile:
+            if not filename:
+                raise ValueError("missing filename suggestion, needed with bytefile")
+            if os.path.basename(filename) != filename:
+                raise ValueError("if bytefile is specified, filename must a basename, not path")
 
-    def get_reply_messages(self):
-        for text, file in self._replies:
-            if file:
+        self._replies.append((text, filename, bytefile, chat))
+
+    def send_reply_messages(self):
+        tempdir = tempfile.mkdtemp() if any(x[2] for x in self._replies) else None
+        l = []
+        try:
+            for msg in self._send_replies_to_core(tempdir):
+                self.logger.info("reply id={} chat={} sent with text: {!r}".format(
+                                 msg.id, msg.chat, msg.text[:50]))
+                l.append(msg)
+        finally:
+            if tempdir:
+                shutil.rmtree(tempdir)
+        return l
+
+    def _send_replies_to_core(self, tempdir):
+        for text, filename, bytefile, chat in self._replies:
+            if bytefile:
+                # XXX avoid double copy -- core will copy this file another time
+                # XXX maybe also avoid loading the file into RAM but it's max 50MB
+                filename = os.path.join(tempdir, filename)
+                with open(filename, "wb") as f:
+                    f.write(bytefile.read())
+
+            if filename:
                 view_type = "file"
             else:
                 view_type = "text"
-            msg = Message.new_empty(self.account, view_type)
+            msg = Message.new_empty(self.incoming_message.account, view_type)
             if text is not None:
                 msg.set_text(text)
-            if file is not None:
-                msg.set_file(file)
+            if filename is not None:
+                msg.set_file(filename)
+            if chat is None:
+                chat = self.incoming_message.chat
+            msg = chat.send_msg(msg)
             yield msg
+
+        self._replies[:] = []

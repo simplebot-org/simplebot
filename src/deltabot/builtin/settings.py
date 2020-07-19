@@ -62,10 +62,10 @@ class db_list:
             out.line("{}: {}".format(key, res))
 
 
-def command_set(command):
-    """show all/one settings or set one particular setting.
+def command_set(command, replies):
+    """show all/one per-peer settings or set a value for a setting.
 
-    examples:
+    Examples:
 
     # show all settings
     /set
@@ -78,16 +78,17 @@ def command_set(command):
     """
     addr = command.message.get_sender_contact().addr
     if not command.payload:
-        return "\n".join(dump_settings(command.bot, scope=addr))
-    if "=" in command.payload:
+        text = "\n".join(dump_settings(command.bot, scope=addr))
+    elif "=" in command.payload:
         name, value = command.payload.split("=", 1)
         name = name.strip()
         value = value.strip()
         old = command.bot.set(name, value, scope=addr)
-        return "old: {}={}".format(name, repr(old))
-
-    x = command.bot.get(command.args[0], scope=addr)
-    return "{}={}".format(command.args[0], x)
+        text = "old: {}={}\nnew: {}={}".format(name, repr(old), name, repr(value))
+    else:
+        x = command.bot.get(command.args[0], scope=addr)
+        text = "{}={}".format(command.args[0], x)
+    replies.add(text=text)
 
 
 def dump_settings(bot, scope):

@@ -12,7 +12,7 @@ def deltabot_init(bot):
     )
 
 
-def process_command_mycalc(command):
+def process_command_mycalc(command, replies):
     """caculcates result of arithmetic integer expression.
 
     send "/mycalc 23+20" to the bot to get the result "43" back
@@ -30,7 +30,7 @@ def process_command_mycalc(command):
         # now it's safe to use eval
         reply = "result of {!r}: {}".format(text, eval(text))
 
-    return reply
+    replies.add(text=reply)
 
 
 class TestMyCalc:

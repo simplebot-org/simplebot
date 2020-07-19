@@ -13,7 +13,7 @@ class Filters:
         self.bot.plugins.add_module("filters", self)
 
     def register(self, name, func):
-        short, long = parse_command_docstring(func)
+        short, long = parse_command_docstring(func, args=["message", "replies"])
         cmd_def = FilterDef(name, short=short, long=long, func=func)
         if name in self._filter_defs:
             raise ValueError("filter {!r} already registered".format(name))
@@ -30,9 +30,8 @@ class Filters:
     def deltabot_incoming_message(self, message, replies):
         for name, filter_def in self._filter_defs.items():
             self.logger.debug("calling filter {!r} on message id={}".format(name, message.id))
-            res = filter_def.func(message)
-            if res:
-                replies.add(text=res)
+            res = filter_def.func(message=message, replies=replies)
+            assert res is None
 
 
 class FilterDef:

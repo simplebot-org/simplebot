@@ -1,4 +1,6 @@
 
+from queue import Queue
+
 import pluggy
 import deltabot
 from deltabot.plugins import get_global_plugin_manager
@@ -34,15 +36,20 @@ def test_setuptools_plugin(monkeypatch, request):
     assert l == [("deltabot.plugins", None)]
 
 
-def test_deltabot_init_db_is_first(monkeypatch, request):
-    l = []
+def test_deltabot_init_hooks(monkeypatch, request):
+    q = Queue()
 
     class MyPlugin:
         @deltabot.hookimpl
         def deltabot_init(self, bot):
+            # make sure db is ready and initialized
             bot.set("hello", "world")
             assert bot.get("hello") == "world"
-            l.append(1)
+            q.put(1)
+
+        @deltabot.hookimpl
+        def deltabot_start(self, bot):
+            q.put(2)
 
     def load_setuptools_entrypoints(self, group, name=None):
         self.register(MyPlugin())
@@ -52,5 +59,7 @@ def test_deltabot_init_db_is_first(monkeypatch, request):
         "load_setuptools_entrypoints",
         load_setuptools_entrypoints
     )
-    _ = request.getfixturevalue("mock_bot")
-    assert l == [1]
+    bot = request.getfixturevalue("mock_bot")
+    assert q.get(timeout=10) == 1
+    bot.start()
+    assert q.get(timeout=10) == 2
