@@ -27,6 +27,18 @@ def test_simple_filter(bot_tester):
     assert msg_reply.text == "try again!"
 
 
+def test_filters_not_called_on_commands(bot_tester):
+    l = []
+
+    def always_answer(message, replies):
+        """ always"""
+        l.append(1)
+
+    bot_tester.bot.filters.register(name="always_answer", func=always_answer)
+    bot_tester.send_command("/help 42")
+    assert not l
+
+
 def test_pseudo_downloader(bot_tester):
     def downloader(message, replies):
         """ pseudo downloader of https"""

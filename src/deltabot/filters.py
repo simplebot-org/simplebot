@@ -26,7 +26,7 @@ class Filters:
     def dict(self):
         return self._filter_defs.copy()
 
-    @deltabot_hookimpl
+    @deltabot_hookimpl(trylast=True)
     def deltabot_incoming_message(self, message, replies):
         for name, filter_def in self._filter_defs.items():
             self.logger.debug("calling filter {!r} on message id={}".format(name, message.id))
