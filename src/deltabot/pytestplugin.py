@@ -56,12 +56,15 @@ def mocker(mock_bot):
             self.bot = mock_bot
             self.account = mock_bot.account
 
-        def make_incoming_message(self, text, addr="Alice <alice@example.org>"):
+        def make_incoming_message(self, text, group=False, addr="Alice <alice@example.org>"):
             msg = Message.new_empty(self.account, "text")
             msg.set_text(text)
             name, routeable_addr = parseaddr(addr)
             contact = self.account.create_contact(routeable_addr, name=name)
-            chat = self.account.create_chat(contact)
+            if group:
+                chat = self.account.create_group_chat("mockgroup", contacts=[contact])
+            else:
+                chat = self.account.create_chat(contact)
             msg_in = chat.prepare_message(msg)
             return msg_in
 

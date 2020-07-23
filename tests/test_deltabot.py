@@ -54,7 +54,6 @@ class TestSettings:
 
 
 class TestReplies:
-
     @pytest.fixture
     def replies(self, mock_bot, mocker):
         incoming_message = mocker.make_incoming_message("0")

@@ -278,6 +278,9 @@ class Replies:
         self.logger = logger
         self._replies = []
 
+    def has_replies(self):
+        return bool(self._replies)
+
     def add(self, text=None, filename=None, bytefile=None, chat=None):
         """ Add a text or file-based reply. """
         if bytefile:

@@ -22,9 +22,16 @@ class Commands:
 
     def register(self, name, func):
         short, long = parse_command_docstring(func, args=["command", "replies"])
+        for cand_name in iter_underscore_subparts(name):
+            if cand_name in self._cmd_defs:
+                raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
+                                 name, cand_name))
+        for reg_name in self._cmd_defs:
+            if reg_name.startswith(name):
+                raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
+                                 name, reg_name))
+
         cmd_def = CommandDef(name, short=short, long=long, func=func)
-        if name in self._cmd_defs:
-            raise ValueError("command {!r} already registered".format(name))
         self._cmd_defs[name] = cmd_def
         self.logger.debug("registered new command {!r}".format(name))
 
@@ -38,17 +45,28 @@ class Commands:
     def deltabot_incoming_message(self, message, replies):
         if not message.text.startswith(CMD_PREFIX):
             return None
-        parts = message.text.split(maxsplit=1)
-        cmd_name = parts.pop(0)
-        cmd_def = self._cmd_defs.get(cmd_name)
-        if cmd_def is None:
-            reply = "unknown command {!r}".format(cmd_name)
+        args = message.text.split()
+        payload = message.text.split(maxsplit=1)[1] if len(args) > 1 else ""
+        orig_cmd_name = args.pop(0)
+
+        parts = orig_cmd_name.split("_")
+        while parts:
+            cmd_name = "_".join(parts)
+            cmd_def = self._cmd_defs.get(cmd_name)
+            if cmd_def is not None:
+                break
+            newarg = parts.pop()
+            args.insert(0, newarg)
+            payload = (newarg + " " + payload).rstrip()
+        else:
+            reply = "unknown command {!r}".format(orig_cmd_name)
             self.logger.warn(reply)
-            replies.add(text=reply)
+            if not message.chat.is_group():
+                replies.add(text=reply)
             return True
 
-        payload = parts[0] if parts else ""
-        cmd = IncomingCommand(bot=self.bot, cmd_def=cmd_def, payload=payload, message=message)
+        cmd = IncomingCommand(bot=self.bot, cmd_def=cmd_def, message=message,
+                              args=args, payload=payload)
         self.bot.logger.info("processing command {}".format(cmd))
         try:
             res = cmd.cmd_def.func(command=cmd, replies=replies)
@@ -92,19 +110,16 @@ class CommandDef:
 
 class IncomingCommand:
     """ incoming command request. """
-    def __init__(self, bot, cmd_def, payload, message):
+    def __init__(self, bot, cmd_def, args, payload, message):
         self.bot = bot
         self.cmd_def = cmd_def
+        self.args = args
         self.payload = payload
         self.message = message
 
     def __repr__(self):
         return "<IncomingCommand {!r} payload={!r} msg={}>".format(
             self.cmd_def.cmd[0], self.payload, self.message.id)
-
-    @property
-    def args(self):
-        return self.payload.split()
 
 
 def parse_command_docstring(func, args):
@@ -118,3 +133,10 @@ def parse_command_docstring(func, args):
 
     lines = description.strip().split("\n")
     return lines.pop(0), "\n".join(lines).strip()
+
+
+def iter_underscore_subparts(name):
+    parts = name.split("_")
+    while parts:
+        yield "_".join(parts)
+        parts.pop()
