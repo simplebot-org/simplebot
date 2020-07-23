@@ -12,6 +12,8 @@ def deltabot_init_parser(parser):
     parser.add_subcommand(Info)
     parser.add_subcommand(ListPlugins)
     parser.add_subcommand(Serve)
+    parser.add_subcommand(AddModule)
+    parser.add_subcommand(DelModule)
 
     parser.add_generic_option(
         "--version", action="version", version=deltabot_version,
@@ -69,6 +71,55 @@ class ListPlugins:
     def run(self, bot, args, out):
         for name, plugin in bot.plugins.items():
             out.line("{:25s}: {}".format(name, plugin))
+
+
+class AddModule:
+    """add python module(s) paths to be loaded as bot plugin(s).
+
+    Note that the filesystem paths to the python modules need
+    to be available when the bot starts up.  You can edit the
+    modules after adding them.
+    """
+    name = "add-module"
+    db_key = "module-plugins"
+
+    def add_arguments(self, parser):
+        parser.add_argument("pymodule", type=str, nargs="+")
+
+    def run(self, bot, args, out):
+        existing = list(x for x in bot.get(self.db_key, default="").split("\n") if x.strip())
+        for pymodule in args.pymodule:
+            assert "," not in pymodule
+            if not os.path.exists(pymodule):
+                out.fail("{} does not exist".format(pymodule))
+            path = os.path.abspath(pymodule)
+            existing.append(path)
+
+        bot.set(self.db_key, "\n".join(existing))
+        out.line("new python module plugin list:")
+        for mod in existing:
+            out.line(mod)
+
+
+class DelModule(AddModule):
+    """Delete python module(s) plugin path from bot plugins.
+
+    Note that the filesystem paths to the python modules need
+    to be available when the bot starts up.  You can edit the
+    modules after adding them.
+    """
+    name = "del-module"
+
+    def run(self, bot, args, out):
+        existing = list(x for x in bot.get(self.db_key, default="").split("\n") if x.strip())
+        remaining = []
+        for pymodule in args.pymodule:
+            for p in existing:
+                if not p.endswith(pymodule):
+                    remaining.append(p)
+
+        bot.set(self.db_key, "\n".join(remaining))
+        out.line("removed {} module(s)".format(len(existing) - len(remaining)))
 
 
 class Serve:

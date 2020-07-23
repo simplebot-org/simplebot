@@ -21,13 +21,20 @@ class Commands:
         self.bot.plugins.add_module("commands", self)
 
     def register(self, name, func):
+        """ register a command function that acts on each incoming non-system message.
+
+        :param name: name of the command, example "/test"
+        :param func: function that needs to accept 'command' and 'replies' arguments,
+                     namely a :class:`deltabot.command.IncomingCommand`
+                     and a :class:`deltabot.bot.Replies` object.
+        """
         short, long = parse_command_docstring(func, args=["command", "replies"])
         for cand_name in iter_underscore_subparts(name):
             if cand_name in self._cmd_defs:
                 raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
                                  name, cand_name))
         for reg_name in self._cmd_defs:
-            if reg_name.startswith(name):
+            if reg_name.startswith(name + "_"):
                 raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
                                  name, reg_name))
 
@@ -36,6 +43,7 @@ class Commands:
         self.logger.debug("registered new command {!r}".format(name))
 
     def unregister(self, name):
+        """ unregister a command function by name. """
         return self._cmd_defs.pop(name)
 
     def dict(self):

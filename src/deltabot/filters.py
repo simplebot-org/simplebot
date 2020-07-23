@@ -13,6 +13,7 @@ class Filters:
         self.bot.plugins.add_module("filters", self)
 
     def register(self, name, func):
+        """ register a filter function that acts on each incoming non-system message. """
         short, long = parse_command_docstring(func, args=["message", "replies"])
         cmd_def = FilterDef(name, short=short, long=long, func=func)
         if name in self._filter_defs:
@@ -21,6 +22,7 @@ class Filters:
         self.logger.debug("registered new filter {!r}".format(name))
 
     def unregister(self, name):
+        """ unregister a filter function. """
         return self._filter_defs.pop(name)
 
     def dict(self):

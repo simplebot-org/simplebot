@@ -5,40 +5,54 @@ import threading
 import tempfile
 import shutil
 
+import py
+
 import deltachat as dc
 from deltachat import account_hookimpl
 from deltachat import Message, Contact
 from deltachat.tracker import ConfigureTracker
 from deltachat.message import parse_system_add_remove
 
+from .builtin.cmdline import AddModule
 from .commands import Commands
 from .filters import Filters
 from .plugins import Plugins, get_global_plugin_manager
 
 
 class DeltaBot:
-    def __init__(self, account, logger, plugin_manager=None):
-
+    def __init__(self, account, logger, plugin_manager=None, args=()):
         # by default we will use the global instance of the
         # plugin_manager.
         if plugin_manager is None:
             plugin_manager = get_global_plugin_manager()
 
+        #: Account object for creating contacts/groups etc.
+        #: see :class:`deltachat.account.Account`
         self.account = account
 
         self.logger = logger
 
         #: plugin subsystem for adding/removing plugins and calling plugin hooks
+        #: see :class:`deltabot.plugins.Plugins`
         self.plugins = Plugins(logger=logger, plugin_manager=plugin_manager)
 
-        #: commands subsystem for registering/executing '/*' commands in incoming messages
+        #: commands subsystem for registering/executing commands in incoming messages
+        #: see :class:`deltabot.commands.Commands`
         self.commands = Commands(self)
 
         #: filter subsystem for registering/performing filters on incoming messages
+        #: see :class:`deltabot.filters.Filters`
         self.filters = Filters(self)
 
         # process dc events and turn them into deltabot ones
         self._eventhandler = IncomingEventHandler(self)
+
+        plugin_manager.hook.deltabot_init.call_historic(kwargs=dict(bot=self, args=args))
+        # add manually added python modules as plugins
+        for pymodule in self.get(AddModule.db_key, "").split("\n"):
+            if pymodule:
+                mod = py.path.local(pymodule).pyimport()
+                self.plugins.add_module(name=os.path.basename(pymodule), module=mod)
 
         # set some useful bot defaults on the account
         self.account.update_config(dict(
@@ -53,20 +67,26 @@ class DeltaBot:
     # API for persistent scoped-key/value settings
     #
     def set(self, name, value, scope="global"):
-        """ Store a per bot setting with the given scope. """
+        """ Store a bot setting with the given scope. """
         assert "/" not in scope and "/" not in name
         key = scope + "/" + name
         self.plugins._pm.hook.deltabot_store_setting(key=key, value=value)
 
+    def delete(self, name, scope="global"):
+        """ Delete a bot setting with the given scope. """
+        assert "/" not in scope
+        key = scope + "/" + name
+        self.plugins._pm.hook.deltabot_store_setting(key=key, value=None)
+
     def get(self, name, default=None, scope="global"):
-        """ Get a per-bot setting from the given scope. """
-        assert "/" not in scope and "/" not in name
+        """ Get a bot setting from the given scope. """
+        assert "/" not in scope
         key = scope + "/" + name
         res = self.plugins._pm.hook.deltabot_get_setting(key=key)
         return res if res is not None else default
 
     def list_settings(self, scope=None):
-        """ list per-bot settings for the given scope.
+        """ list bot settings for the given scope.
 
         If scope is not specified, all settings are returned.
         """
@@ -113,12 +133,9 @@ class DeltaBot:
             except ValueError:
                 return None
 
-    def create_group(self, name, members=[]):
+    def create_group(self, name, contacts=[]):
         """ Create a new group chat. """
-        group = self.account.create_group_chat(name)
-        for member in map(self.get_contact, members):
-            group.add_contact(member)
-        return group
+        return self.account.create_group_chat(name, contacts)
 
     #
     # configuration related API

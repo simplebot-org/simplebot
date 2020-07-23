@@ -38,7 +38,7 @@ if __name__ == "__main__":
             deltabot.pytestplugin=deltabot.pytestplugin
         ''',
         python_requires='>=3.5',
-        install_requires=['deltachat>=0.800.1.dev198', 'py'],
+        install_requires=['deltachat>=1.40.1', 'py'],
         include_package_data=True,
         zip_safe=False,
     )

@@ -25,7 +25,10 @@ class DBManager:
     @deltabot_hookimpl
     def deltabot_store_setting(self, key, value):
         old_val = self.deltabot_get_setting(key)
-        self._execute('REPLACE INTO config VALUES (?,?)', (key, value))
+        if value is not None:
+            self._execute('REPLACE INTO config VALUES (?,?)', (key, value))
+        else:
+            self._execute('DELETE FROM config WHERE keyname=?', (key, ))
         return old_val
 
     @deltabot_hookimpl

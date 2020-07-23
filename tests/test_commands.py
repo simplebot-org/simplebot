@@ -113,3 +113,7 @@ class TestArgParsing:
         assert not mocker.replies.has_replies()
         parse_cmd("/some_other", "/unknown", group=False)
         assert mocker.replies.has_replies()
+
+    def test_two_commands_with_same_prefix(self, parse_cmd, mock_bot):
+        assert parse_cmd("/execute", "/execute").cmd_def.cmd == "/execute"
+        assert parse_cmd("/exec", "/exec").cmd_def.cmd == "/exec"

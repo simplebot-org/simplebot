@@ -6,6 +6,7 @@ from deltabot.hookspec import deltabot_hookimpl
 def deltabot_init_parser(parser):
     parser.add_subcommand(db_set)
     parser.add_subcommand(db_get)
+    parser.add_subcommand(db_del)
     parser.add_subcommand(db_list)
 
 
@@ -31,9 +32,25 @@ class db_get:
         scope, key = args.key
         res = bot.get(key, scope=scope)
         if res is None:
-            out.fail("key {} does not exist".format("/".join(args.key)))
+            out.fail("key {}/{} does not exist".format(scope, key))
         else:
             out.line(res)
+
+
+class db_del:
+    """Delete a low level setting."""
+
+    def add_arguments(self, parser):
+        parser.add_argument("key", type=slash_scoped_key, help="low level database key")
+
+    def run(self, bot, args, out):
+        scope, key = args.key
+        res = bot.get(key, scope=scope)
+        if res is None:
+            out.fail("key {}/{} does not exist".format(scope, key))
+        else:
+            bot.delete(key, scope=scope)
+            out.line("key '{}/{}' deleted".format(scope, key))
 
 
 class db_set:
@@ -59,7 +76,12 @@ class db_list:
     def run(self, bot, args, out):
         res = bot.list_settings(args.scope)
         for key, res in res:
-            out.line("{}: {}".format(key, res))
+            if "\n" in res:
+                out.line("{}:".format(key))
+                for line in res.split("\n"):
+                    out.line("   " + line)
+            else:
+                out.line("{}: {}".format(key, res))
 
 
 def command_set(command, replies):

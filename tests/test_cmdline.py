@@ -28,6 +28,11 @@ class TestSettings:
         mycmd.run_ok(["db_list"], """
             global/hello: world
         """)
+        mycmd.run_ok(["db_del", "global/hello"], """
+            *delete*
+        """)
+        out = mycmd.run_ok(["db_list"])
+        assert "hello" not in out
 
 
 class TestInit:
@@ -69,3 +74,15 @@ class TestPluginManagement:
         mycmd.run_ok(["list-plugins"], """
             *deltabot.builtin.*
         """)
+
+    def test_add_del_list_module(self, mycmd, examples):
+        path = examples.join("mycalc.py").strpath
+        mycmd.run_ok(["add-module", path], "*{}*".format(path))
+        mycmd.run_ok(["list-plugins"], """
+            *mycalc.py*
+        """)
+        mycmd.run_ok(["del-module", path], """
+            *removed*1*
+        """)
+        out = mycmd.run_ok(["list-plugins"])
+        assert "mycalc.py" not in out

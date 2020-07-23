@@ -124,6 +124,14 @@ def plugin_manager():
     return make_plugin_manager()
 
 
+@pytest.fixture
+def examples(request):
+    p = request.fspath.dirpath().dirpath().join("examples")
+    if not p.exists():
+        pytest.skip("could not locate examples dir at {}".format(p))
+    return p
+
+
 class CmdlineRunner:
     def __init__(self):
         self._rootargs = ["deltabot"]

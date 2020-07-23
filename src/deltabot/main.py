@@ -34,6 +34,4 @@ def make_bot_from_args(args, plugin_manager, account=None):
         account = Account(db_path, "deltabot/{}".format(sys.platform))
 
     logger = plugin_manager.hook.deltabot_get_logger(args=args)
-    bot = DeltaBot(account, logger, plugin_manager=plugin_manager)
-    plugin_manager.hook.deltabot_init.call_historic(kwargs=dict(bot=bot, args=args))
-    return bot
+    return DeltaBot(account, logger, plugin_manager=plugin_manager, args=args)

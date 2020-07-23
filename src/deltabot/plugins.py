@@ -13,7 +13,7 @@ class Plugins:
 
     def add_module(self, name, module):
         """ add a named deltabot plugin python module. """
-        self.logger.debug("registering new plugin {!r}".format(name))
+        self.logger.debug("registering plugin {!r}".format(name))
         self._pm.register(plugin=module, name=name)
         self._pm.check_pending()
 
