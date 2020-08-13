@@ -61,15 +61,6 @@ class DeltaBot:
                 mod = py.path.local(pymodule).pyimport()
                 self.plugins.add_module(name=os.path.basename(pymodule), module=mod)
 
-        # set some useful bot defaults on the account
-        self.account.update_config(dict(
-            save_mime_headers=1,
-            e2ee_enabled=1,
-            sentbox_watch=0,
-            mvbox_watch=0,
-            bcc_self=0
-        ))
-
     #
     # API for persistent scoped-key/value settings
     #
@@ -159,9 +150,23 @@ class DeltaBot:
         # XXX support reconfiguration (changed password at least)
         assert not self.is_configured()
         assert not self.account.is_started()
+
+        self.account.update_config(dict(
+            addr=email,
+            mail_pw=password,
+            # set some useful bot defaults on the account
+            delete_server_after=1,
+            delete_device_after=60*60,
+            mdns_enabled=0,
+            save_mime_headers=1,
+            e2ee_enabled=1,
+            sentbox_watch=0,
+            mvbox_watch=0,
+            bcc_self=0
+        ))
+
         tracker = ConfigureTracker(self.account)
         with self.account.temp_plugin(tracker) as configtracker:
-            self.account.update_config(dict(addr=email, mail_pw=password))
             self.account.configure()
             try:
                 configtracker.wait_finish()
