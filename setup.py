@@ -1,31 +1,25 @@
 # -*- coding: utf-8 -*-
-import re
-import os
-
 import setuptools
 
 
 if __name__ == "__main__":
-    MODULE_NAME = 'deltabot'
-
     with open('README.rst') as f:
         long_desc = f.read()
 
-
     setuptools.setup(
-        name=MODULE_NAME,
-        description='Deltabot: Extensible bot system for Delta Chat',
+        name='simplebot',
+        description='SimpleBot: Extensible bot for Delta Chat',
         setup_requires=['setuptools_scm'],
-        use_scm_version = True,
+        use_scm_version=True,
         long_description=long_desc,
         long_description_content_type='text/x-rst',
-        author='The Deltabot Contributors',
+        author='The SimpleBot Contributors',
         author_email='adbenitez@nauta.cu, holger@merlinux.eu',
-        url='https://github.com/deltachat-bot/deltabot',
+        url='https://github.com/SimpleBot-Inc/simplebot',
         package_dir={'': 'src'},
-        packages = setuptools.find_packages('src'),
+        packages=setuptools.find_packages('src'),
         classifiers=['Development Status :: 4 - Beta',
-                     'Intended Audience :: Developers',
+                     'Intended Audience :: Users',
                      'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
                      'Operating System :: POSIX',
                      'Operating System :: MacOS :: MacOS X',
@@ -33,7 +27,7 @@ if __name__ == "__main__":
                      'Programming Language :: Python :: 3'],
         entry_points='''
             [console_scripts]
-            deltabot=deltabot.main:main
+            simplebot=deltabot.main:main
             [pytest11]
             deltabot.pytestplugin=deltabot.pytestplugin
         ''',
