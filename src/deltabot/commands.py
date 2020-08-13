@@ -20,13 +20,14 @@ class Commands:
         self._cmd_defs = OrderedDict()
         self.bot.plugins.add_module("commands", self)
 
-    def register(self, name, func):
+    def register(self, name, func, admin=False):
         """ register a command function that acts on each incoming non-system message.
 
         :param name: name of the command, example "/test"
         :param func: function that needs to accept 'command' and 'replies' arguments,
                      namely a :class:`deltabot.command.IncomingCommand`
                      and a :class:`deltabot.bot.Replies` object.
+        :param admin: if True the command will be available for bot administrators only
         """
         short, long = parse_command_docstring(func, args=["command", "replies"])
         for cand_name in iter_underscore_subparts(name):
@@ -38,7 +39,7 @@ class Commands:
                 raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
                                  name, reg_name))
 
-        cmd_def = CommandDef(name, short=short, long=long, func=func)
+        cmd_def = CommandDef(name, short=short, long=long, func=func, admin=admin)
         self._cmd_defs[name] = cmd_def
         self.logger.debug("registered new command {!r}".format(name))
 
@@ -91,10 +92,13 @@ class Commands:
 
     def command_help(self, command, replies):
         """ reply with help message about available commands. """
+        is_admin = self.bot.is_admin(
+            command.message.get_sender_contact().addr)
         l = []
         l.append("**commands**")
         for c in self._cmd_defs.values():
-            l.append("{}: {}".format(c.cmd, c.short))
+            if not c.admin or is_admin:
+                l.append("{}: {}".format(c.cmd, c.short))
         l.append("")
         pm = self.bot.plugins._pm
         plugins = [pm.get_name(plug) for plug, dist in pm.list_plugin_distinfo()]
@@ -104,13 +108,14 @@ class Commands:
 
 class CommandDef:
     """ Definition of a '/COMMAND' with args. """
-    def __init__(self, cmd, short, long, func):
+    def __init__(self, cmd, short, long, func, admin=False):
         if cmd[0] != CMD_PREFIX:
             raise ValueError("cmd {!r} must start with {!r}".format(cmd, CMD_PREFIX))
         self.cmd = cmd
         self.long = long
         self.short = short
         self.func = func
+        self.admin = admin
 
     def __eq__(self, c):
         return c.__dict__ == self.__dict__

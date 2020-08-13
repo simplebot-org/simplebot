@@ -88,3 +88,11 @@ class DeltaBotSpecs:
     @deltabot_hookspec(firstresult=True)
     def deltabot_list_settings(self):
         """ get a list of persistent (key, value) tuples. """
+
+    @deltabot_hookspec
+    def deltabot_ban(self, address):
+        """ When an address have been banned. """
+
+    @deltabot_hookspec
+    def deltabot_unban(self, address):
+        """ When an address have been unbanned. """

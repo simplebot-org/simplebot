@@ -14,6 +14,7 @@ from deltachat.tracker import ConfigureTracker
 from deltachat.message import parse_system_add_remove
 
 from .builtin.cmdline import AddModule
+from .builtin.admin import get_admins
 from .commands import Commands
 from .filters import Filters
 from .plugins import Plugins, get_global_plugin_manager
@@ -60,6 +61,12 @@ class DeltaBot:
             elif pymodule:
                 mod = py.path.local(pymodule).pyimport()
                 self.plugins.add_module(name=os.path.basename(pymodule), module=mod)
+
+    #
+    # API for bot administration
+    #
+    def is_admin(self, addr):
+        return addr in get_admins()
 
     #
     # API for persistent scoped-key/value settings
