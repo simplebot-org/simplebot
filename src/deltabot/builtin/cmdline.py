@@ -19,11 +19,11 @@ def deltabot_init_parser(parser):
         "--version", action="version", version=deltabot_version,
         help="show program's version number and exit"
     )
-    basedir_default = os.path.expanduser(
-        os.environ.get("DELTABOT_BASEDIR", "~/.config/deltabot"))
+    basedir_default = os.environ.get(
+        "DELTABOT_BASEDIR", "~/.config/deltabot")
     parser.add_generic_option(
         "--basedir", action="store", metavar="DIR",
-        default=basedir_default,
+        default=basedir_default, type=os.path.expanduser,
         help="directory for storing all deltabot state")
     parser.add_generic_option("--show-ffi", action="store_true", help="show low level ffi events")
 
