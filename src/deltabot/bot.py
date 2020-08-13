@@ -49,8 +49,15 @@ class DeltaBot:
 
         plugin_manager.hook.deltabot_init.call_historic(kwargs=dict(bot=self, args=args))
         # add manually added python modules as plugins
-        for pymodule in self.get(AddModule.db_key, "").split("\n"):
-            if pymodule:
+        mods = self.get(AddModule.db_key, "").split("\n")
+        while mods:
+            pymodule = mods.pop(0)
+            if os.path.isdir(pymodule) and not os.path.exists(os.path.join(pymodule, '__init__.py')):
+                for m in os.listdir(pymodule):
+                    m = os.path.join(pymodule, m)
+                    if m.endswith('.py') or os.path.isdir(m):
+                        mods.append(m)
+            elif pymodule:
                 mod = py.path.local(pymodule).pyimport()
                 self.plugins.add_module(name=os.path.basename(pymodule), module=mod)
 
