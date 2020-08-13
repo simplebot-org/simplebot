@@ -95,14 +95,14 @@ class Commands:
         is_admin = self.bot.is_admin(
             command.message.get_sender_contact().addr)
         l = []
-        l.append("**commands**")
+        l.append("Commands:\n")
         for c in self._cmd_defs.values():
             if not c.admin or is_admin:
-                l.append("{}: {}".format(c.cmd, c.short))
-        l.append("")
+                l.append("{}: {}\n".format(c.cmd, c.short))
+        l.append("\n")
         pm = self.bot.plugins._pm
         plugins = [pm.get_name(plug) for plug, dist in pm.list_plugin_distinfo()]
-        l.append("enabled plugins: {}".format(" ".join(plugins)))
+        l.append("Enabled Plugins:\n{}".format("\n".join(plugins)))
         replies.add(text="\n".join(l))
 
 
