@@ -139,8 +139,8 @@ def parse_command_docstring(func, args):
         if arg not in funcargs:
             raise ValueError("{!r} needs to accept {!r} argument".format(func, arg))
 
-    lines = description.strip().split("\n")
-    return lines.pop(0), "\n".join(lines).strip()
+    lines = description.strip().split("\n", maxsplit=1)
+    return lines.pop(0), ''.join(lines).strip()
 
 
 def iter_underscore_subparts(name):
