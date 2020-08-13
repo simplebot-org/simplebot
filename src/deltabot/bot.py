@@ -154,8 +154,7 @@ class DeltaBot:
 
     def perform_configure_address(self, email, password):
         """ perform initial email/password bot account configuration.  """
-        # XXX support reconfiguration (changed password at least)
-        assert not self.is_configured()
+        assert not self.is_configured() or self.account.get_config("addr") == email
         assert not self.account.is_started()
 
         self.account.update_config(dict(
