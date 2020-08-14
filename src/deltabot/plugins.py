@@ -55,5 +55,5 @@ def make_plugin_manager():
     pm.register(plugin=log, name=".builtin.log")
     pm.check_pending()
     # register setuptools modules
-    pm.load_setuptools_entrypoints("deltabot.plugins")
+    pm.load_setuptools_entrypoints("simplebot.plugins")
     return pm
