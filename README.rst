@@ -56,7 +56,7 @@ If you know how to code in Python, you can quickly create plugins and install th
 
     $ simplebot add-module ~/my_plugins/server_stats.py
 
-See the `examples` folder to see some examples about how to create plugins this way.
+Check the `examples` folder to see some examples about how to create plugins this way.
 
 
 Note for users
