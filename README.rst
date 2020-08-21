@@ -3,51 +3,50 @@ SimpleBot
 
 An extensible Delta Chat bot. 
 
-Install
--------
+Quick Start: Running a bot+plugins in 7 steps
+---------------------------------------------
 
-To install SimpleBot run the following command (preferably in a ``virtualenv``):
+1. Declare bot address and password::
 
-.. code-block:: bash
+     $ ADDR='bot@example.com'
+     $ PASSWORD='myPassword'
 
-   $ pip3 install simplebot
+2. Create and activate virtual environment (Optional but recommended)::
 
-Try typing "simplebot --version" to verify it worked.
+     $ python3 -m venv ~/.venvs/`echo $ADDR|tr "@" "_"`
+     $ source ~/.venvs/`echo $ADDR|tr "@" "_"`/bin/activate
+     $ pip3 install -U pip wheel
 
-.. note::
+3. Install deltachat's python bindings::
 
-    SimpleBot requires Delta Chat's Python bindings.  On Linux bindings
-    have pre-built binary wheels and thus the above deltabot install should just work.
-    On other platforms you need to install the bindings from source, see
-    `deltachat Python bindings readme <https://github.com/deltachat/deltachat-core-rust/tree/master/python>`_.
+     $ pip3 install -U -i https://m.devpi.net/dc/master deltachat
 
+4. Install simplebot::
 
-Initialize the bot
-------------------
+     $ git clone https://github.com/simplebot-inc/simplebot
+     $ pip3 install ./simplebot
 
-Configure an e-mail address for your chat bot (using example credentials)::
+5. Install some plugins::
 
-    simplebot init tmp.vd9dd@testrun.org OzrSxdx5hiaD
+     $ git clone https://github.com/simplebot-inc/simplebot_plugins
+     $ python3 simplebot_plugins/scripts/install_plugin.py
 
+6. Configure bot::
 
-Running the bot
----------------
+     $ simplebot --basedir ~/bots/`echo $ADDR|tr "@" "_"` init $ADDR "$PASSWORD"
 
-If initialization ended successfully, now you can run the bot::
+7. Start the bot::
 
-    simplebot serve
-
-Within a Delta Chat app, you may now send a chat `/help` message to
-`tmp.vd9dd@testrun.org` and should get a short list of available commands
-in the reply.
+     $ simplebot --basedir ~/bots/`echo $ADDR|tr "@" "_"` serve
 
 
 Plugins
 -------
 
-SimpleBot is a bit useless without plugins, so once you have your bot working you probably want to install some plugins, for official plugins see:
+SimpleBot is a bit useless without plugins, for official plugins see:
 
 https://github.com/SimpleBot-Inc/simplebot_plugins
+
 
 Installing script plugins
 -------------------------
