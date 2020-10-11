@@ -67,7 +67,9 @@ class Commands:
             newarg = parts.pop()
             args.insert(0, newarg)
             payload = (newarg + " " + payload).rstrip()
-        else:
+
+        if not cmd_def or (cmd_def.admin and not self.bot.is_admin(
+                message.get_sender_contact().addr)):
             reply = "unknown command {!r}".format(orig_cmd_name)
             self.logger.warn(reply)
             if not message.chat.is_group():
