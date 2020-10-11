@@ -90,9 +90,9 @@ class DeltaBotSpecs:
         """ get a list of persistent (key, value) tuples. """
 
     @deltabot_hookspec
-    def deltabot_ban(self, address):
-        """ When an address have been banned. """
+    def deltabot_ban(self, contact):
+        """ When a contact have been banned. """
 
     @deltabot_hookspec
-    def deltabot_unban(self, address):
-        """ When an address have been unbanned. """
+    def deltabot_unban(self, contact):
+        """ When a contact have been unbanned. """

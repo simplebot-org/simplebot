@@ -51,8 +51,11 @@ class list_banned:
 
     def run(self, bot, args, out):
         unban_addr(args.addr)
+        addrs = []
+        for contact in get_banned_list():
+            addrs.append(contact.addr)
         out.line('Banned addresses:\n{}'.format(
-            '\n'.join(get_banned_list()) or '(Empty list)'))
+            '\n'.join(addrs) or '(Empty list)'))
 
 
 class add_admin:
@@ -103,8 +106,11 @@ def cmd_ban(command, replies):
         ban_addr(command.payload)
         replies.add(text='Banned: {}'.format(command.payload))
     else:
+        addrs = []
+        for contact in get_banned_list():
+            addrs.append(contact.addr)
         replies.add(text='Banned addresses:\n{}'.format(
-            '\n'.join(get_banned_list()) or '(Empty list)'))
+            '\n'.join(addrs) or '(Empty list)'))
 
 
 def cmd_unban(command, replies):
@@ -117,18 +123,24 @@ def cmd_unban(command, replies):
     replies.add(text='Unbanned: {}'.format(command.payload))
 
 
-def ban_addr(addr):
-    # TODO: block contact
-    dbot.plugins._pm.hook.deltabot_ban(addr)
+def ban_addr(addr) -> None:
+    contact = dbot.get_contact(addr)
+    contact.set_blocked()
+    dbot.plugins._pm.hook.deltabot_ban(contact)
 
 
-def unban_addr(addr):
-    # TODO: unblock contact
-    dbot.plugins._pm.hook.deltabot_unban(addr)
+def unban_addr(addr) -> None:
+    contact = dbot.get_contact(addr)
+    contact.set_blocked(False)
+    dbot.plugins._pm.hook.deltabot_unban(contact)
 
 
-def get_banned_list():
-    return []  # TODO
+def get_banned_list() -> list:
+    blacklist = []
+    for contact in dbot.account.get_contacts():
+        if contact.is_blocked():
+            blacklist.append(contact)
+    return blacklist
 
 
 def get_admins():
