@@ -126,13 +126,13 @@ def cmd_unban(command, replies):
 def ban_addr(addr) -> None:
     contact = dbot.get_contact(addr)
     contact.set_blocked()
-    dbot.plugins._pm.hook.deltabot_ban(contact)
+    dbot.plugins._pm.hook.deltabot_ban(contact=contact)
 
 
 def unban_addr(addr) -> None:
     contact = dbot.get_contact(addr)
     contact.set_blocked(False)
-    dbot.plugins._pm.hook.deltabot_unban(contact)
+    dbot.plugins._pm.hook.deltabot_unban(contact=contact)
 
 
 def get_banned_list() -> list:
