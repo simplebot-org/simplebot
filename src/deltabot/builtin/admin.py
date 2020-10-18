@@ -50,7 +50,6 @@ class list_banned:
         pass
 
     def run(self, bot, args, out):
-        unban_addr(args.addr)
         addrs = []
         for contact in get_banned_list():
             addrs.append(contact.addr)
@@ -125,7 +124,7 @@ def cmd_unban(command, replies):
 
 def ban_addr(addr) -> None:
     contact = dbot.get_contact(addr)
-    contact.set_blocked()
+    contact.set_blocked(True)
     dbot.plugins._pm.hook.deltabot_ban(contact=contact)
 
 
