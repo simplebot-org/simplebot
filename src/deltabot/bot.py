@@ -66,7 +66,7 @@ class DeltaBot:
     # API for bot administration
     #
     def is_admin(self, addr):
-        return addr in get_admins()
+        return addr in get_admins(self)
 
     #
     # API for persistent scoped-key/value settings

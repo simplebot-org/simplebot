@@ -14,9 +14,6 @@ def deltabot_init_parser(parser):
 
 @deltabot_hookimpl
 def deltabot_init(bot):
-    global dbot
-    dbot = bot
-
     bot.commands.register(name="/ban", func=cmd_ban, admin=True)
     bot.commands.register(name="/unban", func=cmd_unban, admin=True)
 
@@ -28,7 +25,7 @@ class ban:
         parser.add_argument("addr", help="email address to ban")
 
     def run(self, bot, args, out):
-        ban_addr(args.addr)
+        ban_addr(bot, args.addr)
         out.line('Banned: {}'.format(args.addr))
 
 
@@ -39,7 +36,7 @@ class unban:
         parser.add_argument("addr", help="email address to unban")
 
     def run(self, bot, args, out):
-        unban_addr(args.addr)
+        unban_addr(bot, args.addr)
         out.line('Unbanned: {}'.format(args.addr))
 
 
@@ -50,11 +47,7 @@ class list_banned:
         pass
 
     def run(self, bot, args, out):
-        addrs = []
-        for contact in get_banned_list():
-            addrs.append(contact.addr)
-        out.line('Banned addresses:\n{}'.format(
-            '\n'.join(addrs) or '(Empty list)'))
+        out.line(get_banned_list(bot))
 
 
 class add_admin:
@@ -90,7 +83,7 @@ class list_admin:
         pass
 
     def run(self, bot, args, out):
-        out.line('Administrator addresses:\n{}'.format(
+        out.line('Administrators:\n{}'.format(
             bot.get(self.db_key, default='(Empty list)')))
 
 
@@ -102,14 +95,10 @@ def cmd_ban(command, replies):
     /ban
     """
     if '@' in command.payload:
-        ban_addr(command.payload)
+        ban_addr(command.bot, command.payload)
         replies.add(text='Banned: {}'.format(command.payload))
     else:
-        addrs = []
-        for contact in get_banned_list():
-            addrs.append(contact.addr)
-        replies.add(text='Banned addresses:\n{}'.format(
-            '\n'.join(addrs) or '(Empty list)'))
+        replies.add(text=get_banned_list(command.bot))
 
 
 def cmd_unban(command, replies):
@@ -118,35 +107,34 @@ def cmd_unban(command, replies):
     Examples:
     /unban foo@example.com
     """
-    unban_addr(command.payload)
+    unban_addr(command.bot, command.payload)
     replies.add(text='Unbanned: {}'.format(command.payload))
 
 
-def ban_addr(addr) -> None:
-    contact = dbot.get_contact(addr)
-    contact.set_blocked(True)
-    dbot.plugins._pm.hook.deltabot_ban(contact=contact)
+def ban_addr(bot, addr: str) -> None:
+    contact = bot.get_contact(addr)
+    contact.block()
+    bot.plugins._pm.hook.deltabot_ban(contact=contact)
 
 
-def unban_addr(addr) -> None:
-    contact = dbot.get_contact(addr)
-    contact.set_blocked(False)
-    dbot.plugins._pm.hook.deltabot_unban(contact=contact)
+def unban_addr(bot, addr: str) -> None:
+    contact = bot.get_contact(addr)
+    contact.unblock()
+    bot.plugins._pm.hook.deltabot_unban(contact=contact)
 
 
-def get_banned_list() -> list:
-    blacklist = []
-    for contact in dbot.account.get_contacts():
-        if contact.is_blocked():
-            blacklist.append(contact)
-    return blacklist
+def get_banned_list(bot) -> str:
+    addrs = []
+    for contact in bot.account.get_blocked_contacts():
+        addrs.append(contact.addr)
+    return 'Banned addresses:\n{}'.format('\n'.join(addrs) or '(Empty list)')
 
 
-def get_admins():
-    return dbot.get('administrators', default='').split('\n')
+def get_admins(bot):
+    return bot.get('administrators', default='').split('\n')
 
 
-class TestCommandSettings:
+class TestCommandAdmin:
     def test_mock_cmd_ban(self, mocker):
         reply_msg = mocker.run_command("/ban foo@example.com")
         assert reply_msg.text.lower().startswith("banned:")
