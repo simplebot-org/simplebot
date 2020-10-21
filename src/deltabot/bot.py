@@ -216,6 +216,12 @@ class CheckAll:
         logger = self.bot.logger
         logger.info("CheckAll perform-loop start")
         for message in self.bot.account.get_fresh_messages():
+            if message.get_sender_contact().is_blocked():
+                message.mark_seen()
+                logger.info(
+                    "Received message from blocked contact {}:{}".format(
+                        message.get_sender_contact().addr, message.text))
+                continue
             try:
                 replies = Replies(message, logger=logger)
                 logger.info("processing incoming fresh message id={}".format(message.id))
