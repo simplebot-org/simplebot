@@ -216,12 +216,6 @@ class CheckAll:
         logger = self.bot.logger
         logger.info("CheckAll perform-loop start")
         for message in self.bot.account.get_fresh_messages():
-            if message.get_sender_contact().is_blocked():
-                message.mark_seen()
-                logger.info(
-                    "Received message from blocked contact {}:{}".format(
-                        message.get_sender_contact().addr, message.text))
-                continue
             try:
                 replies = Replies(message, logger=logger)
                 logger.info("processing incoming fresh message id={}".format(message.id))
@@ -289,6 +283,12 @@ class IncomingEventHandler:
     def ac_incoming_message(self, message):
         # we always accept incoming messages to remove the need  for
         # bot authors to having to deal with deaddrop/contact requests.
+        if message.get_sender_contact().is_blocked():
+            message.mark_seen()
+            self.logger.info(
+                "Received message from blocked contact {}: {}".format(
+                    message.get_sender_contact().addr, message.text[:50]))
+            return
         message.create_chat()
         self.logger.info("incoming message from {} id={} chat={} text={!r}".format(
             message.get_sender_contact().addr,
