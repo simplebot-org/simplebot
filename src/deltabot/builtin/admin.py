@@ -113,8 +113,8 @@ def cmd_unban(command, replies):
 
 def ban_addr(bot, addr: str) -> None:
     contact = bot.get_contact(addr)
-    contact.block()
     bot.plugins._pm.hook.deltabot_ban(contact=contact)
+    contact.block()
 
 
 def unban_addr(bot, addr: str) -> None:
