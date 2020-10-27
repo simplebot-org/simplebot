@@ -160,6 +160,7 @@ class DeltaBot:
         self.account.update_config(dict(
             addr=email,
             mail_pw=password,
+            bot=1,
             # set some useful bot defaults on the account
             delete_server_after=1,
             delete_device_after=60*60,
