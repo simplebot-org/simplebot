@@ -33,7 +33,8 @@ class Filters:
         for name, filter_def in self._filter_defs.items():
             self.logger.debug("calling filter {!r} on message id={}".format(name, message.id))
             res = filter_def.func(message=message, replies=replies)
-            assert res is None
+            if res is not None:
+                break
 
 
 class FilterDef:
