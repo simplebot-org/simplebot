@@ -260,6 +260,7 @@ class IncomingEventHandler:
         self.plugins = bot.plugins
         self.bot.account.add_account_plugin(self)
         self._needs_check = threading.Event()
+        self._needs_check.set()
         self._running = True
 
     def start(self):
