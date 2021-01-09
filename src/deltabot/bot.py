@@ -235,7 +235,7 @@ class CheckAll:
                 logger.exception("processing message={} failed: {}".format(
                     message.id, ex))
             logger.info("processing message id={} FINISHED".format(message.id))
-            self.db.pop_msg(msg)
+            self.db.pop_msg(msg_id)
         logger.info("CheckAll perform-loop finish")
 
     def handle_system_message(self, message, replies):
@@ -260,7 +260,6 @@ class IncomingEventHandler:
         self.bot = bot
         self.logger = bot.logger
         self.plugins = bot.plugins
-        self.db = self.plugins._pm.get_plugin('db')
         self.bot.account.add_account_plugin(self)
         self._needs_check = threading.Event()
         self._needs_check.set()
@@ -268,6 +267,7 @@ class IncomingEventHandler:
 
     def start(self):
         self.logger.info("starting bot-event-handler THREAD")
+        self.db = self.bot.plugins._pm.get_plugin(name='db')
         self._thread = t = threading.Thread(target=self.event_worker, name="bot-event-handler")
         t.setDaemon(1)
         t.start()

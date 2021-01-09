@@ -34,10 +34,10 @@ class DBManager:
     def pop_msg(self, msg_id: int) -> None:
         with self.db:
             self.db.execute(
-                'DELETE msgs WHERE id=?', (msg_id,))
+                'DELETE FROM msgs WHERE id=?', (msg_id,))
 
     def get_msgs(self) -> list:
-        return self.db.execute('SELECT * FROM msgs').fetchall()
+        return [r[0] for r in self.db.execute('SELECT * FROM msgs').fetchall()]
 
     @deltabot_hookimpl
     def deltabot_store_setting(self, key, value):
