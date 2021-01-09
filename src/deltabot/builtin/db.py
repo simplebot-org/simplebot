@@ -28,8 +28,8 @@ class DBManager:
 
     def put_msg(self, msg_id: int) -> None:
         with self.db:
-            return self.db.execute(
-                'REPLACE INTO msgs VALUES (?)', (msg_id,))
+            self.db.execute(
+                'INSERT INTO msgs VALUES (?)', (msg_id,))
 
     def pop_msg(self, msg_id: int) -> None:
         with self.db:
