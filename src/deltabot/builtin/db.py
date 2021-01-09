@@ -14,13 +14,30 @@ class DBManager:
     def __init__(self, db_path):
         self.db = sqlite3.connect(db_path, check_same_thread=False)
         self.db.row_factory = sqlite3.Row
-        self._execute('''CREATE TABLE IF NOT EXISTS config
-                        (keyname TEXT PRIMARY KEY,
-                         value TEXT)''')
+        with self.db:
+            self.db.execute(
+                'CREATE TABLE IF NOT EXISTS config'
+                ' (keyname TEXT PRIMARY KEY,value TEXT)')
+            self.db.execute(
+                'CREATE TABLE IF NOT EXISTS msgs'
+                ' (id INTEGER PRIMARY KEY)')
 
     def _execute(self, statement, args=()):
         with self.db:
             return self.db.execute(statement, args)
+
+    def put_msg(self, msg_id: int) -> None:
+        with self.db:
+            return self.db.execute(
+                'REPLACE INTO msgs VALUES (?)', (msg_id,))
+
+    def pop_msg(self, msg_id: int) -> None:
+        with self.db:
+            self.db.execute(
+                'DELETE msgs WHERE id=?', (msg_id,))
+
+    def get_msgs(self) -> list:
+        return self.db.execute('SELECT * FROM msgs').fetchall()
 
     @deltabot_hookimpl
     def deltabot_store_setting(self, key, value):

@@ -210,13 +210,15 @@ class DeltaBot:
 
 
 class CheckAll:
-    def __init__(self, bot):
+    def __init__(self, bot, db):
         self.bot = bot
+        self.db = db
 
     def perform(self):
         logger = self.bot.logger
         logger.info("CheckAll perform-loop start")
-        for message in self.bot.account.get_fresh_messages():
+        for msg_id in self.db.get_msgs():
+            message = self.bot.account.get_message_by_id(msg_id)
             try:
                 replies = Replies(message, logger=logger)
                 logger.info("processing incoming fresh message id={}".format(message.id))
@@ -233,7 +235,7 @@ class CheckAll:
                 logger.exception("processing message={} failed: {}".format(
                     message.id, ex))
             logger.info("processing message id={} FINISHED".format(message.id))
-            message.mark_seen()
+            self.db.pop_msg(msg)
         logger.info("CheckAll perform-loop finish")
 
     def handle_system_message(self, message, replies):
@@ -258,6 +260,7 @@ class IncomingEventHandler:
         self.bot = bot
         self.logger = bot.logger
         self.plugins = bot.plugins
+        self.db = self.plugins._pm.get_plugin('db')
         self.bot.account.add_account_plugin(self)
         self._needs_check = threading.Event()
         self._needs_check.set()
@@ -279,7 +282,7 @@ class IncomingEventHandler:
         while self._running:
             self._needs_check.wait()
             self._needs_check.clear()
-            CheckAll(self.bot).perform()
+            CheckAll(self.bot, self.db).perform()
 
     @account_hookimpl
     def ac_incoming_message(self, message):
@@ -290,7 +293,8 @@ class IncomingEventHandler:
             message.get_sender_contact().addr,
             message.id, message.chat.id, message.text[:50]))
 
-        # message is now in fresh state, schedule a check
+        self.db.put_msg(message.id)
+        # message is now in DB, schedule a check
         self._needs_check.set()
 
     @account_hookimpl
