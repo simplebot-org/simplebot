@@ -22,10 +22,6 @@ class DBManager:
                 'CREATE TABLE IF NOT EXISTS msgs'
                 ' (id INTEGER PRIMARY KEY)')
 
-    def _execute(self, statement, args=()):
-        with self.db:
-            return self.db.execute(statement, args)
-
     def put_msg(self, msg_id: int) -> None:
         with self.db:
             self.db.execute(
@@ -41,20 +37,23 @@ class DBManager:
 
     @deltabot_hookimpl
     def deltabot_store_setting(self, key, value):
-        if value is not None:
-            self._execute('REPLACE INTO config VALUES (?,?)', (key, value))
-        else:
-            self._execute('DELETE FROM config WHERE keyname=?', (key, ))
+        with self.db:
+            if value is not None:
+                self.db.execute(
+                    'REPLACE INTO config VALUES (?,?)', (key, value))
+            else:
+                self.db.execute(
+                    'DELETE FROM config WHERE keyname=?', (key, ))
 
     @deltabot_hookimpl
     def deltabot_get_setting(self, key):
-        row = self._execute(
+        row = self.db.execute(
             'SELECT * FROM config WHERE keyname=?', (key,)).fetchone()
         return row and row['value']
 
     @deltabot_hookimpl
     def deltabot_list_settings(self):
-        rows = self._execute('SELECT * FROM config').fetchall()
+        rows = self.db.execute('SELECT * FROM config').fetchall()
         return [(row['keyname'], row["value"]) for row in rows]
 
     @deltabot_hookimpl
