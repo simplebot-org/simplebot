@@ -12,7 +12,8 @@ def deltabot_init(bot):
 
 class DBManager:
     def __init__(self, db_path):
-        self.db = sqlite3.connect(db_path, check_same_thread=False)
+        self.db = sqlite3.connect(
+            db_path, check_same_thread=False, isolation_level=None)
         self.db.row_factory = sqlite3.Row
         with self.db:
             self.db.execute(
