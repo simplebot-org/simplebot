@@ -297,16 +297,19 @@ class IncomingEventHandler:
         # message is now in DB, schedule a check
         self._needs_check.set()
 
+    # @account_hookimpl
+    # def ac_chat_modified(self, message):
+    #     self.db.put_msg(message.id)
+    #     self._needs_check.set()
+
     @account_hookimpl
-    def ac_chat_modified(self):
+    def ac_member_removed(self, message):
+        self.db.put_msg(message.id)
         self._needs_check.set()
 
     @account_hookimpl
-    def ac_member_removed(self):
-        self._needs_check.set()
-
-    @account_hookimpl
-    def ac_member_added(self):
+    def ac_member_added(self, message):
+        self.db.put_msg(message.id)
         self._needs_check.set()
 
     @account_hookimpl
