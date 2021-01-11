@@ -97,7 +97,7 @@ class Commands:
         is_admin = self.bot.is_admin(
             command.message.get_sender_contact().addr)
         l = []
-        l.append("🖲️ Commands:\n")
+        l.append("➡️ Commands:\n")
         for c in self._cmd_defs.values():
             if not c.admin or is_admin:
                 l.append("{}: {}\n".format(c.cmd, c.short))
