@@ -327,7 +327,7 @@ class Replies:
     def has_replies(self):
         return bool(self._replies)
 
-    def add(self, text=None, filename=None, bytefile=None, chat=None):
+    def add(self, text=None, filename=None, bytefile=None, chat=None, quote=None):
         """ Add a text or file-based reply. """
         if bytefile:
             if not filename:
@@ -335,7 +335,7 @@ class Replies:
             if os.path.basename(filename) != filename:
                 raise ValueError("if bytefile is specified, filename must a basename, not path")
 
-        self._replies.append((text, filename, bytefile, chat))
+        self._replies.append((text, filename, bytefile, chat, quote))
 
     def send_reply_messages(self):
         tempdir = tempfile.mkdtemp() if any(x[2] for x in self._replies) else None
@@ -351,7 +351,7 @@ class Replies:
         return l
 
     def _send_replies_to_core(self, tempdir):
-        for text, filename, bytefile, chat in self._replies:
+        for text, filename, bytefile, chat, quote in self._replies:
             if bytefile:
                 # XXX avoid double copy -- core will copy this file another time
                 # XXX maybe also avoid loading the file into RAM but it's max 50MB
@@ -364,6 +364,8 @@ class Replies:
             else:
                 view_type = "text"
             msg = Message.new_empty(self.incoming_message.account, view_type)
+            if quote is not None:
+                msg.quote = quote
             if text is not None:
                 msg.set_text(text)
             if filename is not None:
