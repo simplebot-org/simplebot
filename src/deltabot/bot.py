@@ -224,7 +224,7 @@ class CheckAll:
                 logger.info("processing incoming fresh message id={}".format(message.id))
                 if message.is_system_message():
                     self.handle_system_message(message, replies)
-                else:
+                elif not message.get_sender_contact().is_blocked():
                     self.bot.plugins.hook.deltabot_incoming_message(
                         message=message,
                         bot=self.bot,
