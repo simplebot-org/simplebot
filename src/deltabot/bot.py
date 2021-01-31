@@ -155,7 +155,6 @@ class DeltaBot:
     def perform_configure_address(self, email, password):
         """ perform initial email/password bot account configuration.  """
         assert not self.is_configured() or self.account.get_config("addr") == email
-        assert not self.account.is_started()
 
         self.account.update_config(dict(
             addr=email,
@@ -194,8 +193,7 @@ class DeltaBot:
         addr = self.account.get_config("addr")
         self.logger.info("bot listening at: {}".format(addr))
         self._eventhandler.start()
-        if not self.account.is_started():
-            self.account.start_io()
+        self.account.start_io()
 
     def wait_shutdown(self):
         """ Wait and block until bot account is shutdown. """
