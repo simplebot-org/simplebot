@@ -10,6 +10,8 @@ import py
 import deltachat as dc
 from deltachat import account_hookimpl
 from deltachat import Message, Contact
+from deltachat.capi import lib
+from deltachat.cutil import as_dc_charpointer
 from deltachat.tracker import ConfigureTracker
 from deltachat.message import parse_system_add_remove
 
@@ -325,7 +327,7 @@ class Replies:
     def has_replies(self):
         return bool(self._replies)
 
-    def add(self, text=None, filename=None, bytefile=None, chat=None, quote=None):
+    def add(self, text=None, html=None, filename=None, bytefile=None, quote=None, chat=None):
         """ Add a text or file-based reply. """
         if bytefile:
             if not filename:
@@ -333,7 +335,7 @@ class Replies:
             if os.path.basename(filename) != filename:
                 raise ValueError("if bytefile is specified, filename must a basename, not path")
 
-        self._replies.append((text, filename, bytefile, chat, quote))
+        self._replies.append((text, filename, bytefile, chat, quote, html))
 
     def send_reply_messages(self):
         tempdir = tempfile.mkdtemp() if any(x[2] for x in self._replies) else None
@@ -349,7 +351,7 @@ class Replies:
         return l
 
     def _send_replies_to_core(self, tempdir):
-        for text, filename, bytefile, chat, quote in self._replies:
+        for text, filename, bytefile, chat, quote, html in self._replies:
             if bytefile:
                 # XXX avoid double copy -- core will copy this file another time
                 # XXX maybe also avoid loading the file into RAM but it's max 50MB
@@ -366,6 +368,8 @@ class Replies:
                 msg.quote = quote
             if text is not None:
                 msg.set_text(text)
+            if html is not None:
+                lib.dc_msg_set_html(msg._dc_msg, as_dc_charpointer(html))
             if filename is not None:
                 msg.set_file(filename)
             if chat is None:
