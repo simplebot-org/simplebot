@@ -3,10 +3,10 @@ SimpleBot
 
 An extensible Delta Chat bot. 
 
-Quick Start: Running a bot+plugins in 7 steps
----------------------------------------------
+Quick Start: Running a bot+plugins
+----------------------------------
 
-1. Declare bot address and password::
+1. Declare bot address and password (optional)::
 
      $ ADDR='bot@example.com'
      $ PASSWORD='myPassword'
@@ -19,21 +19,20 @@ Quick Start: Running a bot+plugins in 7 steps
 
 3. Install deltachat's python bindings::
 
-     $ pip3 install -U -i https://m.devpi.net/dc/master deltachat
+     $ pip3 install --pre -U -i https://m.devpi.net/dc/master deltachat
 
 4. Install simplebot::
 
-     $ git clone https://github.com/simplebot-inc/simplebot
-     $ pip3 install ./simplebot
+     $ pip3 install https://github.com/simplebot-inc/simplebot/archive/master.zip
 
-5. Install some plugins::
+5. Configure bot::
+
+     $ simplebot --basedir ~/bots/`echo $ADDR|tr "@" "_"` init $ADDR "$PASSWORD"
+
+6. Install some plugins::
 
      $ git clone https://github.com/simplebot-inc/simplebot_plugins
      $ python3 simplebot_plugins/scripts/install_plugin.py
-
-6. Configure bot::
-
-     $ simplebot --basedir ~/bots/`echo $ADDR|tr "@" "_"` init $ADDR "$PASSWORD"
 
 7. Start the bot::
 
