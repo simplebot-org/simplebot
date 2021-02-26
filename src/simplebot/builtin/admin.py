@@ -7,9 +7,7 @@ def deltabot_init_parser(parser):
     parser.add_subcommand(ban)
     parser.add_subcommand(unban)
     parser.add_subcommand(list_banned)
-    parser.add_subcommand(add_admin)
-    parser.add_subcommand(del_admin)
-    parser.add_subcommand(list_admin)
+    parser.add_subcommand(AdminCmd)
 
 
 @deltabot_hookimpl
@@ -50,39 +48,43 @@ class list_banned:
         out.line(get_banned_list(bot))
 
 
-class add_admin:
-    """Grant administrator rights to an address."""
-
-    db_key = "administrators"
+class AdminCmd:
+    """Administrator tools."""
+    name = 'admin'
+    db_key = 'administrators'
 
     def add_arguments(self, parser):
         parser.add_argument("addr", help="email address")
+        parser.add_argument(
+            "--add", help="grant administrator rights to an address.",
+            metavar="ADDR")
+        parser.add_argument(
+            "--del", help="revoke administrator rights to an address.",
+            metavar="ADDR", dest='_del')
+        parser.add_argument(
+            "--list", help="list administrators.",
+            action='store_true')
 
     def run(self, bot, args, out):
+        if args.add:
+            self._add(bot, args.add)
+        elif args._del:
+            self._del(bot, args._del)
+        else:
+            self._list(bot, out)
+
+    def _add(self, bot, addr):
         existing = list(x for x in bot.get(self.db_key, default="").split("\n") if x.strip())
-        assert "," not in args.addr
-        existing.append(args.addr)
+        assert "," not in addr
+        existing.append(addr)
         bot.set(self.db_key, "\n".join(existing))
 
-
-class del_admin(add_admin):
-    """Revoke administrator rights to an address."""
-
-    def run(self, bot, args, out):
+    def _del(self, bot, addr):
         existing = list(x for x in bot.get(self.db_key, default="").split("\n") if x.strip())
-        existing.remove(args.addr)
+        existing.remove(addr)
         bot.set(self.db_key, "\n".join(existing))
 
-
-class list_admin:
-    """List addresses with administrator rights."""
-
-    db_key = "administrators"
-
-    def add_arguments(self, parser):
-        pass
-
-    def run(self, bot, args, out):
+    def _list(self, bot, out):
         out.line('Administrators:\n{}'.format(
             bot.get(self.db_key, default='(Empty list)')))
 

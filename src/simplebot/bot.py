@@ -15,7 +15,7 @@ from deltachat.cutil import as_dc_charpointer
 from deltachat.tracker import ConfigureTracker
 from deltachat.message import parse_system_add_remove
 
-from .builtin.cmdline import AddModule
+from .builtin.cmdline import PluginCmd
 from .builtin.admin import get_admins
 from .commands import Commands
 from .filters import Filters
@@ -52,7 +52,7 @@ class DeltaBot:
 
         plugin_manager.hook.deltabot_init.call_historic(kwargs=dict(bot=self, args=args))
         # add manually added python modules as plugins
-        mods = self.get(AddModule.db_key, "").split("\n")
+        mods = self.get(PluginCmd.db_key, '').split('\n')
         while mods:
             pymodule = mods.pop(0)
             if os.path.isdir(pymodule) and not os.path.exists(os.path.join(pymodule, '__init__.py')):

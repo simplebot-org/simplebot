@@ -4,10 +4,8 @@ from ..hookspec import deltabot_hookimpl
 
 @deltabot_hookimpl
 def deltabot_init_parser(parser):
-    parser.add_subcommand(db_set)
-    parser.add_subcommand(db_get)
-    parser.add_subcommand(db_del)
-    parser.add_subcommand(db_list)
+    parser.add_subcommand(db_cmd)
+    parser.add_subcommand(set_avatar)
 
 
 @deltabot_hookimpl
@@ -22,66 +20,71 @@ def slash_scoped_key(key):
     return (key[:i], key[i + 1:])
 
 
-class db_get:
-    """Get a low level setting."""
-
+class set_avatar:
+    """set bot avatar."""
     def add_arguments(self, parser):
-        parser.add_argument("key", type=slash_scoped_key, help="low level database key")
+        parser.add_argument('avatar', metavar='PATH', type=str,
+                            help='path to the avatar image.')
 
     def run(self, bot, args, out):
-        scope, key = args.key
+        bot.account.set_avatar(args.avatar)
+
+
+class db_cmd:
+    """low level settings."""
+    name = 'db'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--list", help="list all key,values.", metavar='SCOPE',
+            nargs='?')
+        parser.add_argument(
+            "--get", help="get a low level setting.", metavar="KEY",
+            type=slash_scoped_key)
+        parser.add_argument(
+            "--set", help="set a low level setting.",
+            metavar=('KEY', 'VALUE'), nargs=2)
+        parser.add_argument(
+            "--del", help="delete a low level setting.", metavar="KEY",
+            type=slash_scoped_key, dest='_del')
+
+    def run(self, bot, args, out):
+        if args.get:
+            self._get(bot, *args.get, out)
+        elif args._del:
+            self._del(bot, *args._del, out)
+        elif args.set:
+            self._set(bot, *args.set)
+        else:
+            self._list(bot, args.list, out)
+
+    def _get(self, bot, scope, key, out):
         res = bot.get(key, scope=scope)
         if res is None:
             out.fail("key {}/{} does not exist".format(scope, key))
         else:
             out.line(res)
 
+    def _set(self, bot, key, value):
+        scope, key = slash_scoped_key(key)
+        bot.set(key, value, scope=scope)
 
-class db_del:
-    """Delete a low level setting."""
-
-    def add_arguments(self, parser):
-        parser.add_argument("key", type=slash_scoped_key, help="low level database key")
-
-    def run(self, bot, args, out):
-        scope, key = args.key
-        res = bot.get(key, scope=scope)
-        if res is None:
-            out.fail("key {}/{} does not exist".format(scope, key))
-        else:
-            bot.delete(key, scope=scope)
-            out.line("key '{}/{}' deleted".format(scope, key))
-
-
-class db_set:
-    """Set a low level setting."""
-
-    def add_arguments(self, parser):
-        parser.add_argument("key", type=slash_scoped_key, help="low level database key")
-        parser.add_argument("value", type=str, help="low level key value")
-
-    def run(self, bot, args, out):
-        scope, key = args.key
-        bot.set(key, args.value, scope=scope)
-
-
-class db_list:
-    """List all key,values. """
-
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--scope", type=str,
-            help="slash-terminated scope of db key", default=None)
-
-    def run(self, bot, args, out):
-        res = bot.list_settings(args.scope)
-        for key, res in res:
+    def _list(self, bot, scope, out):
+        for key, res in bot.list_settings(scope):
             if "\n" in res:
                 out.line("{}:".format(key))
                 for line in res.split("\n"):
                     out.line("   " + line)
             else:
                 out.line("{}: {}".format(key, res))
+
+    def _del(self, bot, scope, key, out):
+        res = bot.get(key, scope=scope)
+        if res is None:
+            out.fail("key {}/{} does not exist".format(scope, key))
+        else:
+            bot.delete(key, scope=scope)
+            out.line("key '{}/{}' deleted".format(scope, key))
 
 
 def command_set(command, replies):

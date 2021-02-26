@@ -12,7 +12,7 @@ and web-serving of Delta Chat Bots.  New sub commands may be added via plugins.
 
 class MyArgumentParser(argparse.ArgumentParser):
     class ArgumentError(Exception):
-        """ and error from the argparse subsystem. """
+        """ an error from the argparse subsystem. """
 
     def error(self, error):
         """raise errors instead of printing and raising SystemExit"""
