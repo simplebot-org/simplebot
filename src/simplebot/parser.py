@@ -29,7 +29,7 @@ class MyArgumentParser(argparse.ArgumentParser):
         action.inipath = inipath
 
     def add_subcommand(self, cls):
-        """ Add a subcommand to deltabot. """
+        """ Add a subcommand to simplebot. """
         if not hasattr(self, "subparsers"):
             raise ValueError("can not add sub command to subcommand")
         doc, description = parse_docstring(cls.__doc__)
@@ -50,7 +50,7 @@ class MyArgumentParser(argparse.ArgumentParser):
         subparser.set_defaults(subcommand_instance=inst)
 
     def _merge_ini(self):
-        p = os.path.join(self.basedir, "deltabot.ini")
+        p = os.path.join(self.basedir, "bot.ini")
         if os.path.exists(p):
             cfg = py.iniconfig.IniConfig(p)
             for action in self._actions:
@@ -118,7 +118,7 @@ def try_argcomplete(parser):
 
 
 def get_base_parser(plugin_manager, argv):
-    parser = MyArgumentParser(prog="deltabot", description=main_description)
+    parser = MyArgumentParser(prog="simplebot", description=main_description)
     parser.plugin_manager = plugin_manager
     parser.subparsers = parser.add_subparsers(dest="command")
     parser.generic_options = parser.add_argument_group("generic options")

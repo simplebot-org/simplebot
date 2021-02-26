@@ -36,15 +36,15 @@ class DeltaBot:
         self.logger = logger
 
         #: plugin subsystem for adding/removing plugins and calling plugin hooks
-        #: see :class:`deltabot.plugins.Plugins`
+        #: see :class:`simplebot.plugins.Plugins`
         self.plugins = Plugins(logger=logger, plugin_manager=plugin_manager)
 
         #: commands subsystem for registering/executing commands in incoming messages
-        #: see :class:`deltabot.commands.Commands`
+        #: see :class:`simplebot.commands.Commands`
         self.commands = Commands(self)
 
         #: filter subsystem for registering/performing filters on incoming messages
-        #: see :class:`deltabot.filters.Filters`
+        #: see :class:`simplebot.filters.Filters`
         self.filters = Filters(self)
 
         # process dc events and turn them into deltabot ones

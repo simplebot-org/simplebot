@@ -13,7 +13,7 @@ class DeltaBotSpecs:
     def deltabot_init_parser(self, parser):
         """ initialize the deltabot main parser with new options and subcommands.
 
-        :param parser: a :class:`deltabot.parser.MyArgumentParser` instance where you can
+        :param parser: a :class:`simplebot.parser.MyArgumentParser` instance where you can
                         call `add_subcommand(name, func)` to get a sub parser where you
                         can then add arguments.
         """

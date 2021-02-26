@@ -25,8 +25,8 @@ class Commands:
 
         :param name: name of the command, example "/test"
         :param func: function that needs to accept 'command' and 'replies' arguments,
-                     namely a :class:`deltabot.command.IncomingCommand`
-                     and a :class:`deltabot.bot.Replies` object.
+                     namely a :class:`simplebot.command.IncomingCommand`
+                     and a :class:`simplebot.bot.Replies` object.
         :param admin: if True the command will be available for bot administrators only
         """
         short, long = parse_command_docstring(func, args=["command", "replies"])

@@ -29,7 +29,7 @@ def make_bot(request, account, plugin_module):
     pm = make_plugin_manager()
 
     # initialize command line
-    argv = ["deltabot", "--basedir", basedir]
+    argv = ["simplebot", "--basedir", basedir]
     parser = get_base_parser(pm, argv=argv)
 
     args = parser.main_parse_argv(argv)
@@ -38,7 +38,7 @@ def make_bot(request, account, plugin_module):
 
     # we auto-register the (non-builtin) module
     # which contains the test which requested this bot
-    if not plugin_module.__name__.startswith("deltabot.builtin."):
+    if not plugin_module.__name__.startswith("simplebot.builtin."):
         # don't re-register already registered setuptools plugins
         if not pm.is_registered(plugin_module):
             bot.plugins.add_module(plugin_module.__name__, plugin_module)
@@ -134,7 +134,7 @@ def examples(request):
 
 class CmdlineRunner:
     def __init__(self):
-        self._rootargs = ["deltabot"]
+        self._rootargs = ["simplebot"]
 
     def set_basedir(self, account_dir):
         self._rootargs.append("--basedir={}".format(account_dir))

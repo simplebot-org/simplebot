@@ -1,12 +1,12 @@
 
 import os
 
-from deltabot.hookspec import deltabot_hookimpl
+from ..hookspec import deltabot_hookimpl
 
 
 @deltabot_hookimpl
 def deltabot_init_parser(parser):
-    from deltabot import __version__ as deltabot_version
+    from .. import __version__ as deltabot_version
 
     parser.add_subcommand(Init)
     parser.add_subcommand(Info)

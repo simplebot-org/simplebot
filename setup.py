@@ -9,7 +9,7 @@ if __name__ == "__main__":
     with open('README.rst') as f:
         long_desc = f.read()
 
-    with open(os.path.join('src', 'deltabot', '__init__.py')) as fh:
+    with open(os.path.join('src', 'simplebot', '__init__.py')) as fh:
         version = re.search(
             r"__version__ = '(.*?)'", fh.read(), re.M).group(1)
 
@@ -33,9 +33,9 @@ if __name__ == "__main__":
                      'Programming Language :: Python :: 3'],
         entry_points='''
             [console_scripts]
-            simplebot=deltabot.main:main
+            simplebot=simplebot.main:main
             [pytest11]
-            deltabot.pytestplugin=deltabot.pytestplugin
+            deltabot.pytestplugin=simplebot.pytestplugin
         ''',
         python_requires='>=3.5',
         install_requires=['deltachat>=1.40.2.dev', 'py'],

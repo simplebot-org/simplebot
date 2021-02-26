@@ -42,7 +42,7 @@ def get_global_plugin_manager():
 
 
 def make_plugin_manager():
-    from deltabot.builtin import admin, db, cmdline, log, settings
+    from .builtin import admin, db, cmdline, log, settings
 
     pm = pluggy.PluginManager(spec_name)
     pm.add_hookspecs(DeltaBotSpecs)

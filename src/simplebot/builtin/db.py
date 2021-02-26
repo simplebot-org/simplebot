@@ -1,7 +1,8 @@
 
 import os
 import sqlite3
-from deltabot.hookspec import deltabot_hookimpl
+
+from ..hookspec import deltabot_hookimpl
 
 
 @deltabot_hookimpl(tryfirst=True)

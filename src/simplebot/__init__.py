@@ -5,5 +5,5 @@ from .bot import DeltaBot  # noqa
 
 __version__ = '0.11.0'
 
-# for nice access via deltabot.hookimpl
+# for nice access via simplebot.hookimpl
 hookimpl = deltabot_hookimpl

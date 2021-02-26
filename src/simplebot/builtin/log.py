@@ -1,7 +1,8 @@
 
 import os
 import logging.handlers
-from deltabot import deltabot_hookimpl
+
+from ..hookspec import deltabot_hookimpl
 
 
 @deltabot_hookimpl
@@ -29,7 +30,7 @@ def make_logger(logdir, stdout_loglevel):
     chandler.setFormatter(formatter)
     logger.addHandler(chandler)
 
-    log_path = os.path.join(logdir, "deltabot.log")
+    log_path = os.path.join(logdir, "bot.log")
     fhandler = logging.handlers.RotatingFileHandler(
         log_path, backupCount=5, maxBytes=2000000)
     fhandler.setLevel(logging.DEBUG)
