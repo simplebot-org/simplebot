@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*-
+
+import re
+import os
+
 import setuptools
 
 
@@ -6,11 +9,14 @@ if __name__ == "__main__":
     with open('README.rst') as f:
         long_desc = f.read()
 
+    with open(os.path.join('src', 'deltabot', '__init__.py')) as fh:
+        version = re.search(
+            r"__version__ = '(.*?)'", fh.read(), re.M).group(1)
+
     setuptools.setup(
         name='simplebot',
         description='SimpleBot: Extensible bot for Delta Chat',
-        setup_requires=['setuptools_scm'],
-        use_scm_version=True,
+        version=version,
         long_description=long_desc,
         long_description_content_type='text/x-rst',
         author='The SimpleBot Contributors',
