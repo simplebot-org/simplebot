@@ -61,8 +61,12 @@ class DeltaBot:
                     if m.endswith('.py') or os.path.isdir(m):
                         mods.append(m)
             elif pymodule:
-                mod = py.path.local(pymodule).pyimport()
-                self.plugins.add_module(name=os.path.basename(pymodule), module=mod)
+                if os.path.exists(pymodule):
+                    mod = py.path.local(pymodule).pyimport()
+                    self.plugins.add_module(
+                        name=os.path.basename(pymodule), module=mod)
+                else:
+                    self.logger.warning('Plugin not found: %s', pymodule)
 
     #
     # API for bot administration
