@@ -20,7 +20,7 @@ def deltabot_get_logger(args):
 
 
 def make_logger(logdir, stdout_loglevel):
-    logger = logging.Logger('deltabot')
+    logger = logging.Logger('simplebot')
     logger.parent = None
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s')

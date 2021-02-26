@@ -6,7 +6,7 @@ from ..hookspec import deltabot_hookimpl
 
 @deltabot_hookimpl
 def deltabot_init_parser(parser):
-    from .. import __version__ as deltabot_version
+    from .. import __version__ as simplebot_version
 
     parser.add_subcommand(Init)
     parser.add_subcommand(Info)
@@ -16,15 +16,15 @@ def deltabot_init_parser(parser):
     parser.add_subcommand(DelModule)
 
     parser.add_generic_option(
-        "--version", action="version", version=deltabot_version,
+        "--version", action="version", version=simplebot_version,
         help="show program's version number and exit"
     )
     basedir_default = os.environ.get(
-        "DELTABOT_BASEDIR", "~/.config/deltabot")
+        "SIMPLEBOT_BASEDIR", "~/.config/simplebot")
     parser.add_generic_option(
         "--basedir", action="store", metavar="DIR",
         default=basedir_default, type=os.path.expanduser,
-        help="directory for storing all deltabot state")
+        help="directory for storing all simplebot state")
     parser.add_generic_option("--show-ffi", action="store_true", help="show low level ffi events")
 
 
@@ -65,7 +65,7 @@ class Info:
 
 
 class ListPlugins:
-    """list deltabot plugins. """
+    """list simplebot plugins. """
     name = "list-plugins"
 
     def run(self, bot, args, out):

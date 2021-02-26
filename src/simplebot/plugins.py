@@ -12,18 +12,18 @@ class Plugins:
         self.hook = self._pm.hook
 
     def add_module(self, name, module):
-        """ add a named deltabot plugin python module. """
+        """ add a named simplebot plugin python module. """
         self.logger.debug("registering plugin {!r}".format(name))
         self._pm.register(plugin=module, name=name)
         self._pm.check_pending()
 
     def remove(self, name):
-        """ remove a named deltabot plugin. """
+        """ remove a named simplebot plugin. """
         self.logger.debug("removing plugin {!r}".format(name))
         self._pm.unregister(name=name)
 
     def dict(self):
-        """ return a dict name->deltabot plugin object mapping. """
+        """ return a dict name->simplebot plugin object mapping. """
         return dict(self._pm.list_name_plugin())
 
     def items(self):

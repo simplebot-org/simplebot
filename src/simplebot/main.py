@@ -31,7 +31,7 @@ def make_bot_from_args(args, plugin_manager, account=None):
 
     if account is None:
         db_path = os.path.join(basedir, "account.db")
-        account = Account(db_path, "deltabot/{}".format(sys.platform))
+        account = Account(db_path, "simplebot/{}".format(sys.platform))
 
     logger = plugin_manager.hook.deltabot_get_logger(args=args)
     return DeltaBot(account, logger, plugin_manager=plugin_manager, args=args)

@@ -47,7 +47,7 @@ class DeltaBot:
         #: see :class:`simplebot.filters.Filters`
         self.filters = Filters(self)
 
-        # process dc events and turn them into deltabot ones
+        # process dc events and turn them into simplebot ones
         self._eventhandler = IncomingEventHandler(self)
 
         plugin_manager.hook.deltabot_init.call_historic(kwargs=dict(bot=self, args=args))
