@@ -1,4 +1,5 @@
 
+from typing import Callable
 from collections import OrderedDict
 
 from . import deltabot_hookimpl
@@ -6,13 +7,13 @@ from .commands import parse_command_docstring
 
 
 class Filters:
-    def __init__(self, bot):
+    def __init__(self, bot) -> None:
         self.bot = bot
         self.logger = bot.logger
         self._filter_defs = OrderedDict()
         self.bot.plugins.add_module("filters", self)
 
-    def register(self, name, func):
+    def register(self, name: str, func: Callable) -> None:
         """ register a filter function that acts on each incoming non-system message. """
         short, long = parse_command_docstring(func, args=["message", "replies"])
         cmd_def = FilterDef(name, short=short, long=long, func=func)
@@ -21,15 +22,15 @@ class Filters:
         self._filter_defs[name] = cmd_def
         self.logger.debug("registered new filter {!r}".format(name))
 
-    def unregister(self, name):
+    def unregister(self, name: str) -> Callable:
         """ unregister a filter function. """
         return self._filter_defs.pop(name)
 
-    def dict(self):
+    def dict(self) -> dict:
         return self._filter_defs.copy()
 
     @deltabot_hookimpl(trylast=True)
-    def deltabot_incoming_message(self, message, replies):
+    def deltabot_incoming_message(self, message, replies) -> None:
         for name, filter_def in self._filter_defs.items():
             self.logger.debug("calling filter {!r} on message id={}".format(name, message.id))
             res = filter_def.func(message=message, replies=replies)
@@ -39,11 +40,11 @@ class Filters:
 
 class FilterDef:
     """ Definition of a Filter that acts on incoming messages. """
-    def __init__(self, name, short, long, func):
+    def __init__(self, name, short, long, func) -> None:
         self.name = name
         self.short = short
         self.long = long
         self.func = func
 
-    def __eq__(self, c):
+    def __eq__(self, c) -> bool:
         return c.__dict__ == self.__dict__

@@ -1,6 +1,7 @@
 
 import inspect
 from collections import OrderedDict
+from typing import Callable, Generator, Optional
 
 from . import deltabot_hookimpl
 
@@ -12,13 +13,13 @@ class NotFound(LookupError):
 
 
 class Commands:
-    def __init__(self, bot):
+    def __init__(self, bot) -> None:
         self.bot = bot
         self.logger = bot.logger
         self._cmd_defs = OrderedDict()
         self.bot.plugins.add_module("commands", self)
 
-    def register(self, name, func, admin=False):
+    def register(self, name: str, func: Callable, admin: bool = False) -> None:
         """ register a command function that acts on each incoming non-system message.
 
         :param name: name of the command, example "/test"
@@ -41,15 +42,15 @@ class Commands:
         self._cmd_defs[name] = cmd_def
         self.logger.debug("registered new command {!r}".format(name))
 
-    def unregister(self, name):
+    def unregister(self, name: str) -> Callable:
         """ unregister a command function by name. """
         return self._cmd_defs.pop(name)
 
-    def dict(self):
+    def dict(self) -> dict:
         return self._cmd_defs.copy()
 
     @deltabot_hookimpl
-    def deltabot_incoming_message(self, message, replies):
+    def deltabot_incoming_message(self, message, replies) -> Optional[bool]:
         if not message.text.startswith(CMD_PREFIX):
             return None
         args = message.text.split()
@@ -86,11 +87,11 @@ class Commands:
         return True
 
     @deltabot_hookimpl
-    def deltabot_init(self, bot):
+    def deltabot_init(self, bot) -> None:
         assert bot == self.bot
         self.register("/help", self.command_help)
 
-    def command_help(self, command, replies):
+    def command_help(self, command, replies) -> None:
         """ reply with help message about available commands. """
         is_admin = self.bot.is_admin(
             command.message.get_sender_contact().addr)
@@ -108,7 +109,7 @@ class Commands:
 
 class CommandDef:
     """ Definition of a '/COMMAND' with args. """
-    def __init__(self, cmd, short, long, func, admin=False):
+    def __init__(self, cmd, short, long, func, admin=False) -> None:
         if cmd[0] != CMD_PREFIX:
             raise ValueError("cmd {!r} must start with {!r}".format(cmd, CMD_PREFIX))
         self.cmd = cmd
@@ -117,25 +118,25 @@ class CommandDef:
         self.func = func
         self.admin = admin
 
-    def __eq__(self, c):
+    def __eq__(self, c) -> bool:
         return c.__dict__ == self.__dict__
 
 
 class IncomingCommand:
     """ incoming command request. """
-    def __init__(self, bot, cmd_def, args, payload, message):
+    def __init__(self, bot, cmd_def, args, payload, message) -> None:
         self.bot = bot
         self.cmd_def = cmd_def
         self.args = args
         self.payload = payload
         self.message = message
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<IncomingCommand {!r} payload={!r} msg={}>".format(
             self.cmd_def.cmd[0], self.payload, self.message.id)
 
 
-def parse_command_docstring(func, args):
+def parse_command_docstring(func, args) -> tuple:
     description = func.__doc__
     if not description:
         raise ValueError("command {!r} needs to have a docstring".format(func))
@@ -148,7 +149,7 @@ def parse_command_docstring(func, args):
     return lines.pop(0), ''.join(lines).strip()
 
 
-def iter_underscore_subparts(name):
+def iter_underscore_subparts(name) -> Generator[str, None, None]:
     parts = name.split("_")
     while parts:
         yield "_".join(parts)

@@ -9,7 +9,7 @@ from .parser import MyArgumentParser, get_base_parser
 from .plugins import get_global_plugin_manager
 
 
-def main(argv=None):
+def main(argv=None) -> None:
     """delta.chat bot management command line interface."""
     pm = get_global_plugin_manager()
     if argv is None:
@@ -24,7 +24,7 @@ def main(argv=None):
     parser.main_run(bot=bot, args=args)
 
 
-def make_bot_from_args(args, plugin_manager, account=None):
+def make_bot_from_args(args, plugin_manager, account=None) -> DeltaBot:
     basedir = os.path.abspath(os.path.expanduser(args.basedir))
     if not os.path.exists(basedir):
         os.makedirs(basedir)

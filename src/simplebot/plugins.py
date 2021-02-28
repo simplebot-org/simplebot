@@ -5,28 +5,28 @@ from .hookspec import DeltaBotSpecs, spec_name
 
 
 class Plugins:
-    def __init__(self, logger, plugin_manager):
+    def __init__(self, logger, plugin_manager) -> None:
         assert plugin_manager
         self._pm = plugin_manager
         self.logger = logger
         self.hook = self._pm.hook
 
-    def add_module(self, name, module):
+    def add_module(self, name, module) -> None:
         """ add a named simplebot plugin python module. """
         self.logger.debug("registering plugin {!r}".format(name))
         self._pm.register(plugin=module, name=name)
         self._pm.check_pending()
 
-    def remove(self, name):
+    def remove(self, name) -> None:
         """ remove a named simplebot plugin. """
         self.logger.debug("removing plugin {!r}".format(name))
         self._pm.unregister(name=name)
 
-    def dict(self):
+    def dict(self) -> dict:
         """ return a dict name->simplebot plugin object mapping. """
         return dict(self._pm.list_name_plugin())
 
-    def items(self):
+    def items(self) -> list:
         """ return (name, plugin obj) list. """
         return self._pm.list_name_plugin()
 

@@ -15,11 +15,11 @@ class MyArgumentParser(argparse.ArgumentParser):
     class ArgumentError(Exception):
         """ an error from the argparse subsystem. """
 
-    def error(self, error):
+    def error(self, error) -> None:
         """raise errors instead of printing and raising SystemExit"""
         raise self.ArgumentError(error)
 
-    def add_generic_option(self, *flags, **kwargs):
+    def add_generic_option(self, *flags, **kwargs) -> None:
         """ add a generic argument option. """
         if not hasattr(self, "subparsers"):
             raise ValueError("can not add generic option to sub command")
@@ -29,7 +29,7 @@ class MyArgumentParser(argparse.ArgumentParser):
         action = self.generic_options.add_argument(*flags, **kwargs)
         action.inipath = inipath
 
-    def add_subcommand(self, cls):
+    def add_subcommand(self, cls) -> None:
         """ Add a subcommand to simplebot. """
         if not hasattr(self, "subparsers"):
             raise ValueError("can not add sub command to subcommand")
@@ -50,7 +50,7 @@ class MyArgumentParser(argparse.ArgumentParser):
             meth(parser=subparser)
         subparser.set_defaults(subcommand_instance=inst)
 
-    def _merge_ini(self):
+    def _merge_ini(self) -> None:
         p = os.path.join(self.basedir, "bot.ini")
         if os.path.exists(p):
             cfg = py.iniconfig.IniConfig(p)
@@ -72,7 +72,7 @@ class MyArgumentParser(argparse.ArgumentParser):
             self.print_usage()
             self.exit(2, "%s: error: %s\n" % (self.prog, e.args[0]))
 
-    def main_run(self, bot, args):
+    def main_run(self, bot, args) -> None:
         out = CmdlineOutput()
 
         if args.command is None:
@@ -93,22 +93,22 @@ class MyArgumentParser(argparse.ArgumentParser):
 
 
 class CmdlineOutput:
-    def __init__(self):
+    def __init__(self) -> None:
         self.tw = py.io.TerminalWriter()
 
-    def line(self, message="", **kwargs):
+    def line(self, message="", **kwargs) -> None:
         self.tw.line(message, **kwargs)
 
-    def fail(self, message):
+    def fail(self, message) -> None:
         self.tw.line("FAIL: {}".format(message), red=True)
         raise SystemExit(1)
 
-    def ok_finish(self, message, **kwargs):
+    def ok_finish(self, message, **kwargs) -> None:
         self.line(message, **kwargs)
         raise SystemExit(0)
 
 
-def try_argcomplete(parser):
+def try_argcomplete(parser) -> None:
     if os.environ.get('_ARGCOMPLETE'):
         try:
             import argcomplete
@@ -131,7 +131,7 @@ def get_base_parser(plugin_manager, argv):
     return parser
 
 
-def parse_docstring(txt):
+def parse_docstring(txt) -> tuple:
     description = txt
     i = txt.find(".")
     if i == -1:
