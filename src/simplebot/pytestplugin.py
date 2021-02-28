@@ -1,19 +1,18 @@
 
 import os
-import py
 from email.utils import parseaddr
 from queue import Queue
 
+import py
 import pytest
 from _pytest.pytester import LineMatcher
-
-from deltachat.message import Message
 from deltachat import account_hookimpl
+from deltachat.message import Message
 
-from .parser import get_base_parser
-from .main import make_bot_from_args
-from .plugins import make_plugin_manager
 from .bot import Replies
+from .main import make_bot_from_args
+from .parser import get_base_parser
+from .plugins import make_plugin_manager
 
 
 @pytest.fixture

@@ -4,9 +4,9 @@ import sys
 
 from deltachat import Account
 
-from .plugins import get_global_plugin_manager
-from .parser import get_base_parser, MyArgumentParser
 from .bot import DeltaBot
+from .parser import MyArgumentParser, get_base_parser
+from .plugins import get_global_plugin_manager
 
 
 def main(argv=None):

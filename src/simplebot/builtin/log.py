@@ -1,6 +1,6 @@
 
-import os
 import logging.handlers
+import os
 
 from ..hookspec import deltabot_hookimpl
 

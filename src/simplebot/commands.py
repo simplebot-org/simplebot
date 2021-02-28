@@ -2,9 +2,7 @@
 import inspect
 from collections import OrderedDict
 
-
 from . import deltabot_hookimpl
-
 
 CMD_PREFIX = '/'
 

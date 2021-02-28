@@ -1,8 +1,9 @@
 # PYTHON_ARGCOMPLETE_OK
 
-import os
-import py
 import argparse
+import os
+
+import py
 
 main_description = """
 The deltabot command line offers sub commands for initialization, configuration

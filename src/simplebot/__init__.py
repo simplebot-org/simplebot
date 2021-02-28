@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from .hookspec import deltabot_hookimpl  # noqa
 from .bot import DeltaBot  # noqa
+from .hookspec import deltabot_hookimpl  # noqa
 
 __version__ = '0.11.0'
 

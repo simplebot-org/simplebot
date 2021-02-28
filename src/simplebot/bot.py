@@ -1,29 +1,28 @@
 # -*- coding: utf-8 -*-
 
 import os
-import threading
-import tempfile
 import shutil
-
-import py
+import tempfile
+import threading
 
 import deltachat as dc
-from deltachat import account_hookimpl
-from deltachat import Message, Contact
+import py
+from deltachat import Account, Contact, Message, account_hookimpl
 from deltachat.capi import lib
 from deltachat.cutil import as_dc_charpointer
-from deltachat.tracker import ConfigureTracker
 from deltachat.message import parse_system_add_remove
+from deltachat.tracker import ConfigureTracker
 
-from .builtin.cmdline import PluginCmd
 from .builtin.admin import get_admins
+from .builtin.cmdline import PluginCmd
 from .commands import Commands
 from .filters import Filters
 from .plugins import Plugins, get_global_plugin_manager
 
 
 class DeltaBot:
-    def __init__(self, account, logger, plugin_manager=None, args=()):
+    def __init__(self, account: Account, logger, plugin_manager=None,
+                 args: tuple = ()) -> None:
         # by default we will use the global instance of the
         # plugin_manager.
         if plugin_manager is None:
