@@ -3,7 +3,7 @@ import inspect
 from collections import OrderedDict
 from typing import Callable, Generator, Optional
 
-from . import deltabot_hookimpl
+from .hookspec import deltabot_hookimpl
 
 CMD_PREFIX = '/'
 

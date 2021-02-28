@@ -1,9 +1,9 @@
 
-from typing import Callable
 from collections import OrderedDict
+from typing import Callable
 
-from . import deltabot_hookimpl
 from .commands import parse_command_docstring
+from .hookspec import deltabot_hookimpl
 
 
 class Filters:
