@@ -326,6 +326,7 @@ class CheckAll:
 class IncomingEventHandler:
     def __init__(self, bot) -> None:
         self.bot = bot
+        self.db = self.bot.plugins._pm.get_plugin(name='db')
         self.logger = bot.logger
         self.plugins = bot.plugins
         self.bot.account.add_account_plugin(self)
@@ -335,7 +336,6 @@ class IncomingEventHandler:
 
     def start(self) -> None:
         self.logger.info("starting bot-event-handler THREAD")
-        self.db = self.bot.plugins._pm.get_plugin(name='db')
         self._thread = t = threading.Thread(target=self.event_worker, name="bot-event-handler", daemon=True)
         t.start()
 
