@@ -288,17 +288,23 @@ class CheckAll:
         for msg_id in self.db.get_msgs():
             message = self.bot.account.get_message_by_id(msg_id)
             try:
-                replies = Replies(message, logger=logger)
-                logger.info("processing incoming fresh message id={}".format(message.id))
-                if message.is_system_message():
-                    self.handle_system_message(message, replies)
-                elif not message.get_sender_contact().is_blocked():
-                    self.bot.plugins.hook.deltabot_incoming_message(
-                        message=message,
-                        bot=self.bot,
-                        replies=replies
-                    )
-                replies.send_reply_messages()
+                headers = message.get_mime_headers() or dict()
+                if 'Chat-Version' in headers:
+                    replies = Replies(message, logger=logger)
+                    logger.info(
+                        "processing incoming fresh message id={}".format(
+                            message.id))
+                    if message.is_system_message():
+                        self.handle_system_message(message, replies)
+                    elif not message.get_sender_contact().is_blocked():
+                        self.bot.plugins.hook.deltabot_incoming_message(
+                            message=message,
+                            bot=self.bot,
+                            replies=replies
+                        )
+                    replies.send_reply_messages()
+                else:
+                    logger.debug("ignoring classic email id=%s", message.id)
             except Exception as ex:
                 logger.exception("processing message={} failed: {}".format(
                     message.id, ex))
