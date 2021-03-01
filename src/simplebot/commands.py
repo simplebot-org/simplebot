@@ -57,6 +57,13 @@ class Commands:
         payload = message.text.split(maxsplit=1)[1] if len(args) > 1 else ""
         orig_cmd_name = args.pop(0)
 
+        if '@' in orig_cmd_name:
+            suffix = '@' + self.bot.self_contact.addr
+            if orig_cmd_name.endswith(suffix):
+                orig_cmd_name = orig_cmd_name[:-len(suffix)]
+            else:
+                return True
+
         parts = orig_cmd_name.split("_")
         while parts:
             cmd_name = "_".join(parts)
