@@ -6,7 +6,7 @@ import os
 import py
 
 main_description = """
-The deltabot command line offers sub commands for initialization, configuration
+The simplebot command line offers sub commands for initialization, configuration
 and web-serving of Delta Chat Bots.  New sub commands may be added via plugins.
 """
 
