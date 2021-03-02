@@ -289,7 +289,7 @@ class CheckAll:
             message = self.bot.account.get_message_by_id(msg_id)
             try:
                 headers = message.get_mime_headers() or dict()
-                if 'Chat-Version' in headers:
+                if 'Chat-Version' in headers or message.is_encrypted():
                     replies = Replies(message, logger=logger)
                     logger.info(
                         "processing incoming fresh message id={}".format(
