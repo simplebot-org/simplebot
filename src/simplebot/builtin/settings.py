@@ -6,6 +6,8 @@ from ..hookspec import deltabot_hookimpl
 def deltabot_init_parser(parser):
     parser.add_subcommand(db_cmd)
     parser.add_subcommand(set_avatar)
+    parser.add_subcommand(set_name)
+    parser.add_subcommand(set_config)
 
 
 @deltabot_hookimpl
@@ -28,6 +30,26 @@ class set_avatar:
 
     def run(self, bot, args, out):
         bot.account.set_avatar(args.avatar)
+        out.line('Avatar updated.')
+
+
+class set_name:
+    """set bot display name."""
+    def add_arguments(self, parser):
+        parser.add_argument('name', type=str, help='the new display name')
+
+    def run(self, bot, args, out):
+        bot.account.set_config('displayname', args.name)
+
+
+class set_config:
+    """set low level delta chat configuration."""
+    def add_arguments(self, parser):
+        parser.add_argument('key', type=str, help='configuration key')
+        parser.add_argument('value', type=str, help='configuration new value')
+
+    def run(self, bot, args, out):
+        bot.account.set_config(args.key, args.value)
 
 
 class db_cmd:
