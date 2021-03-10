@@ -286,8 +286,8 @@ class CheckAll:
         logger = self.bot.logger
         logger.info("CheckAll perform-loop start")
         for msg_id in self.db.get_msgs():
-            message = self.bot.account.get_message_by_id(msg_id)
             try:
+                message = self.bot.account.get_message_by_id(msg_id)
                 headers = message.get_mime_headers() or dict()
                 if 'Chat-Version' in headers or message.is_encrypted():
                     replies = Replies(message, logger=logger)
@@ -304,11 +304,12 @@ class CheckAll:
                         )
                     replies.send_reply_messages()
                 else:
-                    logger.debug("ignoring classic email id=%s", message.id)
+                    logger.debug("ignoring classic email id=%s", msg_id)
+                logger.info(
+                    "processing message id={} FINISHED".format(msg_id))
             except Exception as ex:
-                logger.exception("processing message={} failed: {}".format(
-                    message.id, ex))
-            logger.info("processing message id={} FINISHED".format(message.id))
+                logger.exception(
+                    "processing message={} failed: {}".format(msg_id, ex))
             self.db.pop_msg(msg_id)
         logger.info("CheckAll perform-loop finish")
 
