@@ -31,7 +31,7 @@ class Replies:
         return bool(self._replies)
 
     def add(self, text: str = None, html: str = None,
-            filename: str = None, bytefile=None,
+            filename: str = None, bytefile=None, sender: str = None,
             quote: Message = None, chat: Chat = None) -> None:
         """ Add a text or file-based reply. """
         if bytefile:
@@ -40,7 +40,7 @@ class Replies:
             if os.path.basename(filename) != filename:
                 raise ValueError("if bytefile is specified, filename must a basename, not path")
 
-        self._replies.append((text, filename, bytefile, chat, quote, html))
+        self._replies.append((text, filename, bytefile, chat, quote, html, sender))
 
     def send_reply_messages(self) -> list:
         tempdir = tempfile.mkdtemp() if any(x[2] for x in self._replies) else None
@@ -56,7 +56,7 @@ class Replies:
         return l
 
     def _send_replies_to_core(self, tempdir: str) -> Generator[Message, None, None]:
-        for text, filename, bytefile, chat, quote, html in self._replies:
+        for text, filename, bytefile, chat, quote, html, sender in self._replies:
             if bytefile:
                 # XXX avoid double copy -- core will copy this file another time
                 # XXX maybe also avoid loading the file into RAM but it's max 50MB
@@ -77,6 +77,9 @@ class Replies:
                 lib.dc_msg_set_html(msg._dc_msg, as_dc_charpointer(html))
             if filename is not None:
                 msg.set_file(filename)
+            if sender is not None:
+                lib.dc_msg_set_override_sender_name(
+                    msg._dc_msg, as_dc_charpointer(sender))
             if chat is None:
                 chat = self.incoming_message.chat
             msg = chat.send_msg(msg)
