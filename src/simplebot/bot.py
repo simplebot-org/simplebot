@@ -337,7 +337,7 @@ class CheckAll:
         meth = getattr(self.bot.plugins.hook, hook_name)
         logger.info("calling hook {}".format(hook_name))
         meth(message=message, replies=replies, chat=message.chat,
-             actor=self.bot.account.create_contact(actor),
+             actor=self.bot.account.create_contact(actor), bot=self.bot,
              contact=self.bot.account.create_contact(affected))
 
 

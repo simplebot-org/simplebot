@@ -53,7 +53,7 @@ class DeltaBotSpecs:
         """
 
     @deltabot_hookspec(firstresult=True)
-    def deltabot_member_added(self, chat, contact, actor, message, replies):
+    def deltabot_member_added(self, chat, contact, actor, message, replies, bot):
         """ When a member has been added by an actor.
 
         :param chat: Chat where contact was added.
@@ -64,7 +64,7 @@ class DeltaBotSpecs:
         """
 
     @deltabot_hookspec(firstresult=True)
-    def deltabot_member_removed(self, chat, contact, actor, message, replies):
+    def deltabot_member_removed(self, chat, contact, actor, message, replies, bot):
         """ When a member has been removed by an actor.
 
         When a member left a chat, the contact and the actor will be the
