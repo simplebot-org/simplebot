@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 
 from .bot import DeltaBot  # noqa
-from .hookspec import deltabot_hookimpl  # noqa
+from .commands import command_decorator as command
+from .filters import filter_decorator as filter
+from .hookspec import deltabot_hookimpl as hookimpl  # noqa
 
 __version__ = '0.11.0'
-
-# for nice access via simplebot.hookimpl
-hookimpl = deltabot_hookimpl

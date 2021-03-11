@@ -1,11 +1,12 @@
 
 import inspect
 from collections import OrderedDict
-from typing import Callable, Generator, Optional
+from typing import Callable, Generator, List, Optional, Tuple
 
 from .hookspec import deltabot_hookimpl
 
 CMD_PREFIX = '/'
+_cmds: List[Tuple[str, Callable, bool]] = []
 
 
 class NotFound(LookupError):
@@ -161,3 +162,15 @@ def iter_underscore_subparts(name) -> Generator[str, None, None]:
     while parts:
         yield "_".join(parts)
         parts.pop()
+
+
+def command_decorator(func: Callable = None, name: str = None,
+                      admin: bool = False) -> Callable:
+    """Register decorated function as bot command."""
+    def _decorator(func):
+        _cmds.append((name or CMD_PREFIX + func.__name__, func, admin))
+        return func
+
+    if func is None:
+        return _decorator
+    return _decorator(func)

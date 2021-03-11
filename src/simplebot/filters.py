@@ -1,9 +1,11 @@
 
 from collections import OrderedDict
-from typing import Callable
+from typing import Callable, List, Tuple
 
 from .commands import parse_command_docstring
 from .hookspec import deltabot_hookimpl
+
+_filters: List[Tuple[str, Callable]] = []
 
 
 class Filters:
@@ -48,3 +50,14 @@ class FilterDef:
 
     def __eq__(self, c) -> bool:
         return c.__dict__ == self.__dict__
+
+
+def filter_decorator(func: Callable = None, name: str = None) -> Callable:
+    """Register decorated function as bot filter."""
+    def _decorator(func):
+        _filters.append((name or func.__name__, func))
+        return func
+
+    if func is None:
+        return _decorator
+    return _decorator(func)

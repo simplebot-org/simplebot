@@ -16,8 +16,8 @@ from deltachat.tracker import ConfigureTracker
 
 from .builtin.admin import get_admins
 from .builtin.cmdline import PluginCmd
-from .commands import Commands
-from .filters import Filters
+from .commands import Commands, _cmds
+from .filters import Filters, _filters
 from .plugins import Plugins, get_global_plugin_manager
 
 
@@ -134,6 +134,14 @@ class DeltaBot:
                         name=os.path.basename(pymodule), module=mod)
                 else:
                     self.logger.warning('Plugin not found: %s', pymodule)
+
+        for name, function, admin in _cmds:
+            self.commands.register(name, function, admin)
+        _cmds.clear()
+
+        for name, function in _filters:
+            self.filters.register(name, function)
+        _filters.clear()
 
     #
     # API for bot administration

@@ -1,4 +1,5 @@
 
+from ..commands import command_decorator
 from ..hookspec import deltabot_hookimpl
 
 
@@ -8,11 +9,6 @@ def deltabot_init_parser(parser):
     parser.add_subcommand(set_avatar)
     parser.add_subcommand(set_name)
     parser.add_subcommand(set_config)
-
-
-@deltabot_hookimpl
-def deltabot_init(bot):
-    bot.commands.register(name="/set", func=command_set)
 
 
 def slash_scoped_key(key):
@@ -109,7 +105,8 @@ class db_cmd:
             out.line("key '{}/{}' deleted".format(scope, key))
 
 
-def command_set(command, replies):
+@command_decorator(name='/set')
+def cmd_set(command, replies):
     """show all/one per-peer settings or set a value for a setting.
 
     Examples:

@@ -1,4 +1,5 @@
 
+from ..commands import command_decorator
 from ..hookspec import deltabot_hookimpl
 
 
@@ -8,12 +9,6 @@ def deltabot_init_parser(parser):
     parser.add_subcommand(unban)
     parser.add_subcommand(list_banned)
     parser.add_subcommand(AdminCmd)
-
-
-@deltabot_hookimpl
-def deltabot_init(bot):
-    bot.commands.register(name="/ban", func=cmd_ban, admin=True)
-    bot.commands.register(name="/unban", func=cmd_unban, admin=True)
 
 
 class ban:
@@ -89,6 +84,7 @@ class AdminCmd:
             bot.get(self.db_key, default='(Empty list)')))
 
 
+@command_decorator(name='/ban', admin=True)
 def cmd_ban(command, replies):
     """Ban the given address or list banned addresses if no address is given.
 
@@ -103,6 +99,7 @@ def cmd_ban(command, replies):
         replies.add(text=get_banned_list(command.bot))
 
 
+@command_decorator(name='/unban', admin=True)
 def cmd_unban(command, replies):
     """Unban the given address.
 
