@@ -24,12 +24,10 @@ class Commands:
         """ register a command function that acts on each incoming non-system message.
 
         :param name: name of the command, example "/test"
-        :param func: function that needs to accept 'command' and 'replies' arguments,
-                     namely a :class:`simplebot.command.IncomingCommand`
-                     and a :class:`simplebot.bot.Replies` object.
+        :param func: function can accept 'bot', 'command'(:class:`simplebot.command.IncomingCommand`), 'message', 'payload' and 'replies'(:class:`simplebot.bot.Replies`) arguments.
         :param admin: if True the command will be available for bot administrators only
         """
-        short, long = parse_command_docstring(func, args=["command", "replies"])
+        short, long, args = parse_command_docstring(func, args=["command", "replies", "bot", "payload", "message"])
         for cand_name in iter_underscore_subparts(name):
             if cand_name in self._cmd_defs:
                 raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
@@ -39,7 +37,7 @@ class Commands:
                 raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
                                  name, reg_name))
 
-        cmd_def = CommandDef(name, short=short, long=long, func=func, admin=admin)
+        cmd_def = CommandDef(name, short=short, long=long, func=func, args=args, admin=admin)
         self._cmd_defs[name] = cmd_def
         self.logger.debug("registered new command {!r}".format(name))
 
@@ -87,7 +85,7 @@ class Commands:
                               args=args, payload=payload)
         self.bot.logger.info("processing command {}".format(cmd))
         try:
-            res = cmd.cmd_def.func(command=cmd, replies=replies)
+            res = cmd.cmd_def(command=cmd, replies=replies, bot=self.bot, payload=cmd.payload, message=cmd.message)
         except Exception as ex:
             self.logger.exception(ex)
         else:
@@ -117,17 +115,24 @@ class Commands:
 
 class CommandDef:
     """ Definition of a '/COMMAND' with args. """
-    def __init__(self, cmd, short, long, func, admin=False) -> None:
+    def __init__(self, cmd, short, long, func, args, admin=False) -> None:
         if cmd[0] != CMD_PREFIX:
             raise ValueError("cmd {!r} must start with {!r}".format(cmd, CMD_PREFIX))
         self.cmd = cmd
         self.long = long
         self.short = short
         self.func = func
+        self.args = args
         self.admin = admin
 
     def __eq__(self, c) -> bool:
         return c.__dict__ == self.__dict__
+
+    def __call__(self, **kwargs):
+        for key in list(kwargs.keys()):
+            if key not in self.args:
+                del kwargs[key]
+        return self.func(**kwargs)
 
 
 class IncomingCommand:
@@ -147,14 +152,15 @@ class IncomingCommand:
 def parse_command_docstring(func, args) -> tuple:
     description = func.__doc__
     if not description:
-        raise ValueError("command {!r} needs to have a docstring".format(func))
+        raise ValueError("{!r} needs to have a docstring".format(func))
     funcargs = set(inspect.getargs(func.__code__).args)
-    for arg in args:
-        if arg not in funcargs:
-            raise ValueError("{!r} needs to accept {!r} argument".format(func, arg))
+    funcargs.discard('self')
+    for arg in funcargs:
+        if arg not in args:
+            raise ValueError("{!r} requests an invalid argument: {!r}, valid arguments: {!r}".format(func, arg, funcargs))
 
     lines = description.strip().split("\n", maxsplit=1)
-    return lines.pop(0), ''.join(lines).strip()
+    return lines.pop(0), ''.join(lines).strip(), funcargs
 
 
 def iter_underscore_subparts(name) -> Generator[str, None, None]:
