@@ -28,7 +28,7 @@ class Commands:
         :param func: function can accept 'bot', 'command'(:class:`simplebot.command.IncomingCommand`), 'message', 'payload' and 'replies'(:class:`simplebot.bot.Replies`) arguments.
         :param admin: if True the command will be available for bot administrators only
         """
-        short, long, args = parse_command_docstring(func, args=["command", "replies", "bot", "payload", "message"])
+        short, long, args = parse_command_docstring(func, args=["command", "replies", "bot", "payload", "args", "message"])
         for cand_name in iter_underscore_subparts(name):
             if cand_name in self._cmd_defs:
                 raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
@@ -86,7 +86,7 @@ class Commands:
                               args=args, payload=payload)
         self.bot.logger.info("processing command {}".format(cmd))
         try:
-            res = cmd.cmd_def(command=cmd, replies=replies, bot=self.bot, payload=cmd.payload, message=cmd.message)
+            res = cmd.cmd_def(command=cmd, replies=replies, bot=self.bot, payload=cmd.payload, args=cmd.args, message=cmd.message)
         except Exception as ex:
             self.logger.exception(ex)
         else:
