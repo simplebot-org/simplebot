@@ -1,5 +1,6 @@
 
 import inspect
+import types
 from collections import OrderedDict
 from typing import Callable, Generator, List, Optional, Tuple
 
@@ -154,7 +155,8 @@ def parse_command_docstring(func, args) -> tuple:
     if not description:
         raise ValueError("{!r} needs to have a docstring".format(func))
     funcargs = set(inspect.getargs(func.__code__).args)
-    funcargs.discard('self')
+    if isinstance(func, types.MethodType):
+        funcargs.discard('self')
     for arg in funcargs:
         if arg not in args:
             raise ValueError("{!r} requests an invalid argument: {!r}, valid arguments: {!r}".format(func, arg, funcargs))
