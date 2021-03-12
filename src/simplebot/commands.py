@@ -159,7 +159,7 @@ def parse_command_docstring(func, args) -> tuple:
         funcargs.discard('self')
     for arg in funcargs:
         if arg not in args:
-            raise ValueError("{!r} requests an invalid argument: {!r}, valid arguments: {!r}".format(func, arg, funcargs))
+            raise ValueError("{!r} requests an invalid argument: {!r}, valid arguments: {!r}".format(func, arg, args))
 
     lines = description.strip().split("\n", maxsplit=1)
     return lines.pop(0), ''.join(lines).strip(), funcargs
