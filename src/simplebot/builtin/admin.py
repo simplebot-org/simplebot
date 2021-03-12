@@ -4,7 +4,7 @@ from ..hookspec import deltabot_hookimpl
 
 
 @deltabot_hookimpl
-def deltabot_init_parser(parser):
+def deltabot_init_parser(parser) -> None:
     parser.add_subcommand(ban)
     parser.add_subcommand(unban)
     parser.add_subcommand(list_banned)
@@ -14,10 +14,10 @@ def deltabot_init_parser(parser):
 class ban:
     """Ban the given address."""
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("addr", help="email address to ban")
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         ban_addr(bot, args.addr)
         out.line('Banned: {}'.format(args.addr))
 
@@ -25,10 +25,10 @@ class ban:
 class unban:
     """Unban the given address."""
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("addr", help="email address to unban")
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         unban_addr(bot, args.addr)
         out.line('Unbanned: {}'.format(args.addr))
 
@@ -36,10 +36,7 @@ class unban:
 class list_banned:
     """List banned addresses."""
 
-    def add_arguments(self, parser):
-        pass
-
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         out.line(get_banned_list(bot))
 
 
@@ -48,7 +45,7 @@ class AdminCmd:
     name = 'admin'
     db_key = 'administrators'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("addr", help="email address")
         parser.add_argument(
             "--add", help="grant administrator rights to an address.",
@@ -60,7 +57,7 @@ class AdminCmd:
             "--list", help="list administrators.",
             action='store_true')
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         if args.add:
             self._add(bot, args.add)
         elif args._del:
@@ -68,24 +65,24 @@ class AdminCmd:
         else:
             self._list(bot, out)
 
-    def _add(self, bot, addr):
+    def _add(self, bot, addr) -> None:
         existing = list(x for x in bot.get(self.db_key, default="").split("\n") if x.strip())
         assert "," not in addr
         existing.append(addr)
         bot.set(self.db_key, "\n".join(existing))
 
-    def _del(self, bot, addr):
+    def _del(self, bot, addr) -> None:
         existing = list(x for x in bot.get(self.db_key, default="").split("\n") if x.strip())
         existing.remove(addr)
         bot.set(self.db_key, "\n".join(existing))
 
-    def _list(self, bot, out):
+    def _list(self, bot, out) -> None:
         out.line('Administrators:\n{}'.format(
             bot.get(self.db_key, default='(Empty list)')))
 
 
 @command_decorator(name='/ban', admin=True)
-def cmd_ban(command, replies):
+def cmd_ban(command, replies) -> None:
     """Ban the given address or list banned addresses if no address is given.
 
     Examples:
@@ -100,7 +97,7 @@ def cmd_ban(command, replies):
 
 
 @command_decorator(name='/unban', admin=True)
-def cmd_unban(command, replies):
+def cmd_unban(command, replies) -> None:
     """Unban the given address.
 
     Examples:
@@ -129,7 +126,7 @@ def get_banned_list(bot) -> str:
     return 'Banned addresses:\n{}'.format('\n'.join(addrs) or '(Empty list)')
 
 
-def get_admins(bot):
+def get_admins(bot) -> list:
     return bot.get('administrators', default='').split('\n')
 
 

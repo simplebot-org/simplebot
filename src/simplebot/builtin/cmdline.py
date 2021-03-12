@@ -5,7 +5,7 @@ from ..hookspec import deltabot_hookimpl
 
 
 @deltabot_hookimpl
-def deltabot_init_parser(parser):
+def deltabot_init_parser(parser) -> None:
     from .. import __version__ as simplebot_version
 
     parser.add_subcommand(Init)
@@ -28,7 +28,7 @@ def deltabot_init_parser(parser):
 
 
 @deltabot_hookimpl
-def deltabot_init(bot, args):
+def deltabot_init(bot, args) -> None:
     if args.show_ffi:
         from deltachat.events import FFIEventLogger
         log = FFIEventLogger(bot.account)
@@ -40,11 +40,11 @@ class Init:
 
     This will set and verify smtp/imap connectivity using the provided credentials.
     """
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("emailaddr", metavar="ADDR", type=str)
         parser.add_argument("password", type=str)
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         if "@" not in args.emailaddr:
             out.fail('invalid email address: {!r}'.format(args.emailaddr))
         success = bot.perform_configure_address(
@@ -57,7 +57,7 @@ class Init:
 class Info:
     """show information about configured account."""
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         if not bot.is_configured():
             out.fail("account not configured, use 'deltabot init'")
 
@@ -68,7 +68,7 @@ class Info:
 class Serve:
     """serve and react to incoming messages"""
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         if not bot.is_configured():
             out.fail(
                 'account not configured: {}'.format(bot.account.db_path))
@@ -82,7 +82,7 @@ class PluginCmd:
     name = 'plugin'
     db_key = 'module-plugins'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             '--list', help='list bot plugins.', action='store_true')
         parser.add_argument(
@@ -90,7 +90,7 @@ class PluginCmd:
         parser.add_argument(
             '--del', help='delete python module(s) plugin path from bot plugins.', metavar='PYMODULE', dest='_del', type=str, nargs='+')
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         if args.add:
             self._add(bot, args.add, out)
         elif args._del:
@@ -99,7 +99,7 @@ class PluginCmd:
             for name, plugin in bot.plugins.items():
                 out.line('{:25s}: {}'.format(name, plugin))
 
-    def _add(self, bot, pymodules, out):
+    def _add(self, bot, pymodules, out) -> None:
         existing = list(x for x in bot.get(
             self.db_key, default='').split('\n') if x.strip())
         for pymodule in pymodules:
@@ -114,7 +114,7 @@ class PluginCmd:
         for mod in existing:
             out.line(mod)
 
-    def _del(self, bot, pymodules, out):
+    def _del(self, bot, pymodules, out) -> None:
         existing = list(x for x in bot.get(
             self.db_key, default='').split('\n') if x.strip())
         remaining = []

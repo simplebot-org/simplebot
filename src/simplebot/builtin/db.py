@@ -6,13 +6,13 @@ from ..hookspec import deltabot_hookimpl
 
 
 @deltabot_hookimpl(tryfirst=True)
-def deltabot_init(bot):
+def deltabot_init(bot) -> None:
     db_path = os.path.join(os.path.dirname(bot.account.db_path), "bot.db")
     bot.plugins.add_module("db", DBManager(db_path))
 
 
 class DBManager:
-    def __init__(self, db_path):
+    def __init__(self, db_path: str) -> None:
         self.db = sqlite3.connect(
             db_path, check_same_thread=False, isolation_level=None)
         self.db.row_factory = sqlite3.Row
@@ -38,7 +38,7 @@ class DBManager:
         return [r[0] for r in self.db.execute('SELECT * FROM msgs').fetchall()]
 
     @deltabot_hookimpl
-    def deltabot_store_setting(self, key, value):
+    def deltabot_store_setting(self, key: str, value: str) -> None:
         with self.db:
             if value is not None:
                 self.db.execute(
@@ -48,18 +48,18 @@ class DBManager:
                     'DELETE FROM config WHERE keyname=?', (key, ))
 
     @deltabot_hookimpl
-    def deltabot_get_setting(self, key):
+    def deltabot_get_setting(self, key: str) -> None:
         row = self.db.execute(
             'SELECT * FROM config WHERE keyname=?', (key,)).fetchone()
         return row and row['value']
 
     @deltabot_hookimpl
-    def deltabot_list_settings(self):
+    def deltabot_list_settings(self) -> list:
         rows = self.db.execute('SELECT * FROM config').fetchall()
         return [(row['keyname'], row["value"]) for row in rows]
 
     @deltabot_hookimpl
-    def deltabot_shutdown(self, bot):
+    def deltabot_shutdown(self, bot) -> None:
         self.db.close()
 
 

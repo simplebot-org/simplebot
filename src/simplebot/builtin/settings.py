@@ -4,14 +4,14 @@ from ..hookspec import deltabot_hookimpl
 
 
 @deltabot_hookimpl
-def deltabot_init_parser(parser):
+def deltabot_init_parser(parser) -> None:
     parser.add_subcommand(db_cmd)
     parser.add_subcommand(set_avatar)
     parser.add_subcommand(set_name)
     parser.add_subcommand(set_config)
 
 
-def slash_scoped_key(key):
+def slash_scoped_key(key: str) -> tuple:
     i = key.find("/")
     if i == -1:
         raise ValueError("key {!r} does not contain a '/' scope delimiter")
@@ -20,31 +20,31 @@ def slash_scoped_key(key):
 
 class set_avatar:
     """set bot avatar."""
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument('avatar', metavar='PATH', type=str,
                             help='path to the avatar image.')
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         bot.account.set_avatar(args.avatar)
         out.line('Avatar updated.')
 
 
 class set_name:
     """set bot display name."""
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument('name', type=str, help='the new display name')
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         bot.account.set_config('displayname', args.name)
 
 
 class set_config:
     """set low level delta chat configuration."""
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument('key', type=str, help='configuration key')
         parser.add_argument('value', type=str, help='configuration new value')
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         bot.account.set_config(args.key, args.value)
 
 
@@ -52,7 +52,7 @@ class db_cmd:
     """low level settings."""
     name = 'db'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "--list", help="list all key,values.", metavar='SCOPE',
             nargs='?')
@@ -66,7 +66,7 @@ class db_cmd:
             "--del", help="delete a low level setting.", metavar="KEY",
             type=slash_scoped_key, dest='_del')
 
-    def run(self, bot, args, out):
+    def run(self, bot, args, out) -> None:
         if args.get:
             self._get(bot, *args.get, out)
         elif args._del:
@@ -76,18 +76,18 @@ class db_cmd:
         else:
             self._list(bot, args.list, out)
 
-    def _get(self, bot, scope, key, out):
+    def _get(self, bot, scope, key, out) -> None:
         res = bot.get(key, scope=scope)
         if res is None:
             out.fail("key {}/{} does not exist".format(scope, key))
         else:
             out.line(res)
 
-    def _set(self, bot, key, value):
+    def _set(self, bot, key, value) -> None:
         scope, key = slash_scoped_key(key)
         bot.set(key, value, scope=scope)
 
-    def _list(self, bot, scope, out):
+    def _list(self, bot, scope, out) -> None:
         for key, res in bot.list_settings(scope):
             if "\n" in res:
                 out.line("{}:".format(key))
@@ -96,7 +96,7 @@ class db_cmd:
             else:
                 out.line("{}: {}".format(key, res))
 
-    def _del(self, bot, scope, key, out):
+    def _del(self, bot, scope, key, out) -> None:
         res = bot.get(key, scope=scope)
         if res is None:
             out.fail("key {}/{} does not exist".format(scope, key))
@@ -106,7 +106,7 @@ class db_cmd:
 
 
 @command_decorator(name='/set')
-def cmd_set(command, replies):
+def cmd_set(command, replies) -> None:
     """show all/one per-peer settings or set a value for a setting.
 
     Examples:
@@ -135,7 +135,7 @@ def cmd_set(command, replies):
     replies.add(text=text)
 
 
-def dump_settings(bot, scope):
+def dump_settings(bot, scope) -> list:
     lines = []
     for name, value in bot.list_settings(scope=scope):
         lines.append("{}={}".format(name, value))
