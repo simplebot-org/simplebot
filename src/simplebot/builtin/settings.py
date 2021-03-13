@@ -50,7 +50,7 @@ class set_name:
 
 
 class set_config:
-    """set low level delta chat configuration."""
+    """set low level account configuration."""
     def add_arguments(self, parser) -> None:
         parser.add_argument('key', type=str, help='configuration key')
         parser.add_argument('value', type=str, help='configuration new value')

@@ -87,7 +87,7 @@ class Info:
 
     def run(self, bot, out) -> None:
         if not bot.is_configured():
-            out.fail("account not configured, use 'deltabot init'")
+            out.fail("account not configured, use 'simplebot init'")
 
         for key, val in bot.account.get_info().items():
             out.line('{:30s}: {}'.format(key, val))
@@ -106,7 +106,7 @@ class Serve:
 
 
 class PluginCmd:
-    """bot plugins management."""
+    """per account plugins management."""
     name = 'plugin'
     db_key = 'module-plugins'
 
