@@ -1,12 +1,15 @@
 
+import os
+
 from ..commands import command_decorator
 from ..hookspec import deltabot_hookimpl
+from ..utils import get_builtin_avatar, get_builtin_avatars
 
 
 @deltabot_hookimpl
 def deltabot_init_parser(parser) -> None:
     parser.add_subcommand(db_cmd)
-    parser.add_subcommand(set_avatar)
+    parser.add_subcommand(avatar)
     parser.add_subcommand(set_name)
     parser.add_subcommand(set_config)
 
@@ -18,15 +21,23 @@ def slash_scoped_key(key: str) -> tuple:
     return (key[:i], key[i + 1:])
 
 
-class set_avatar:
-    """set bot avatar."""
+class avatar:
+    """set bot avatar, or show available builtin avatars if no path is given."""
     def add_arguments(self, parser) -> None:
-        parser.add_argument('avatar', metavar='PATH', type=str,
+        parser.add_argument('avatar', metavar='PATH', nargs='?',
                             help='path to the avatar image.')
 
     def run(self, bot, args, out) -> None:
-        bot.account.set_avatar(args.avatar)
-        out.line('Avatar updated.')
+        if not args.avatar:
+            out.line('Builtin avatars:')
+            for name in get_builtin_avatars():
+                out.line(name)
+        else:
+            path = get_builtin_avatar(args.avatar)
+            if os.path.exists(path):
+                args.avatar = path
+            bot.account.set_avatar(args.avatar)
+            out.line('Avatar updated.')
 
 
 class set_name:
