@@ -12,7 +12,7 @@ def deltabot_init_parser(parser) -> None:
 
 
 class ban:
-    """Ban the given address."""
+    """ban the given address."""
 
     def add_arguments(self, parser) -> None:
         parser.add_argument("addr", help="email address to ban")
@@ -23,7 +23,7 @@ class ban:
 
 
 class unban:
-    """Unban the given address."""
+    """unban the given address."""
 
     def add_arguments(self, parser) -> None:
         parser.add_argument("addr", help="email address to unban")
@@ -34,28 +34,27 @@ class unban:
 
 
 class list_banned:
-    """List banned addresses."""
+    """list banned addresses."""
 
     def run(self, bot, args, out) -> None:
         out.line(get_banned_list(bot))
 
 
 class AdminCmd:
-    """Administrator tools."""
+    """administrator tools."""
     name = 'admin'
     db_key = 'administrators'
 
     def add_arguments(self, parser) -> None:
         parser.add_argument("addr", help="email address")
         parser.add_argument(
-            "--add", help="grant administrator rights to an address.",
+            '-a', '--add', help="grant administrator rights to an address.",
             metavar="ADDR")
         parser.add_argument(
-            "--del", help="revoke administrator rights to an address.",
+            '-d', '--del', help="revoke administrator rights to an address.",
             metavar="ADDR", dest='_del')
-        parser.add_argument(
-            "--list", help="list administrators.",
-            action='store_true')
+        parser.add_argument('-l', '--list', help="list administrators.",
+                            action='store_true')
 
     def run(self, bot, args, out) -> None:
         if args.add:

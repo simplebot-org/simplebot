@@ -84,11 +84,11 @@ class PluginCmd:
 
     def add_arguments(self, parser) -> None:
         parser.add_argument(
-            '--list', help='list bot plugins.', action='store_true')
+            '-l', '--list', help='list bot plugins.', action='store_true')
         parser.add_argument(
-            '--add', help='add python module(s) paths to be loaded as bot plugin(s). Note that the filesystem paths to the python modules need to be available when the bot starts up.  You can edit the modules after adding them.', metavar="PYMODULE", type=str, nargs='+')
+            '-a', '--add', help='add python module(s) paths to be loaded as bot plugin(s). Note that the filesystem paths to the python modules need to be available when the bot starts up.  You can edit the modules after adding them.', metavar="PYMODULE", type=str, nargs='+')
         parser.add_argument(
-            '--del', help='delete python module(s) plugin path from bot plugins.', metavar='PYMODULE', dest='_del', type=str, nargs='+')
+            '-d', '--del', help='delete python module(s) plugin path from bot plugins.', metavar='PYMODULE', dest='_del', type=str, nargs='+')
 
     def run(self, bot, args, out) -> None:
         if args.add:

@@ -65,16 +65,16 @@ class db_cmd:
 
     def add_arguments(self, parser) -> None:
         parser.add_argument(
-            "--list", help="list all key,values.", metavar='SCOPE',
+            '-l', '--list', help="list all key,values.", metavar='SCOPE',
             nargs='?')
         parser.add_argument(
-            "--get", help="get a low level setting.", metavar="KEY",
+            '-g', '--get', help="get a low level setting.", metavar="KEY",
             type=slash_scoped_key)
         parser.add_argument(
-            "--set", help="set a low level setting.",
+            '-s', '--set', help="set a low level setting.",
             metavar=('KEY', 'VALUE'), nargs=2)
         parser.add_argument(
-            "--del", help="delete a low level setting.", metavar="KEY",
+            '-d', '--del', help="delete a low level setting.", metavar="KEY",
             type=slash_scoped_key, dest='_del')
 
     def run(self, bot, args, out) -> None:
