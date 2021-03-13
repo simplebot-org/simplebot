@@ -348,7 +348,6 @@ class IncomingEventHandler:
         self.bot = bot
         self.logger = bot.logger
         self.plugins = bot.plugins
-        self.bot.account.add_account_plugin(self)
         self._needs_check = threading.Event()
         self._needs_check.set()
         self._running = True
@@ -356,6 +355,7 @@ class IncomingEventHandler:
     def start(self) -> None:
         self.logger.info("starting bot-event-handler THREAD")
         self.db = self.bot.plugins._pm.get_plugin(name='db')
+        self.bot.account.add_account_plugin(self)
         self._thread = t = threading.Thread(target=self.event_worker, name="bot-event-handler", daemon=True)
         t.start()
 
