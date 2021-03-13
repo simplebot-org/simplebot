@@ -1,9 +1,12 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import argparse
+import inspect
 import os
 
 import py
+
+from .utils import get_account_path, get_default_account
 
 main_description = """
 The simplebot command line offers sub commands for initialization, configuration
@@ -50,8 +53,8 @@ class MyArgumentParser(argparse.ArgumentParser):
             meth(parser=subparser)
         subparser.set_defaults(subcommand_instance=inst)
 
-    def _merge_ini(self) -> None:
-        p = os.path.join(self.basedir, "bot.ini")
+    def _merge_ini(self, basedir) -> None:
+        p = os.path.join(basedir, "bot.ini")
         if os.path.exists(p):
             cfg = py.iniconfig.IniConfig(p)
             for action in self._actions:
@@ -63,9 +66,33 @@ class MyArgumentParser(argparse.ArgumentParser):
 
     def main_parse_argv(self, argv):
         try_argcomplete(self)
-        self._merge_ini()
+        # preliminary get the basedir
+        args, remaining = self.parse_known_args(argv[1:])
+        basedir = args.basedir
+        if not basedir:
+            if args.command == 'init':
+                basedir = get_account_path(args.emailaddr)
+            else:
+                addr = get_default_account()
+                basedir = addr and get_account_path(addr)
+                if basedir and not os.path.exists(basedir):
+                    basedir = None
+        if basedir:
+            self._merge_ini(basedir)
         try:
-            return self.parse_args(argv[1:])
+            args = self.parse_args(argv[1:])
+            if args.command is None:
+                out = CmdlineOutput()
+                out.line(self.format_usage())
+                out.line(self.description.strip())
+                out.line()
+                for name, p in self.subparsers.choices.items():
+                    out.line("{:20s} {}".format(
+                        name, p.description.split("\n")[0].strip()))
+                out.line()
+                out.ok_finish("please specify a subcommand", red=True)
+            args.basedir = basedir
+            return args
         except self.ArgumentError as e:
             if not argv[1:]:
                 return self.parse_args(["-h"])
@@ -74,18 +101,17 @@ class MyArgumentParser(argparse.ArgumentParser):
 
     def main_run(self, bot, args) -> None:
         out = CmdlineOutput()
-
-        if args.command is None:
-            out.line(self.format_usage())
-            out.line(self.description.strip())
-            out.line()
-            for name, p in self.subparsers.choices.items():
-                out.line("{:20s} {}".format(name, p.description.split("\n")[0].strip()))
-            out.line()
-            out.ok_finish("please specify a subcommand", red=True)
-
         try:
-            res = args.subcommand_instance.run(bot=bot, args=args, out=out)
+            funcargs = set(inspect.getargs(
+                args.subcommand_instance.run.__code__).args)
+            if not bot and 'bot' in funcargs:
+                msg = "No default account is set so \"--account\" argument is required to use \"{}\" subcommand.".format(args.command)
+                out.fail(msg)
+            kwargs = dict(bot=bot, args=args, out=out)
+            for key in list(kwargs.keys()):
+                if key not in funcargs:
+                    del kwargs[key]
+            res = args.subcommand_instance.run(**kwargs)
         except ValueError as ex:
             res = str(ex)
         if res:
@@ -118,16 +144,13 @@ def try_argcomplete(parser) -> None:
             argcomplete.autocomplete(parser)
 
 
-def get_base_parser(plugin_manager, argv):
+def get_base_parser(plugin_manager) -> MyArgumentParser:
     parser = MyArgumentParser(prog="simplebot", description=main_description)
     parser.plugin_manager = plugin_manager
     parser.subparsers = parser.add_subparsers(dest="command")
     parser.generic_options = parser.add_argument_group("generic options")
     plugin_manager.hook.deltabot_init_parser(parser=parser)
 
-    # preliminary set the basedir on the parser
-    args, remaining = parser.parse_known_args(argv[1:])
-    parser.basedir = args.basedir
     return parser
 
 

@@ -1,6 +1,7 @@
 
 import os
 import sys
+from typing import Optional
 
 from deltachat import Account
 
@@ -15,7 +16,7 @@ def main(argv=None) -> None:
     if argv is None:
         argv = sys.argv
     try:
-        parser = get_base_parser(plugin_manager=pm, argv=argv)
+        parser = get_base_parser(plugin_manager=pm)
         args = parser.main_parse_argv(argv)
     except MyArgumentParser.ArgumentError as ex:
         print(str(ex), file=sys.stderr)
@@ -24,13 +25,14 @@ def main(argv=None) -> None:
     parser.main_run(bot=bot, args=args)
 
 
-def make_bot_from_args(args, plugin_manager, account=None) -> DeltaBot:
-    basedir = os.path.abspath(os.path.expanduser(args.basedir))
-    if not os.path.exists(basedir):
-        os.makedirs(basedir)
+def make_bot_from_args(args, plugin_manager, account=None) -> Optional[DeltaBot]:
+    if not args.basedir:
+        return None
+    if not os.path.exists(args.basedir):
+        os.makedirs(args.basedir)
 
     if account is None:
-        db_path = os.path.join(basedir, "account.db")
+        db_path = os.path.join(args.basedir, "account.db")
         account = Account(db_path, "simplebot/{}".format(sys.platform))
 
     logger = plugin_manager.hook.deltabot_get_logger(args=args)

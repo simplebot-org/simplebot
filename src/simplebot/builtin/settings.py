@@ -45,7 +45,7 @@ class set_name:
     def add_arguments(self, parser) -> None:
         parser.add_argument('name', type=str, help='the new display name')
 
-    def run(self, bot, args, out) -> None:
+    def run(self, bot, args) -> None:
         bot.account.set_config('displayname', args.name)
 
 
@@ -55,7 +55,7 @@ class set_config:
         parser.add_argument('key', type=str, help='configuration key')
         parser.add_argument('value', type=str, help='configuration new value')
 
-    def run(self, bot, args, out) -> None:
+    def run(self, bot, args) -> None:
         bot.account.set_config(args.key, args.value)
 
 

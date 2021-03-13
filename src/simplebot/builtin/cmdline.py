@@ -2,6 +2,7 @@
 import os
 
 from ..hookspec import deltabot_hookimpl
+from ..utils import get_account_path, get_accounts, set_default_account, get_default_account
 
 
 @deltabot_hookimpl
@@ -12,17 +13,18 @@ def deltabot_init_parser(parser) -> None:
     parser.add_subcommand(Info)
     parser.add_subcommand(Serve)
     parser.add_subcommand(PluginCmd)
+    parser.add_subcommand(list_accounts)
+    parser.add_subcommand(default_account)
 
     parser.add_generic_option(
         "--version", action="version", version=simplebot_version,
         help="show program's version number and exit"
     )
-    basedir_default = os.environ.get(
-        "SIMPLEBOT_BASEDIR", "~/.config/simplebot")
+    path = lambda p: get_account_path(p) if os.path.exists(get_account_path(p)) else os.path.abspath(os.path.expanduser(p))
     parser.add_generic_option(
-        "--basedir", action="store", metavar="DIR",
-        default=basedir_default, type=os.path.expanduser,
-        help="directory for storing all simplebot state")
+        '--account', action='store', metavar='ADDR_OR_PATH',
+        dest='basedir', type=path,
+        help="address of the configured account to use or directory for storing all account state")
     parser.add_generic_option("--show-ffi", action="store_true",
                               help="show low level ffi events")
 
@@ -33,6 +35,32 @@ def deltabot_init(bot, args) -> None:
         from deltachat.events import FFIEventLogger
         log = FFIEventLogger(bot.account)
         bot.account.add_account_plugin(log)
+
+
+class list_accounts:
+    """list configured accounts.
+    """
+
+    def run(self, out) -> None:
+        def_addr = get_default_account()
+        for addr, path in get_accounts():
+            if def_addr == addr:
+                out.line('(default) {}: {}'.format(addr, path))
+            else:
+                out.line('{}: {}'.format(addr, path))
+
+
+class default_account:
+    """set default account.
+    """
+    def add_arguments(self, parser) -> None:
+        parser.add_argument("addr", metavar="ADDR", type=str)
+
+    def run(self, out, args) -> None:
+        if not os.path.exists(get_account_path(args.addr)):
+            out.fail('Unknown account "{}", add it first with "simplebot init"'.format(args.addr))
+
+        set_default_account(args.addr)
 
 
 class Init:
@@ -57,7 +85,7 @@ class Init:
 class Info:
     """show information about configured account."""
 
-    def run(self, bot, args, out) -> None:
+    def run(self, bot, out) -> None:
         if not bot.is_configured():
             out.fail("account not configured, use 'deltabot init'")
 
@@ -68,7 +96,7 @@ class Info:
 class Serve:
     """serve and react to incoming messages"""
 
-    def run(self, bot, args, out) -> None:
+    def run(self, bot, out) -> None:
         if not bot.is_configured():
             out.fail(
                 'account not configured: {}'.format(bot.account.db_path))
