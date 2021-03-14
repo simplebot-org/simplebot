@@ -1,23 +1,28 @@
+"""
+This example illustrates how to use some of simplebot's hooks at the
+package level and also in a class that is registered as a plugin.
+To see all available hooks check ``simplebot.hookspec``
+"""
 
-from deltabot import deltabot_hookimpl
+import simplebot
 
 
-@deltabot_hookimpl
+@simplebot.hookimpl
 def deltabot_init(bot):
     bot.plugins.add_module("grouplogging", GroupLoggingPlugin())
 
 
 class GroupLoggingPlugin:
-    @deltabot_hookimpl
+    @simplebot.hookimpl
     def deltabot_incoming_message(self, message):
         message.chat.send_text("bot: incoming_message sys={} body={!r}".format(
             message.is_system_message(), message.text))
 
-    @deltabot_hookimpl
+    @simplebot.hookimpl
     def deltabot_member_added(self, chat, contact, actor, message, replies):
         replies.add("bot: member_added {}".format(contact.addr))
 
-    @deltabot_hookimpl
+    @simplebot.hookimpl
     def deltabot_member_removed(self, chat, contact, actor, message, replies):
         replies.add("bot: member_removed {}".format(contact.addr))
 

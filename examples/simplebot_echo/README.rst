@@ -1,5 +1,5 @@
-"Echo" Deltabot example plugin
-==============================
+"Echo" SimpleBot example plugin
+===============================
 
 This serves as an example for how to write and package plugins
 with standard Python packaging machinery.

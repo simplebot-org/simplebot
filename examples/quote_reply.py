@@ -1,36 +1,30 @@
+"""
+This example illustrates how to quote-reply a message.
+"""
 
 import re
 
-from deltabot import deltabot_hookimpl
+import simplebot
 
 
-@deltabot_hookimpl
-def deltabot_init(bot):
-    bot.commands.register(
-        name="/mycalc",
-        func=process_command_mycalc
-    )
-
-
-def process_command_mycalc(command, replies):
+@simplebot.command
+def mycalc(payload, message, replies):
     """caculcates result of arithmetic integer expression.
 
     send "/mycalc 23+20" to the bot to get the result "43" back
     """
-    text = command.payload
-
     # don't directly use eval() as it could execute arbitrary code
-    parts = re.split(r"[\+\-\*\/]", text)
+    parts = re.split(r"[\+\-\*\/]", payload)
     try:
         for part in parts:
             int(part.strip())
     except ValueError:
-        reply = "ExpressionError: {!r} not an int in {!r}".format(part, text)
+        reply = "ExpressionError: {!r} not an int in {!r}".format(part, payload)
     else:
         # now it's safe to use eval
-        reply = "result of {!r}: {}".format(text, eval(text))
+        reply = "result of {!r}: {}".format(payload, eval(payload))
 
-    replies.add(text=reply)
+    replies.add(text=reply, quote=message)
 
 
 class TestMyCalc:
