@@ -3,7 +3,7 @@ import os
 
 from ..commands import command_decorator
 from ..hookspec import deltabot_hookimpl
-from ..utils import get_builtin_avatar, get_builtin_avatars
+from ..utils import set_builtin_avatar, get_builtin_avatars
 
 
 @deltabot_hookimpl
@@ -34,10 +34,8 @@ class avatar:
             for name in get_builtin_avatars():
                 out.line(name)
         else:
-            path = get_builtin_avatar(args.avatar)
-            if os.path.exists(path):
-                args.avatar = path
-            bot.account.set_avatar(args.avatar)
+            if not set_builtin_avatar(bot, args.avatar):
+                bot.account.set_avatar(args.avatar)
             out.line('Avatar updated.')
 
 

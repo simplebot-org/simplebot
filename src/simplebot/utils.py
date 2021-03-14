@@ -1,17 +1,39 @@
+
 import configparser
+import logging
 import os
+from tempfile import NamedTemporaryFile
 from urllib.parse import quote, unquote
 
+from PIL import Image
+from PIL.ImageColor import getcolor, getrgb
+from PIL.ImageOps import grayscale
 
-def get_builtin_avatar(name: str) -> str:
-    return os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), 'avatars', name + '.png')
+# disable Pillow debugging to stdout
+logging.getLogger('PIL').setLevel(logging.ERROR)
+
+
+def set_builtin_avatar(bot, name: str = 'auto') -> bool:
+    ext = '.png'
+    path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), 'avatars', name + ext)
+    if os.path.exists(path):
+        color = '#' + hex(
+            bot.get_chat(bot.self_contact).get_color())[2:].zfill(6)
+        blobdir = bot.account.get_blobdir()
+        with NamedTemporaryFile(dir=blobdir, suffix=ext, delete=False) as fp:
+            result_path = fp.name
+        image_tint(path, color).save(result_path)
+        bot.account.set_avatar(fp.name)
+        return True
+    else:
+        return False
 
 
 def get_builtin_avatars() -> list:
     avatars = os.listdir(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), 'avatars'))
-    return [name.split('.')[0] for name in avatars]
+    return [os.path.splitext(name)[0] for name in avatars]
 
 
 def get_config_folder() -> str:
@@ -44,3 +66,35 @@ def get_default_account() -> str:
     if os.path.exists(path):
         config.read(path)
     return config['DEFAULT'].get('default_account')
+
+
+def image_tint(path: str, tint: str) -> Image:
+    src = Image.open(path)
+    if src.mode not in ('RGB', 'RGBA'):
+        raise TypeError('Unsupported source image mode: {}'.format(src.mode))
+    src.load()
+
+    tr, tg, tb = getrgb(tint)
+    tl = getcolor(tint, "L")  # tint color's overall luminosity
+    if not tl: tl = 1  # avoid division by zero
+    tl = float(tl)  # compute luminosity preserving tint factors
+    sr, sg, sb = map(lambda tv: tv/tl, (tr, tg, tb))  # per component
+                                                      # adjustments
+    # create look-up tables to map luminosity to adjusted tint
+    # (using floating-point math only to compute table)
+    luts = (tuple(map(lambda lr: int(lr*sr + 0.5), range(256))) +
+            tuple(map(lambda lg: int(lg*sg + 0.5), range(256))) +
+            tuple(map(lambda lb: int(lb*sb + 0.5), range(256))))
+    l = grayscale(src)  # 8-bit luminosity version of whole image
+    if Image.getmodebands(src.mode) < 4:
+        merge_args = (src.mode, (l, l, l))  # for RGB verion of grayscale
+    else:  # include copy of src image's alpha layer
+        a = Image.new("L", src.size)
+        a.putdata(src.getdata(3))
+        merge_args = (src.mode, (l, l, l, a))  # for RGBA verion of grayscale
+        luts += tuple(range(256))  # for 1:1 mapping of copied alpha values
+
+    image = Image.merge(*merge_args).point(luts)
+    new_image = Image.new("RGBA", image.size, "WHITE") # Create a white rgba background
+    new_image.paste(image, (0, 0), image)
+    return  new_image

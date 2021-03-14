@@ -18,7 +18,7 @@ from .builtin.cmdline import PluginCmd
 from .commands import Commands, _cmds
 from .filters import Filters, _filters
 from .plugins import Plugins, get_global_plugin_manager
-from .utils import get_builtin_avatar
+from .utils import set_builtin_avatar
 
 
 class Replies:
@@ -251,8 +251,6 @@ class DeltaBot:
             mvbox_watch=0,
             bcc_self=0
         ))
-        if not self.account.get_config("selfavatar"):
-            self.account.set_avatar(get_builtin_avatar('default'))
 
         tracker = ConfigureTracker(self.account)
         with self.account.temp_plugin(tracker) as configtracker:
@@ -263,6 +261,7 @@ class DeltaBot:
                 success = False
                 self.logger.error('Failed to configure: {}'.format(ex))
             else:
+                set_builtin_avatar(self)
                 success = True
                 self.logger.info('Successfully configured {}'.format(email))
             return success
