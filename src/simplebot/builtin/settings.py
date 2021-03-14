@@ -11,6 +11,7 @@ def deltabot_init_parser(parser) -> None:
     parser.add_subcommand(db_cmd)
     parser.add_subcommand(avatar)
     parser.add_subcommand(set_name)
+    parser.add_subcommand(set_status)
     parser.add_subcommand(set_config)
 
 
@@ -47,6 +48,15 @@ class set_name:
 
     def run(self, bot, args) -> None:
         bot.account.set_config('displayname', args.name)
+
+
+class set_status:
+    """set bot status/signature."""
+    def add_arguments(self, parser) -> None:
+        parser.add_argument('text', type=str, help='the new status')
+
+    def run(self, bot, args) -> None:
+        bot.account.set_config('selfstatus', args.text)
 
 
 class set_config:
