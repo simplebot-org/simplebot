@@ -10,7 +10,7 @@ To install simplebot run the following commands (preferably in a ``virtualenv``)
 
   $ pip3 install -U pip wheel
   $ pip3 install --pre -U -i https://m.devpi.net/dc/master deltachat
-  $ pip3 install https://github.com/simplebot-inc/simplebot/archive/master.zip
+  $ pip3 install https://github.com/simplebot-org/simplebot/archive/master.zip
 
 **NOTE:** If Delta Chat Python bindings package is not available for your platform you will need to compile and install the bindings manually, check deltachat package documentation for more info.
 
@@ -26,7 +26,7 @@ Quick Start: Running a bot+plugins
 
 2. Install some official plugins::
 
-     $ git clone https://github.com/simplebot-inc/simplebot_plugins
+     $ git clone https://github.com/simplebot-org/simplebot_plugins
      $ python3 simplebot_plugins/scripts/install_plugin.py
 
 3. Start the bot::
@@ -39,7 +39,7 @@ Plugins
 
 SimpleBot is a base bot that relies on plugins to add functionality, for official plugins see:
 
-https://github.com/SimpleBot-Inc/simplebot_plugins
+https://github.com/simplebot-org/simplebot_plugins
 
 Plugins installed as Python packages (for example with ``pip``) are global to all accounts you register in the bot, to separate plugins per account you need to run each account in its own virtual environment.
 
