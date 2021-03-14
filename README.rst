@@ -3,58 +3,70 @@ SimpleBot
 
 An extensible Delta Chat bot. 
 
+Install
+-------
+
+To install simplebot run the following commands (preferably in a ``virtualenv``)::
+
+  $ pip3 install -U pip wheel
+  $ pip3 install --pre -U -i https://m.devpi.net/dc/master deltachat
+  $ pip3 install https://github.com/simplebot-inc/simplebot/archive/master.zip
+
+**NOTE:** If Delta Chat Python bindings package is not available for your platform you will need to compile and install the bindings manually, check deltachat package documentation for more info.
+
+
 Quick Start: Running a bot+plugins
 ----------------------------------
 
-1. Declare bot address and password (optional)::
+(Replace variables ``$ADDR`` and ``$PASSWORD`` with the email and password for the account the bot will use)
 
-     $ ADDR='bot@example.com'
-     $ PASSWORD='myPassword'
+1. Add an account to the bot::
 
-2. Create and activate virtual environment (Optional but recommended)::
+     $ simplebot init "$ADDR" "$PASSWORD"
 
-     $ python3 -m venv ~/.venvs/`echo $ADDR|tr "@" "_"`
-     $ source ~/.venvs/`echo $ADDR|tr "@" "_"`/bin/activate
-     $ pip3 install -U pip wheel
-
-3. Install deltachat's python bindings::
-
-     $ pip3 install --pre -U -i https://m.devpi.net/dc/master deltachat
-
-4. Install simplebot::
-
-     $ pip3 install https://github.com/simplebot-inc/simplebot/archive/master.zip
-
-5. Configure bot::
-
-     $ simplebot --basedir ~/bots/`echo $ADDR|tr "@" "_"` init $ADDR "$PASSWORD"
-
-6. Install some plugins::
+2. Install some official plugins::
 
      $ git clone https://github.com/simplebot-inc/simplebot_plugins
      $ python3 simplebot_plugins/scripts/install_plugin.py
 
-7. Start the bot::
+3. Start the bot::
 
-     $ simplebot --basedir ~/bots/`echo $ADDR|tr "@" "_"` serve
+     $ simplebot --account $ADDR serve
 
 
 Plugins
 -------
 
-SimpleBot is a bit useless without plugins, for official plugins see:
+SimpleBot is a base bot that relies on plugins to add functionality, for official plugins see:
 
 https://github.com/SimpleBot-Inc/simplebot_plugins
 
+Plugins installed as Python packages (for example with ``pip``) are global to all accounts you register in the bot, to separate plugins per account you need to run each account in its own virtual environment.
 
-Installing script plugins
--------------------------
 
-If you know how to code in Python, you can quickly create plugins and install them to tweak your bot::
+Creating per account plugins
+----------------------------
 
-    $ simplebot add-module ~/my_plugins/server_stats.py
+If you know how to code in Python, you can quickly create plugins and install them to tweak your bot.
 
-Check the `examples` folder to see some examples about how to create plugins this way.
+Lets create an "echo bot", create a file named ``echo.py`` and write inside:
+
+.. code:: python
+
+    import simplebot
+
+    @simplebot.filter
+    def echo(message, replies):
+    """ Echoes back received message."""
+        replies.add(text=message.text)
+
+That is it! you have created a plugin that will transform simplebot in an "echo bot" that will echo back any text message you send to it. Now tell simplebot to register your plugin::
+
+    $ simplebot --account $ADDR plugin --add ./echo.py
+
+Now you can run the bot with ``simplebot --account $ADDR serve`` and write to it from Delta Chat app to check it works.
+
+Check the ``examples`` folder to see some examples about how to create plugins.
 
 
 Note for users
@@ -63,3 +75,11 @@ Note for users
 SimpleBot uses `Autocrypt <https://autocrypt.org/>`_ end-to-end encryption
 but note that the operator of the bot service can look into
 messages that are sent to it.
+
+
+Credits
+-------
+
+SimpleBot is based on `deltabot <https://github.com/deltachat-bot/deltabot>`_
+
+SimpleBot logo was created by Cuban designer "Dann".
