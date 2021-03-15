@@ -15,13 +15,14 @@ class Filters:
         self._filter_defs = OrderedDict()
         self.bot.plugins.add_module('filters', self)
 
-    def register(self, name: str, func: Callable) -> None:
+    def register(self, name: str, func: Callable, tryfirst: bool = False, trylast: bool = False) -> None:
         """ register a filter function that acts on each incoming non-system message.
         :param name: name of the filter
         :param func: function can accept 'bot', 'message' and 'replies' arguments.
         """
         short, long, args = parse_command_docstring(func, args=['message', 'replies', 'bot'])
-        cmd_def = FilterDef(name, short=short, long=long, func=func, args=args)
+        prio = 0 - tryfirst + trylast
+        cmd_def = FilterDef(name, short=short, long=long, func=func, args=args, priority=prio)
         if name in self._filter_defs:
             raise ValueError('filter {!r} already registered'.format(name))
         self._filter_defs[name] = cmd_def
@@ -36,21 +37,23 @@ class Filters:
 
     @deltabot_hookimpl(trylast=True)
     def deltabot_incoming_message(self, message, replies) -> None:
-        for name, filter_def in self._filter_defs.items():
+        processed = False
+        for name, filter_def in sorted(self._filter_defs.items(), key=lambda e: e[1].priority):
             self.logger.debug("calling filter {!r} on message id={}".format(name, message.id))
-            res = filter_def(message=message, replies=replies, bot=self.bot)
+            res = filter_def(message=message, replies=replies, bot=self.bot, processed=processed)
             if res is not None:
-                break
+                processed = True
 
 
 class FilterDef:
     """ Definition of a Filter that acts on incoming messages. """
-    def __init__(self, name, short, long, func, args) -> None:
+    def __init__(self, name, short, long, func, args, priority) -> None:
         self.name = name
         self.short = short
         self.long = long
         self.func = func
         self.args = args
+        self.priority = priority
 
     def __eq__(self, c) -> bool:
         return c.__dict__ == self.__dict__
