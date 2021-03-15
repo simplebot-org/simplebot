@@ -1,5 +1,7 @@
 
+import argparse
 import os
+import sys
 
 from ..hookspec import deltabot_hookimpl
 from ..utils import (get_account_path, get_accounts, get_default_account,
@@ -14,20 +16,24 @@ def deltabot_init_parser(parser) -> None:
     parser.add_subcommand(Info)
     parser.add_subcommand(Serve)
     parser.add_subcommand(PluginCmd)
-    parser.add_subcommand(list_accounts)
-    parser.add_subcommand(default_account)
 
     parser.add_generic_option(
+        '-d', '--set-default', action=DefaultAccountAction,
+        help="set default account.")
+    parser.add_generic_option(
+        '-l', '--list-accounts', action=ListAccountsAction,
+        help="list configured accounts.")
+    parser.add_generic_option(
         '-v', '--version', action="version", version=simplebot_version,
-        help="show program's version number and exit"
+        help="show program's version number and exit."
     )
     path = lambda p: get_account_path(p) if os.path.exists(get_account_path(p)) else os.path.abspath(os.path.expanduser(p))
     parser.add_generic_option(
         '-a', '--account', action='store', metavar='ADDR_OR_PATH',
         dest='basedir', type=path,
-        help="address of the configured account to use or directory for storing all account state")
+        help="address of the configured account to use or directory for storing all account state.")
     parser.add_generic_option("--show-ffi", action="store_true",
-                              help="show low level ffi events")
+                              help="show low level ffi events.")
 
 
 @deltabot_hookimpl
@@ -38,30 +44,34 @@ def deltabot_init(bot, args) -> None:
         bot.account.add_account_plugin(log)
 
 
-class list_accounts:
-    """list configured accounts.
-    """
+class ListAccountsAction(argparse.Action):
+    def __init__(self, *args, **kwargs) -> None:
+        kwargs['nargs'] = 0
+        super().__init__(*args, **kwargs)
 
-    def run(self, out) -> None:
+    def __call__(self, parser, *args, **kwargs) -> None:
         def_addr = get_default_account()
         for addr, path in get_accounts():
             if def_addr == addr:
-                out.line('(default) {}: {}'.format(addr, path))
+                parser.out.line('(default) {}: {}'.format(addr, path))
             else:
-                out.line('{}: {}'.format(addr, path))
+                parser.out.line('{}: {}'.format(addr, path))
+        sys.exit(0)
 
 
-class default_account:
-    """set default account.
-    """
-    def add_arguments(self, parser) -> None:
-        parser.add_argument("addr", metavar="ADDR", type=str)
+class DefaultAccountAction(argparse.Action):
+    def __init__(self, *args, **kwargs) -> None:
+        kwargs['metavar'] = 'ADDR'
+        super().__init__(*args, **kwargs)
 
-    def run(self, out, args) -> None:
-        if not os.path.exists(get_account_path(args.addr)):
-            out.fail('Unknown account "{}", add it first with "simplebot init"'.format(args.addr))
+    def __call__(self, parser, namespace, values, option_string=None) -> None:
+        print(values)
+        addr = values[0]
+        if not os.path.exists(get_account_path(addr)):
+            parser.out.fail('Unknown account "{}", add it first with "simplebot init"'.format(addr))
 
-        set_default_account(args.addr)
+        set_default_account(addr)
+        sys.exit(0)
 
 
 class Init:

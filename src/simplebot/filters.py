@@ -37,12 +37,10 @@ class Filters:
 
     @deltabot_hookimpl(trylast=True)
     def deltabot_incoming_message(self, message, replies) -> None:
-        processed = False
         for name, filter_def in sorted(self._filter_defs.items(), key=lambda e: e[1].priority):
             self.logger.debug("calling filter {!r} on message id={}".format(name, message.id))
-            res = filter_def(message=message, replies=replies, bot=self.bot, processed=processed)
-            if res is not None:
-                processed = True
+            res = filter_def(message=message, replies=replies, bot=self.bot)
+            assert res is None
 
 
 class FilterDef:

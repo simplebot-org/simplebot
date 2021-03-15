@@ -82,15 +82,14 @@ class MyArgumentParser(argparse.ArgumentParser):
         try:
             args = self.parse_args(argv[1:])
             if args.command is None:
-                out = CmdlineOutput()
-                out.line(self.format_usage())
-                out.line(self.description.strip())
-                out.line()
+                self.out.line(self.format_usage())
+                self.out.line(self.description.strip())
+                self.out.line()
                 for name, p in self.subparsers.choices.items():
-                    out.line("{:20s} {}".format(
+                    self.out.line("{:20s} {}".format(
                         name, p.description.split("\n")[0].strip()))
-                out.line()
-                out.ok_finish("please specify a subcommand", red=True)
+                self.out.line()
+                self.out.ok_finish("please specify a subcommand", red=True)
             args.basedir = basedir
             return args
         except self.ArgumentError as e:
@@ -100,14 +99,13 @@ class MyArgumentParser(argparse.ArgumentParser):
             self.exit(2, "%s: error: %s\n" % (self.prog, e.args[0]))
 
     def main_run(self, bot, args) -> None:
-        out = CmdlineOutput()
         try:
             funcargs = set(inspect.getargs(
                 args.subcommand_instance.run.__code__).args)
             if not bot and 'bot' in funcargs:
                 msg = "No default account is set so \"--account\" argument is required to use \"{}\" subcommand.".format(args.command)
-                out.fail(msg)
-            kwargs = dict(bot=bot, args=args, out=out)
+                self.out.fail(msg)
+            kwargs = dict(bot=bot, args=args, out=self.out)
             for key in list(kwargs.keys()):
                 if key not in funcargs:
                     del kwargs[key]
@@ -115,7 +113,7 @@ class MyArgumentParser(argparse.ArgumentParser):
         except ValueError as ex:
             res = str(ex)
         if res:
-            out.fail(str(res))
+            self.out.fail(str(res))
 
 
 class CmdlineOutput:
@@ -149,6 +147,7 @@ def get_base_parser(plugin_manager) -> MyArgumentParser:
     parser.plugin_manager = plugin_manager
     parser.subparsers = parser.add_subparsers(dest="command")
     parser.generic_options = parser.add_argument_group("generic options")
+    parser.out = CmdlineOutput()
     plugin_manager.hook.deltabot_init_parser(parser=parser)
 
     return parser
