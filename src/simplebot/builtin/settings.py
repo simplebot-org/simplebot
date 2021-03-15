@@ -3,7 +3,7 @@ import os
 
 from ..commands import command_decorator
 from ..hookspec import deltabot_hookimpl
-from ..utils import set_builtin_avatar, get_builtin_avatars
+from ..utils import get_builtin_avatars, set_builtin_avatar
 
 
 @deltabot_hookimpl

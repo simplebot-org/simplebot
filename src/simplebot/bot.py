@@ -18,7 +18,8 @@ from .builtin.cmdline import PluginCmd
 from .commands import Commands, _cmds
 from .filters import Filters, _filters
 from .plugins import Plugins, get_global_plugin_manager
-from .utils import set_builtin_avatar
+from .utils import (parse_system_image_changed, parse_system_title_changed,
+                    set_builtin_avatar)
 
 
 class Replies:
@@ -327,19 +328,38 @@ class CheckAll:
 
     def handle_system_message(self, message: Message, replies: Replies) -> None:
         logger = self.bot.logger
+
         res = parse_system_add_remove(message.text)
-        if res is None:
-            logger.info("ignoring system message id={} text: {}".format(
-                message.id, message.text))
+        if res:
+            action, affected, actor = res
+            hook_name = "deltabot_member_{}".format(action)
+            meth = getattr(self.bot.plugins.hook, hook_name)
+            logger.info("calling hook {}".format(hook_name))
+            meth(message=message, replies=replies, chat=message.chat,
+                 actor=self.bot.account.create_contact(actor), bot=self.bot,
+                 contact=self.bot.account.create_contact(affected))
             return
 
-        action, affected, actor = res
-        hook_name = "deltabot_member_{}".format(action)
-        meth = getattr(self.bot.plugins.hook, hook_name)
-        logger.info("calling hook {}".format(hook_name))
-        meth(message=message, replies=replies, chat=message.chat,
-             actor=self.bot.account.create_contact(actor), bot=self.bot,
-             contact=self.bot.account.create_contact(affected))
+        res = parse_system_title_changed(message.text)
+        if res:
+            old_title, actor = res
+            logger.info('calling hook deltabot_title_changed')
+            self.bot.plugins.hook.deltabot_title_changed(
+                message=message, replies=replies, chat=message.chat,
+                actor=self.bot.account.create_contact(actor),
+                old=old_title, bot=self.bot)
+            return
+
+        res = parse_system_image_changed(message.text)
+        if res:
+            logger.info('calling hook deltabot_image_changed')
+            self.bot.plugins.hook.deltabot_image_changed(
+                message=message, replies=replies, chat=message.chat,
+                actor=self.bot.account.create_contact(res), bot=self.bot)
+            return
+
+        logger.info("ignoring system message id={} text: {}".format(
+            message.id, message.text))
 
 
 class IncomingEventHandler:

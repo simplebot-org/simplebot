@@ -2,7 +2,8 @@
 import os
 
 from ..hookspec import deltabot_hookimpl
-from ..utils import get_account_path, get_accounts, set_default_account, get_default_account
+from ..utils import (get_account_path, get_accounts, get_default_account,
+                     set_default_account)
 
 
 @deltabot_hookimpl

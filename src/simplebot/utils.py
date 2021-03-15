@@ -2,9 +2,12 @@
 import configparser
 import logging
 import os
+import re
 from tempfile import NamedTemporaryFile
+from typing import Optional
 from urllib.parse import quote, unquote
 
+from deltachat.message import extract_addr
 from PIL import Image
 from PIL.ImageColor import getcolor, getrgb
 from PIL.ImageOps import grayscale
@@ -87,7 +90,7 @@ def image_tint(path: str, tint: str) -> Image:
             tuple(map(lambda lb: int(lb*sb + 0.5), range(256))))
     l = grayscale(src)  # 8-bit luminosity version of whole image
     if Image.getmodebands(src.mode) < 4:
-        merge_args = (src.mode, (l, l, l))  # for RGB verion of grayscale
+        merge_args: tuple = (src.mode, (l, l, l))  # for RGB verion of grayscale
     else:  # include copy of src image's alpha layer
         a = Image.new("L", src.size)
         a.putdata(src.getdata(3))
@@ -98,3 +101,20 @@ def image_tint(path: str, tint: str) -> Image:
     new_image = Image.new("RGBA", image.size, "WHITE") # Create a white rgba background
     new_image.paste(image, (0, 0), image)
     return  new_image
+
+
+def parse_system_title_changed(text: str) -> Optional[tuple]:
+    text = text.lower()
+    m = re.match(r'group name changed from "(.+)" to ".+" by (.+).', text)
+    if m:
+        old_title, actor = m.groups()
+        return (old_title, extract_addr(actor))
+    return None
+
+
+def parse_system_image_changed(text: str) -> Optional[str]:
+    text = text.lower()
+    m = re.match(r'group image changed by (.+).', text)
+    if m:
+        return extract_addr(m.group(0))
+    return None

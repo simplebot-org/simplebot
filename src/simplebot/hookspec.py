@@ -77,6 +77,27 @@ class DeltaBotSpecs:
         :param replies: Can be used to register replies without directly trying to send out.
         """
 
+    @deltabot_hookspec
+    def deltabot_title_changed(self, chat, old, actor, message, replies, bot):
+        """ When the group title has been modified by an actor.
+
+        :param chat: Chat where title was changed.
+        :param old: The title that has been changed.
+        :param actor: Contact that changed the title (None if it was our self-addr)
+        :param message: The original system message that reports the change.
+        :param replies: Can be used to register replies without directly trying to send out.
+        """
+
+    @deltabot_hookspec
+    def deltabot_image_changed(self, chat, actor, message, replies, bot):
+        """ When the group image has been modified by an actor.
+
+        :param chat: Chat where the image was changed.
+        :param actor: Contact that changed the image (None if it was our self-addr)
+        :param message: The original system message that reports the change.
+        :param replies: Can be used to register replies without directly trying to send out.
+        """
+
     @deltabot_hookspec(firstresult=True)
     def deltabot_store_setting(self, key, value):
         """ store a named bot setting persistently. """
