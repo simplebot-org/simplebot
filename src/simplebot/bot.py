@@ -136,12 +136,12 @@ class DeltaBot:
                 else:
                     self.logger.warning('Plugin not found: %s', pymodule)
 
-        for name, function, admin in _cmds:
-            self.commands.register(name, function, admin)
+        for args in _cmds:
+            self.commands.register(*args)
         _cmds.clear()
 
-        for name, function in _filters:
-            self.filters.register(name, function)
+        for args in _filters:
+            self.filters.register(*args)
         _filters.clear()
 
     #

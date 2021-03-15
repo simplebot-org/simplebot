@@ -19,6 +19,10 @@ class Filters:
         """ register a filter function that acts on each incoming non-system message.
         :param name: name of the filter
         :param func: function can accept 'bot', 'message' and 'replies' arguments.
+        :param tryfirst: Set to True if the filter should be executed as
+                         soon as possible.
+        :param trylast: Set to True if the filter should be executed as
+                        late as possible.
         """
         short, long, args = parse_command_docstring(func, args=['message', 'replies', 'bot'])
         prio = 0 - tryfirst + trylast
@@ -63,10 +67,12 @@ class FilterDef:
         return self.func(**kwargs)
 
 
-def filter_decorator(func: Callable = None, name: str = None) -> Callable:
+def filter_decorator(func: Callable = None, name: str = None,
+                     tryfirst: bool = False,
+                     trylast: bool = False) -> Callable:
     """Register decorated function as bot filter."""
     def _decorator(func):
-        _filters.append((name or func.__name__, func))
+        _filters.append((name or func.__name__, func, tryfirst, trylast))
         return func
 
     if func is None:
