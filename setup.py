@@ -6,7 +6,7 @@ import setuptools
 
 
 if __name__ == "__main__":
-    with open('README.rst') as f:
+    with open('README.md') as f:
         long_desc = f.read()
 
     with open(os.path.join('src', 'simplebot', '__init__.py')) as fh:
@@ -18,7 +18,7 @@ if __name__ == "__main__":
         description='SimpleBot: Extensible bot for Delta Chat',
         version=version,
         long_description=long_desc,
-        long_description_content_type='text/x-rst',
+        long_description_content_type='text/markdown',
         author='The SimpleBot Contributors',
         author_email='adbenitez@nauta.cu, holger@merlinux.eu',
         url='https://github.com/SimpleBot-Inc/simplebot',

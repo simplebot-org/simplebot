@@ -1,3 +1,3 @@
 include LICENSE
-include *.rst
+include *.md
 include src/simplebot/avatars/*
