@@ -46,7 +46,6 @@ class AdminCmd:
     db_key = 'administrators'
 
     def add_arguments(self, parser) -> None:
-        parser.add_argument("addr", help="email address")
         parser.add_argument(
             '-a', '--add', help="grant administrator rights to an address.",
             metavar="ADDR")
