@@ -114,9 +114,10 @@ def parse_system_title_changed(text: str, title: str) -> Optional[tuple]:
     return None
 
 
-def parse_system_image_changed(text: str) -> Optional[str]:
+def parse_system_image_changed(text: str) -> Optional[tuple]:
     text = text.lower()
-    m = re.match(r'group image changed by (.+).', text)
+    m = re.match(r'group image (changed|deleted) by (.+).', text)
     if m:
-        return extract_addr(m.group(0))
+        action, actor = m.groups()
+        return (extract_addr(actor), action == 'deleted')
     return None

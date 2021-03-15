@@ -329,12 +329,14 @@ class CheckAll:
     def handle_system_message(self, message: Message, replies: Replies) -> None:
         logger = self.bot.logger
 
-        actor = parse_system_image_changed(message.text)
-        if actor:
+        res = parse_system_image_changed(message.text)
+        if res:
+            actor, deleted = res
             logger.info('calling hook deltabot_image_changed')
             self.bot.plugins.hook.deltabot_image_changed(
                 message=message, replies=replies, chat=message.chat,
-                actor=self.bot.account.create_contact(actor), bot=self.bot)
+                actor=self.bot.account.create_contact(actor),
+                deleted=deleted, bot=self.bot)
             return
 
         res = parse_system_title_changed(message.text, message.chat.get_name())

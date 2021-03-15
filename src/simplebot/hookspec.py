@@ -89,10 +89,11 @@ class DeltaBotSpecs:
         """
 
     @deltabot_hookspec
-    def deltabot_image_changed(self, chat, actor, message, replies, bot):
+    def deltabot_image_changed(self, chat, deleted, actor, message, replies, bot):
         """ When the group image has been modified by an actor.
 
         :param chat: Chat where the image was changed.
+        :param deleted: True if the image was deleted instead of replaced.
         :param actor: Contact that changed the image (None if it was our self-addr)
         :param message: The original system message that reports the change.
         :param replies: Can be used to register replies without directly trying to send out.
