@@ -6,11 +6,12 @@
   which are pluginized themselves.
 - Changed SimpleBot logo (thanks Dann) and added default avatar
   generation based on account color.
-- Added `simplebot.command` and `simplebot.filter` decorators to
+- Added `@simplebot.command` and `@simplebot.filter` decorators to
   simplify commands and filters creation.
 - Added new hooks `deltabot_ban`, `deltabot_unban`,
   `deltabot_title_changed` and `deltabot_image_changed`
 - Added options to influence filter execution order.
+- Added support for commands that are available only to bot administrators.
 - Improved command line, added account manager, administrator tools,
   options to set avatar, display name, status and other low level
   settings for non-standard servers.
