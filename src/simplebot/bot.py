@@ -329,6 +329,24 @@ class CheckAll:
     def handle_system_message(self, message: Message, replies: Replies) -> None:
         logger = self.bot.logger
 
+        actor = parse_system_image_changed(message.text)
+        if actor:
+            logger.info('calling hook deltabot_image_changed')
+            self.bot.plugins.hook.deltabot_image_changed(
+                message=message, replies=replies, chat=message.chat,
+                actor=self.bot.account.create_contact(actor), bot=self.bot)
+            return
+
+        res = parse_system_title_changed(message.text, message.chat.get_name())
+        if res is not None:
+            old_title, actor = res
+            logger.info('calling hook deltabot_title_changed')
+            self.bot.plugins.hook.deltabot_title_changed(
+                message=message, replies=replies, chat=message.chat,
+                actor=self.bot.account.create_contact(actor),
+                old=old_title, bot=self.bot)
+            return
+
         res = parse_system_add_remove(message.text)
         if res:
             action, affected, actor = res
@@ -338,24 +356,6 @@ class CheckAll:
             meth(message=message, replies=replies, chat=message.chat,
                  actor=self.bot.account.create_contact(actor), bot=self.bot,
                  contact=self.bot.account.create_contact(affected))
-            return
-
-        res = parse_system_title_changed(message.text)
-        if res:
-            old_title, actor = res
-            logger.info('calling hook deltabot_title_changed')
-            self.bot.plugins.hook.deltabot_title_changed(
-                message=message, replies=replies, chat=message.chat,
-                actor=self.bot.account.create_contact(actor),
-                old=old_title, bot=self.bot)
-            return
-
-        res = parse_system_image_changed(message.text)
-        if res:
-            logger.info('calling hook deltabot_image_changed')
-            self.bot.plugins.hook.deltabot_image_changed(
-                message=message, replies=replies, chat=message.chat,
-                actor=self.bot.account.create_contact(res), bot=self.bot)
             return
 
         logger.info("ignoring system message id={} text: {}".format(
