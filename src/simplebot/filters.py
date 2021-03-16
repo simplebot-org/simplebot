@@ -17,7 +17,7 @@ class Filters:
 
     def register(self, name: str, func: Callable, tryfirst: bool = False, trylast: bool = False) -> None:
         """ register a filter function that acts on each incoming non-system message.
-        :param name: name of the filter
+        :param name: name of the filter.
         :param func: function can accept 'bot', 'message' and 'replies' arguments.
         :param tryfirst: Set to True if the filter should be executed as
                          soon as possible.
@@ -76,7 +76,9 @@ def filter_decorator(func: Callable = None, name: str = None,
     see all parameters the decorated function can accept.
     """
     def _decorator(func):
-        _filters.append((name or func.__name__, func, tryfirst, trylast))
+        if not name:
+            name =  '{}.{}'.format(func.__module__, func.__name__)
+        _filters.append((name, func, tryfirst, trylast))
         return func
 
     if func is None:
