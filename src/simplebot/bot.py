@@ -34,7 +34,20 @@ class Replies:
     def add(self, text: str = None, html: str = None,
             filename: str = None, bytefile=None, sender: str = None,
             quote: Message = None, chat: Chat = None) -> None:
-        """ Add a text or file-based reply. """
+        """ Schedule a reply message.
+
+        :param text: a text message to include in the reply.
+        :param html: an html body to include in the reply message.
+        :param filename: a path to a file to be attached to the reply.
+        :param bytefile: a byte file object, if present, filename must be
+                         specified and sould be the name of the file the
+                         file object represents, the file will be attached
+                         to the reply message.
+        :param sender: if present, the bot will impersonate the given name.
+        :param quote: a Message object the reply will quote.
+        :param chat: the chat where the reply will be sent, default is the
+                     same chat of the message that triggered this reply.
+        """
         if bytefile:
             if not filename:
                 raise ValueError("missing filename suggestion, needed with bytefile")
@@ -147,7 +160,15 @@ class DeltaBot:
     #
     # API for bot administration
     #
-    def is_admin(self, addr: str) -> bool:
+    def is_admin(self, contact: Union[Contact, int, str]) -> bool:
+        """ True if the given contact is registered as an administrator account.
+        """
+        if isinstance(contact, str):
+            addr = contact
+        elif isinstance(contact, Contact):
+            addr = contact.addr
+        else:
+            addr = self.get_contact(contact).addr
         return addr in get_admins(self)
 
     #
