@@ -25,7 +25,7 @@ class Commands:
         """ register a command function that acts on each incoming non-system message.
 
         :param name: name of the command, example "/test"
-        :param func: function can accept 'bot', 'command'(:class:`simplebot.command.IncomingCommand`), 'message', 'payload' and 'replies'(:class:`simplebot.bot.Replies`) arguments.
+        :param func: function can accept 'bot', 'command'(:class:`simplebot.commands.IncomingCommand`), 'message', 'payload' and 'replies'(:class:`simplebot.bot.Replies`) arguments.
         :param admin: if True the command will be available for bot administrators only
         """
         short, long, args = parse_command_docstring(func, args=["command", "replies", "bot", "payload", "args", "message"])
@@ -174,7 +174,11 @@ def iter_underscore_subparts(name) -> Generator[str, None, None]:
 
 def command_decorator(func: Callable = None, name: str = None,
                       admin: bool = False) -> Callable:
-    """Register decorated function as bot command."""
+    """Register decorated function as bot command.
+
+    Check documentation of method `simplebot.commands.Commands.register` to
+    see all parameters the decorated function can accept.
+    """
     def _decorator(func):
         _cmds.append((name or CMD_PREFIX + func.__name__, func, admin))
         return func

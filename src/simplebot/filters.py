@@ -70,7 +70,11 @@ class FilterDef:
 def filter_decorator(func: Callable = None, name: str = None,
                      tryfirst: bool = False,
                      trylast: bool = False) -> Callable:
-    """Register decorated function as bot filter."""
+    """Register decorated function as bot filter.
+
+    Check documentation of method `simplebot.filters.Filters.register` to
+    see all parameters the decorated function can accept.
+    """
     def _decorator(func):
         _filters.append((name or func.__name__, func, tryfirst, trylast))
         return func
