@@ -16,21 +16,24 @@ from PIL.ImageOps import grayscale
 logging.getLogger('PIL').setLevel(logging.ERROR)
 
 
-def set_builtin_avatar(bot, name: str = 'auto') -> bool:
+def set_builtin_avatar(bot, name: str = 'adaptive-default') -> bool:
     ext = '.png'
     path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'avatars', name + ext)
-    if os.path.exists(path):
+    if not os.path.exists(path):
+        return False
+
+    if name.startswith('adaptive-'):
         color = '#' + hex(
             bot.get_chat(bot.self_contact).get_color())[2:].zfill(6)
         blobdir = bot.account.get_blobdir()
         with NamedTemporaryFile(dir=blobdir, suffix=ext, delete=False) as fp:
             result_path = fp.name
         image_tint(path, color).save(result_path)
-        bot.account.set_avatar(fp.name)
-        return True
-    else:
-        return False
+        path = result_path
+
+    bot.account.set_avatar(path)
+    return True
 
 
 def get_builtin_avatars() -> list:

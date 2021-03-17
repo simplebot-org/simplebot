@@ -30,8 +30,7 @@ class avatar:
 
     def run(self, bot, args, out) -> None:
         if not args.avatar:
-            out.line('Builtin avatars:')
-            for name in get_builtin_avatars():
+            for name in sorted(get_builtin_avatars()):
                 out.line(name)
         else:
             if not set_builtin_avatar(bot, args.avatar):
