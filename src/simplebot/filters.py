@@ -76,9 +76,8 @@ def filter_decorator(func: Callable = None, name: str = None,
     see all parameters the decorated function can accept.
     """
     def _decorator(func):
-        if not name:
-            name =  '{}.{}'.format(func.__module__, func.__name__)
-        _filters.append((name, func, tryfirst, trylast))
+        _name =  name or '{}.{}'.format(func.__module__, func.__name__)
+        _filters.append((_name, func, tryfirst, trylast))
         return func
 
     if func is None:
