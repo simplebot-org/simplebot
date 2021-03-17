@@ -31,13 +31,14 @@ class Replies:
     def has_replies(self) -> bool:
         return bool(self._replies)
 
-    def add(self, text: str = None, html: str = None,
+    def add(self, text: str = None, *, html: str = None, viewtype: str = None,
             filename: str = None, bytefile=None, sender: str = None,
             quote: Message = None, chat: Chat = None) -> None:
         """ Schedule a reply message.
 
         :param text: a text message to include in the reply.
         :param html: an html body to include in the reply message.
+        :param viewtype: the message's view type.
         :param filename: a path to a file to be attached to the reply.
         :param bytefile: a byte file object, if present, filename must be
                          specified and sould be the name of the file the
@@ -54,7 +55,7 @@ class Replies:
             if os.path.basename(filename) != filename:
                 raise ValueError("if bytefile is specified, filename must a basename, not path")
 
-        self._replies.append((text, filename, bytefile, chat, quote, html, sender))
+        self._replies.append((text, filename, bytefile, chat, quote, html, sender, view_type))
 
     def send_reply_messages(self) -> list:
         tempdir = tempfile.mkdtemp() if any(x[2] for x in self._replies) else None
@@ -70,7 +71,7 @@ class Replies:
         return l
 
     def _send_replies_to_core(self, tempdir: str) -> Generator[Message, None, None]:
-        for text, filename, bytefile, chat, quote, html, sender in self._replies:
+        for text, filename, bytefile, chat, quote, html, sender, view_type in self._replies:
             if bytefile:
                 # XXX avoid double copy -- core will copy this file another time
                 # XXX maybe also avoid loading the file into RAM but it's max 50MB
@@ -78,10 +79,11 @@ class Replies:
                 with open(filename, "wb") as f:
                     f.write(bytefile.read())
 
-            if filename:
-                view_type = "file"
-            else:
-                view_type = "text"
+            if not view_type:
+                if filename:
+                    view_type = "file"
+                else:
+                    view_type = "text"
             msg = Message.new_empty(self.incoming_message.account, view_type)
             if quote is not None:
                 msg.quote = quote
