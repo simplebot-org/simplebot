@@ -1,8 +1,8 @@
 
 import os
 import shutil
-import tempfile
 import threading
+from tempfile import NamedTemporaryFile
 from typing import Generator, Union
 
 import deltachat as dc
@@ -58,24 +58,29 @@ class Replies:
         self._replies.append((text, filename, bytefile, chat, quote, html, sender, view_type))
 
     def send_reply_messages(self) -> list:
-        tempdir = tempfile.mkdtemp() if any(x[2] for x in self._replies) else None
         l = []
-        try:
-            for msg in self._send_replies_to_core(tempdir):
-                self.logger.info("reply id={} chat={} sent with text: {!r}".format(
-                                 msg.id, msg.chat, msg.text[:50]))
-                l.append(msg)
-        finally:
-            if tempdir:
-                shutil.rmtree(tempdir)
+        for msg in self._send_replies_to_core():
+            self.logger.info("reply id={} chat={} sent with text: {!r}".format(
+                msg.id, msg.chat, msg.text[:50]))
+            l.append(msg)
         return l
 
-    def _send_replies_to_core(self, tempdir: str) -> Generator[Message, None, None]:
+    def _send_replies_to_core(self) -> Generator[Message, None, None]:
         for text, filename, bytefile, chat, quote, html, sender, view_type in self._replies:
             if bytefile:
                 # XXX avoid double copy -- core will copy this file another time
                 # XXX maybe also avoid loading the file into RAM but it's max 50MB
-                filename = os.path.join(tempdir, filename)
+                blobdir = self.incoming_message.account.get_blobdir()
+                parts = filename.split('.', maxsplit=1)
+                if len(parts) == 2:
+                    prefix, suffix = parts
+                    prefix += '-'
+                    suffix = '.' + suffix
+                else:
+                    prefix = filename + '-'
+                    suffix = None
+                with NamedTemporaryFile(dir=blobdir, prefix=prefix, suffix=suffix, delete=False) as fp:
+                    filename = fp.name
                 with open(filename, "wb") as f:
                     f.write(bytefile.read())
 
