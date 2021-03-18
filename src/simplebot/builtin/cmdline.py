@@ -4,7 +4,8 @@ import os
 import sys
 
 from ..hookspec import deltabot_hookimpl
-from ..utils import (get_account_path, get_accounts, get_default_account,
+from ..utils import (get_account_path, get_accounts, get_builtin_avatars,
+                     get_default_account, set_builtin_avatar,
                      set_default_account)
 
 
@@ -16,13 +17,20 @@ def deltabot_init_parser(parser) -> None:
     parser.add_subcommand(Info)
     parser.add_subcommand(Serve)
     parser.add_subcommand(PluginCmd)
+    parser.add_subcommand(set_avatar)
+    parser.add_subcommand(set_name)
+    parser.add_subcommand(set_status)
+    parser.add_subcommand(set_config)
 
     parser.add_generic_option(
-        '-d', '--set-default', action=DefaultAccountAction,
+        '-d', '--default-account', action=DefaultAccountAction,
         help="set default account.")
     parser.add_generic_option(
         '-l', '--list-accounts', action=ListAccountsAction,
         help="list configured accounts.")
+    parser.add_generic_option(
+        '--avatars', action=ListAvatarsAction,
+        help="show available builtin avatars.")
     parser.add_generic_option(
         '-v', '--version', action="version", version=simplebot_version,
         help="show program's version number and exit."
@@ -42,6 +50,17 @@ def deltabot_init(bot, args) -> None:
         from deltachat.events import FFIEventLogger
         log = FFIEventLogger(bot.account)
         bot.account.add_account_plugin(log)
+
+
+class ListAvatarsAction(argparse.Action):
+    def __init__(self, *args, **kwargs) -> None:
+        kwargs['nargs'] = 0
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, parser, *args, **kwargs) -> None:
+        for name in sorted(get_builtin_avatars()):
+            parser.out.line(name)
+        sys.exit(0)
 
 
 class ListAccountsAction(argparse.Action):
@@ -75,12 +94,12 @@ class DefaultAccountAction(argparse.Action):
 
 
 class Init:
-    """initialize account with emailadr and password.
+    """initialize account with emailaddr and password.
 
     This will set and verify smtp/imap connectivity using the provided credentials.
     """
     def add_arguments(self, parser) -> None:
-        parser.add_argument("emailaddr", metavar="ADDR", type=str)
+        parser.add_argument("emailaddr", type=str)
         parser.add_argument("password", type=str)
 
     def run(self, bot, args, out) -> None:
@@ -165,3 +184,44 @@ class PluginCmd:
         bot.set(self.db_key, '\n'.join(remaining))
         out.line('removed {} module(s)'.format(
             len(existing) - len(remaining)))
+
+
+class set_avatar:
+    """set account's avatar."""
+    def add_arguments(self, parser) -> None:
+        parser.add_argument(
+            'avatar',
+            help='path to the avatar image or builtin avatar name.')
+
+    def run(self, bot, args, out) -> None:
+        if not set_builtin_avatar(bot, args.avatar):
+            bot.account.set_avatar(args.avatar)
+        out.line('Avatar updated.')
+
+
+class set_name:
+    """set account's display name."""
+    def add_arguments(self, parser) -> None:
+        parser.add_argument('name', type=str, help='the new display name')
+
+    def run(self, bot, args) -> None:
+        bot.account.set_config('displayname', args.name)
+
+
+class set_status:
+    """set account's status/signature."""
+    def add_arguments(self, parser) -> None:
+        parser.add_argument('text', type=str, help='the new status')
+
+    def run(self, bot, args) -> None:
+        bot.account.set_config('selfstatus', args.text)
+
+
+class set_config:
+    """set low level account configuration."""
+    def add_arguments(self, parser) -> None:
+        parser.add_argument('key', type=str, help='configuration key')
+        parser.add_argument('value', type=str, help='configuration new value')
+
+    def run(self, bot, args) -> None:
+        bot.account.set_config(args.key, args.value)

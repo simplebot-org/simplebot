@@ -3,16 +3,11 @@ import os
 
 from ..commands import command_decorator
 from ..hookspec import deltabot_hookimpl
-from ..utils import get_builtin_avatars, set_builtin_avatar
 
 
 @deltabot_hookimpl
 def deltabot_init_parser(parser) -> None:
-    parser.add_subcommand(db_cmd)
-    parser.add_subcommand(avatar)
-    parser.add_subcommand(set_name)
-    parser.add_subcommand(set_status)
-    parser.add_subcommand(set_config)
+    parser.add_subcommand(DB)
 
 
 def slash_scoped_key(key: str) -> tuple:
@@ -22,54 +17,8 @@ def slash_scoped_key(key: str) -> tuple:
     return (key[:i], key[i + 1:])
 
 
-class avatar:
-    """set bot avatar, or show available builtin avatars if no path is given."""
-    def add_arguments(self, parser) -> None:
-        parser.add_argument('avatar', metavar='PATH', nargs='?',
-                            help='path to the avatar image.')
-
-    def run(self, bot, args, out) -> None:
-        if not args.avatar:
-            for name in sorted(get_builtin_avatars()):
-                out.line(name)
-        else:
-            if not set_builtin_avatar(bot, args.avatar):
-                bot.account.set_avatar(args.avatar)
-            out.line('Avatar updated.')
-
-
-class set_name:
-    """set bot display name."""
-    def add_arguments(self, parser) -> None:
-        parser.add_argument('name', type=str, help='the new display name')
-
-    def run(self, bot, args) -> None:
-        bot.account.set_config('displayname', args.name)
-
-
-class set_status:
-    """set bot status/signature."""
-    def add_arguments(self, parser) -> None:
-        parser.add_argument('text', type=str, help='the new status')
-
-    def run(self, bot, args) -> None:
-        bot.account.set_config('selfstatus', args.text)
-
-
-class set_config:
-    """set low level account configuration."""
-    def add_arguments(self, parser) -> None:
-        parser.add_argument('key', type=str, help='configuration key')
-        parser.add_argument('value', type=str, help='configuration new value')
-
-    def run(self, bot, args) -> None:
-        bot.account.set_config(args.key, args.value)
-
-
-class db_cmd:
+class DB:
     """low level settings."""
-    name = 'db'
-
     def add_arguments(self, parser) -> None:
         parser.add_argument(
             '-l', '--list', help="list all key,values.", metavar='SCOPE',
@@ -166,16 +115,16 @@ class TestCommandSettings:
         assert reply_msg.text.startswith("no settings")
 
     def test_mock_set_works(self, mocker):
-        reply_msg = mocker.run_command("/set hello=world")
+        reply_msg = mocker.run_command("/set hello world")
         assert "old" in reply_msg.text
         msg_reply = mocker.run_command("/set")
         assert "hello=world" == msg_reply.text
 
     def test_get_set_functional(self, bot_tester):
-        msg_reply = bot_tester.send_command("/set hello=world")
-        msg_reply = bot_tester.send_command("/set hello2=world2")
-        msg_reply = bot_tester.send_command("/set hello")
-        assert msg_reply.text == "hello=world"
+        msg_reply = bot_tester.send_command("/set hello world")
+        msg_reply = bot_tester.send_command("/set hello2 world2")
         msg_reply = bot_tester.send_command("/set")
         assert "hello=world" in msg_reply.text
         assert "hello2=world2" in msg_reply.text
+        msg_reply = bot_tester.send_command("/set hello")
+        assert "hello=None" in msg_reply.text
