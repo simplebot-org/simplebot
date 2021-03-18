@@ -124,32 +124,30 @@ class db_cmd:
 
 
 @command_decorator(name='/set')
-def cmd_set(command, replies) -> None:
-    """show all/one per-peer settings or set a value for a setting.
+def cmd_set(bot, payload, message, replies) -> None:
+    """show all user settings or set a value for a setting.
 
     Examples:
 
     # show all settings
     /set
 
-    # show value for one setting
+    # unset one setting
     /set name
 
     # set one setting
-    /set name=value
+    /set name value
     """
-    addr = command.message.get_sender_contact().addr
-    if not command.payload:
-        text = "\n".join(dump_settings(command.bot, scope=addr))
-    elif "=" in command.payload:
-        name, value = command.payload.split("=", 1)
-        name = name.strip()
-        value = value.strip()
-        old = command.bot.set(name, value, scope=addr)
-        text = "old: {}={}\nnew: {}={}".format(name, repr(old), name, repr(value))
+    addr = message.get_sender_contact().addr
+    if not payload:
+        text = "\n".join(dump_settings(bot, scope=addr))
     else:
-        x = command.bot.get(command.args[0], scope=addr)
-        text = "{}={}".format(command.args[0], x)
+        args = payload.split(maxsplit=1)
+        if len(args) == 1:
+            args.append(None)
+        name, value = args
+        old = bot.set(name, value and value.strip(), scope=addr)
+        text = "old: {0}={1!r}\nnew: {0}={2!r}".format(name, old, value)
     replies.add(text=text)
 
 
