@@ -36,10 +36,13 @@ def deltabot_init_parser(parser) -> None:
         help="show program's version number and exit."
     )
     path = lambda p: get_account_path(p) if os.path.exists(get_account_path(p)) else os.path.abspath(os.path.expanduser(p))
+    default_account = os.environ.get("SIMPLEBOT_ACCOUNT")
     parser.add_generic_option(
         '-a', '--account', action='store', metavar='ADDR_OR_PATH',
-        dest='basedir', type=path,
-        help="address of the configured account to use or directory for storing all account state.")
+        dest='basedir', type=path, default=default_account,
+        help="address of the configured account to use or directory for"
+        " storing all account state (can be set via SIMPLEBOT_ACCOUNT"
+        " environment variable).")
     parser.add_generic_option("--show-ffi", action="store_true",
                               help="show low level ffi events.")
 
