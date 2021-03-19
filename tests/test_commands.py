@@ -1,22 +1,23 @@
 
 import pytest
 
-from deltabot.commands import parse_command_docstring
-from deltabot.bot import Replies
+from simplebot.commands import parse_command_docstring
+from simplebot.bot import Replies
 
 
 def test_parse_command_docstring():
     with pytest.raises(ValueError):
         parse_command_docstring(lambda: None, args=[])
 
-    def func(command, replies):
+    def func(replies, command):
         """short description.
 
         long description.
         """
-    short, long = parse_command_docstring(func, args="command replies".split())
+    short, long, args = parse_command_docstring(func, args="command replies".split())
     assert short == "short description."
     assert long == "long description."
+    assert len(args) == 2
 
 
 def test_run_help(mocker):
@@ -24,8 +25,15 @@ def test_run_help(mocker):
     assert "/help" in reply.text
 
 
+def test_partial_args(mock_bot):
+    def my_command(replies):
+        """ this command only needs the "replies" argument """
+
+    mock_bot.commands.register(name="/example", func=my_command)
+
+
 def test_fail_args(mock_bot):
-    def my_command(command):
+    def my_command(unknown_arg):
         """ invalid """
 
     with pytest.raises(ValueError):

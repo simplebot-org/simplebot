@@ -11,27 +11,27 @@ def test_general_help(cmd):
 
 
 def test_version(cmd):
-    from deltabot import __version__ as deltabot_version
+    from simplebot import __version__ as version
     cmd.run_ok(["--version"], """
         *{}*
-    """.format(deltabot_version))
+    """.format(version))
 
 
 class TestSettings:
     def test_get_set_list(self, mycmd, session_liveconfig):
-        mycmd.run_fail(["db_get", "hello"])
-        mycmd.run_fail(["db_set", "hello", "world"])
-        mycmd.run_ok(["db_set", "global/hello", "world"])
-        mycmd.run_ok(["db_get", "global/hello"], """
+        mycmd.run_fail(["db", "--get", "hello"])
+        mycmd.run_fail(["db", "--set", "hello", "world"])
+        mycmd.run_ok(["db", "--set", "global/hello", "world"])
+        mycmd.run_ok(["db", "--get", "global/hello"], """
             world
         """)
-        mycmd.run_ok(["db_list"], """
+        mycmd.run_ok(["db", "--list"], """
             global/hello: world
         """)
-        mycmd.run_ok(["db_del", "global/hello"], """
+        mycmd.run_ok(["db", "--del", "global/hello"], """
             *delete*
         """)
-        out = mycmd.run_ok(["db_list"])
+        out = mycmd.run_ok(["db", "--list"])
         assert "hello" not in out
 
 
@@ -71,18 +71,19 @@ class TestInit:
 
 class TestPluginManagement:
     def test_list_plugins(self, mycmd):
-        mycmd.run_ok(["list-plugins"], """
-            *deltabot.builtin.*
+        mycmd.run_ok(["plugin", "--list"], """
+            *simplebot.builtin.*
         """)
 
     def test_add_del_list_module(self, mycmd, examples):
-        path = examples.join("mycalc.py").strpath
-        mycmd.run_ok(["add-module", path], "*{}*".format(path))
-        mycmd.run_ok(["list-plugins"], """
-            *mycalc.py*
-        """)
-        mycmd.run_ok(["del-module", path], """
+        filename = "quote_reply.py"
+        path = examples.join(filename).strpath
+        mycmd.run_ok(["plugin", "--add", path], "*{}*".format(path))
+        mycmd.run_ok(["plugin", "--list"], """
+            *{}*
+        """.format(filename))
+        mycmd.run_ok(["plugin", "--del", path], """
             *removed*1*
         """)
-        out = mycmd.run_ok(["list-plugins"])
-        assert "mycalc.py" not in out
+        out = mycmd.run_ok(["plugin", "--list"])
+        assert filename not in out

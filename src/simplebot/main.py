@@ -16,7 +16,7 @@ def main(argv=None) -> None:
     if argv is None:
         argv = sys.argv
     try:
-        parser = get_base_parser(plugin_manager=pm)
+        parser = get_base_parser(plugin_manager=pm, argv=argv)
         args = parser.main_parse_argv(argv)
     except MyArgumentParser.ArgumentError as ex:
         print(str(ex), file=sys.stderr)

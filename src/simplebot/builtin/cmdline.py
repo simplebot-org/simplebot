@@ -87,7 +87,6 @@ class DefaultAccountAction(argparse.Action):
         super().__init__(*args, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None) -> None:
-        print(values)
         addr = values[0]
         if not os.path.exists(get_account_path(addr)):
             parser.out.fail('Unknown account "{}", add it first with "simplebot init"'.format(addr))

@@ -3,7 +3,7 @@ import io
 
 import pytest
 
-from deltabot.bot import Replies
+from simplebot.bot import Replies
 
 
 class TestDeltaBot:
@@ -36,7 +36,7 @@ class TestDeltaBot:
 
     def test_create_group(self, mock_bot):
         members = set(["x{}@example.org".format(i) for i in range(3)])
-        chat = mock_bot.create_group("test", members=members)
+        chat = mock_bot.create_group("test", contacts=members)
         assert chat.get_name() == "test"
         assert chat.is_group()
         for contact in chat.get_contacts():

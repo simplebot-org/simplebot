@@ -16,21 +16,27 @@ from .plugins import make_plugin_manager
 
 
 @pytest.fixture
+def mock_stopped_bot(acfactory, request):
+    account = acfactory.get_configured_offline_account()
+    return make_bot(request, account, request.module, False)
+
+
+@pytest.fixture
 def mock_bot(acfactory, request):
     account = acfactory.get_configured_offline_account()
     return make_bot(request, account, request.module)
 
 
-def make_bot(request, account, plugin_module):
+def make_bot(request, account, plugin_module, started=True):
     basedir = os.path.dirname(account.db_path)
 
     # we use a new plugin manager for each test
     pm = make_plugin_manager()
 
-    # initialize command line
-    parser = get_base_parser(pm)
-
     argv = ["simplebot", "--account", basedir]
+
+    # initialize command line
+    parser = get_base_parser(pm, argv)
     args = parser.main_parse_argv(argv)
 
     bot = make_bot_from_args(args=args, plugin_manager=pm, account=account)
@@ -44,7 +50,8 @@ def make_bot(request, account, plugin_module):
 
     # startup bot
     request.addfinalizer(bot.trigger_shutdown)
-    bot.start()
+    if started:
+        bot.start()
     return bot
 
 
@@ -140,11 +147,11 @@ class CmdlineRunner:
 
     def invoke(self, args):
         # create a new plugin manager for each command line invocation
+        cap = py.io.StdCaptureFD(mixed=True)
         pm = make_plugin_manager()
         parser = get_base_parser(pm, argv=self._rootargs)
         argv = self._rootargs + args
         code, message = 0, None
-        cap = py.io.StdCaptureFD(mixed=True)
         try:
             try:
                 args = parser.main_parse_argv(argv)

@@ -53,8 +53,10 @@ class MyArgumentParser(argparse.ArgumentParser):
             meth(parser=subparser)
         subparser.set_defaults(subcommand_instance=inst)
 
-    def _merge_ini(self, basedir) -> None:
-        p = os.path.join(basedir, "bot.ini")
+    def _merge_ini(self) -> None:
+        if not self.basedir:
+            return
+        p = os.path.join(self.basedir, "bot.ini")
         if os.path.exists(p):
             cfg = py.iniconfig.IniConfig(p)
             for action in self._actions:
@@ -66,22 +68,10 @@ class MyArgumentParser(argparse.ArgumentParser):
 
     def main_parse_argv(self, argv):
         try_argcomplete(self)
-        # preliminary get the basedir
-        args, remaining = self.parse_known_args(argv[1:])
-        basedir = args.basedir
-        if not basedir:
-            if args.command == 'init':
-                basedir = get_account_path(args.emailaddr)
-            else:
-                addr = get_default_account()
-                basedir = addr and get_account_path(addr)
-                if basedir and not os.path.exists(basedir):
-                    basedir = None
-        if basedir:
-            self._merge_ini(basedir)
+        self._merge_ini()
         try:
             args = self.parse_args(argv[1:])
-            args.basedir = basedir
+            args.basedir = self.basedir
             return args
         except self.ArgumentError as e:
             if not argv[1:]:
@@ -143,13 +133,25 @@ def try_argcomplete(parser) -> None:
             argcomplete.autocomplete(parser)
 
 
-def get_base_parser(plugin_manager) -> MyArgumentParser:
+def get_base_parser(plugin_manager, argv) -> MyArgumentParser:
     parser = MyArgumentParser(prog="simplebot", description=main_description)
     parser.plugin_manager = plugin_manager
     parser.subparsers = parser.add_subparsers(dest="command")
     parser.generic_options = parser.add_argument_group("generic options")
     parser.out = CmdlineOutput()
     plugin_manager.hook.deltabot_init_parser(parser=parser)
+
+    # preliminary get the basedir
+    args, remaining = parser.parse_known_args(argv[1:])
+    if not args.basedir:
+        if args.command == 'init':
+            args.basedir = get_account_path(args.emailaddr)
+        else:
+            addr = get_default_account()
+            args.basedir = addr and get_account_path(addr)
+            if args.basedir and not os.path.exists(args.basedir):
+                args.basedir = None
+    parser.basedir = args.basedir
 
     return parser
 
