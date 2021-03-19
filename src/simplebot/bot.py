@@ -55,7 +55,7 @@ class Replies:
             if os.path.basename(filename) != filename:
                 raise ValueError("if bytefile is specified, filename must a basename, not path")
 
-        self._replies.append((text, filename, bytefile, chat, quote, html, sender, view_type))
+        self._replies.append((text, filename, bytefile, chat, quote, html, sender, viewtype))
 
     def send_reply_messages(self) -> list:
         l = []
@@ -158,11 +158,9 @@ class DeltaBot:
 
         for args in _cmds:
             self.commands.register(*args)
-        _cmds.clear()
 
         for args in _filters:
             self.filters.register(*args)
-        _filters.clear()
 
     #
     # API for bot administration
