@@ -81,15 +81,6 @@ class MyArgumentParser(argparse.ArgumentParser):
             self._merge_ini(basedir)
         try:
             args = self.parse_args(argv[1:])
-            if args.command is None:
-                self.out.line(self.format_usage())
-                self.out.line(self.description.strip())
-                self.out.line()
-                for name, p in self.subparsers.choices.items():
-                    self.out.line("{:20s} {}".format(
-                        name, p.description.split("\n")[0].strip()))
-                self.out.line()
-                self.out.ok_finish("please specify a subcommand", red=True)
             args.basedir = basedir
             return args
         except self.ArgumentError as e:
@@ -100,6 +91,16 @@ class MyArgumentParser(argparse.ArgumentParser):
 
     def main_run(self, bot, args) -> None:
         try:
+            if args.command is None:
+                self.out.line(self.format_usage())
+                self.out.line(self.description.strip())
+                self.out.line()
+                for name, p in self.subparsers.choices.items():
+                    self.out.line("{:20s} {}".format(
+                        name, p.description.split("\n")[0].strip()))
+                self.out.line()
+                self.out.ok_finish("please specify a subcommand", red=True)
+
             funcargs = set(inspect.getargs(
                 args.subcommand_instance.run.__code__).args)
             if not bot and 'bot' in funcargs:
