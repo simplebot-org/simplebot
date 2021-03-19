@@ -7,8 +7,8 @@ from typing import Generator, Union
 
 import deltachat as dc
 import py
-from deltachat import Account, Chat, Contact, Message, account_hookimpl
-from deltachat.capi import lib
+from deltachat import Account, Chat, Contact, Message, account_hookimpl, const
+from deltachat.capi import ffi, lib
 from deltachat.cutil import as_dc_charpointer
 from deltachat.message import parse_system_add_remove
 from deltachat.tracker import ConfigureTracker
@@ -84,12 +84,26 @@ class Replies:
                 with open(filename, "wb") as f:
                     f.write(bytefile.read())
 
+            _view_type_mapping = {
+                'text': const.DC_MSG_TEXT,
+                'image': const.DC_MSG_IMAGE,
+                'gif': const.DC_MSG_GIF,
+                'audio': const.DC_MSG_AUDIO,
+                'video': const.DC_MSG_VIDEO,
+                'file': const.DC_MSG_FILE,
+                'sticker': const.DC_MSG_STICKER,
+            }
             if not view_type:
                 if filename:
                     view_type = "file"
                 else:
                     view_type = "text"
-            msg = Message.new_empty(self.incoming_message.account, view_type)
+            view_type_code = _view_type_mapping.get(view_type, view_type)
+            msg = Message(self.incoming_message.account, ffi.gc(
+                lib.dc_msg_new(self.incoming_message.account._dc_context, view_type_code),
+                lib.dc_msg_unref
+            ))
+
             if quote is not None:
                 msg.quote = quote
             if text is not None:
