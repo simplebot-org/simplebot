@@ -1,11 +1,11 @@
 
 from collections import OrderedDict
-from typing import Callable, List, Tuple
+from typing import Callable, Set, Tuple
 
 from .commands import parse_command_docstring
 from .hookspec import deltabot_hookimpl
 
-_filters: List[Tuple[str, Callable]] = []
+_filters: Set[Tuple[str, Callable, bool, bool]] = set()
 
 
 class Filters:
@@ -75,9 +75,9 @@ def filter_decorator(func: Callable = None, name: str = None,
     Check documentation of method `simplebot.filters.Filters.register` to
     see all parameters the decorated function can accept.
     """
-    def _decorator(func):
+    def _decorator(func) -> Callable:
         _name =  name or '{}.{}'.format(func.__module__, func.__name__)
-        _filters.append((_name, func, tryfirst, trylast))
+        _filters.add((_name, func, tryfirst, trylast))
         return func
 
     if func is None:

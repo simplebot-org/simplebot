@@ -2,12 +2,12 @@
 import inspect
 import types
 from collections import OrderedDict
-from typing import Callable, Generator, List, Optional, Tuple
+from typing import Callable, Generator, Optional, Set, Tuple
 
 from .hookspec import deltabot_hookimpl
 
 CMD_PREFIX = '/'
-_cmds: List[Tuple[str, Callable, bool]] = []
+_cmds: Set[Tuple[str, Callable, bool]] = set()
 
 
 class NotFound(LookupError):
@@ -179,8 +179,8 @@ def command_decorator(func: Callable = None, name: str = None,
     Check documentation of method `simplebot.commands.Commands.register` to
     see all parameters the decorated function can accept.
     """
-    def _decorator(func):
-        _cmds.append((name or CMD_PREFIX + func.__name__, func, admin))
+    def _decorator(func) -> Callable:
+        _cmds.add((name or CMD_PREFIX + func.__name__, func, admin))
         return func
 
     if func is None:
