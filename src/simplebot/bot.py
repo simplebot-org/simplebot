@@ -68,8 +68,6 @@ class Replies:
     def _send_replies_to_core(self) -> Generator[Message, None, None]:
         for text, filename, bytefile, chat, quote, html, sender, view_type in self._replies:
             if bytefile:
-                # XXX avoid double copy -- core will copy this file another time
-                # XXX maybe also avoid loading the file into RAM but it's max 50MB
                 blobdir = self.incoming_message.account.get_blobdir()
                 parts = filename.split('.', maxsplit=1)
                 if len(parts) == 2:
@@ -106,13 +104,13 @@ class Replies:
 
             if quote is not None:
                 msg.quote = quote
-            if text is not None:
+            if text:
                 msg.set_text(text)
-            if html is not None:
+            if html:
                 lib.dc_msg_set_html(msg._dc_msg, as_dc_charpointer(html))
-            if filename is not None:
+            if filename:
                 msg.set_file(filename)
-            if sender is not None:
+            if sender:
                 lib.dc_msg_set_override_sender_name(
                     msg._dc_msg, as_dc_charpointer(sender))
             if chat is None:
