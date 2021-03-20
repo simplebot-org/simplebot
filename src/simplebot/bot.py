@@ -283,7 +283,6 @@ class DeltaBot:
             # set some useful bot defaults on the account
             delete_server_after=1,
             delete_device_after=2592000,
-            mdns_enabled=0,
             save_mime_headers=1,
             e2ee_enabled=1,
             sentbox_watch=0,
