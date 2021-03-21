@@ -56,7 +56,7 @@ def test_register(mock_bot):
 class TestArgParsing:
 
     @pytest.fixture
-    def parse_cmd(self, mock_bot, mocker):
+    def parse_cmd(self, mocker):
         def proc(name, text, group=None):
             l = []
 
@@ -64,12 +64,13 @@ class TestArgParsing:
                 """ my commands example. """
                 l.append(command)
 
-            mock_bot.commands.register(name=name, func=my_command)
+            mocker.bot.commands.register(name=name, func=my_command)
 
             msg = mocker.make_incoming_message(text, group=group)
-            replies = Replies(msg, mock_bot.logger)
+            replies = Replies(msg, mocker.bot.logger)
             mocker.replies = replies
-            mock_bot.commands.deltabot_incoming_message(message=msg, replies=replies)
+            mocker.bot.commands.deltabot_incoming_message(
+                message=msg, replies=replies)
             if len(l) == 1:
                 return l[0]
 
@@ -122,6 +123,6 @@ class TestArgParsing:
         parse_cmd("/some_other", "/unknown", group=None)
         assert mocker.replies.has_replies()
 
-    def test_two_commands_with_same_prefix(self, parse_cmd, mock_bot):
+    def test_two_commands_with_same_prefix(self, parse_cmd):
         assert parse_cmd("/execute", "/execute").cmd_def.cmd == "/execute"
         assert parse_cmd("/exec", "/exec").cmd_def.cmd == "/exec"
