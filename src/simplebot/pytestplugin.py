@@ -8,8 +8,8 @@ import py
 import pytest
 from _pytest.pytester import LineMatcher
 from deltachat import account_hookimpl
-from deltachat.message import Message
 from deltachat.chat import Chat
+from deltachat.message import Message
 
 from .bot import Replies
 from .main import make_bot_from_args

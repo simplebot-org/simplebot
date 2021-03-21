@@ -2,6 +2,7 @@
 from queue import Queue
 
 import pluggy
+
 import simplebot
 from simplebot.plugins import get_global_plugin_manager
 

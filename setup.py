@@ -1,9 +1,8 @@
 
-import re
 import os
+import re
 
 import setuptools
-
 
 if __name__ == "__main__":
     with open('README.md') as f:

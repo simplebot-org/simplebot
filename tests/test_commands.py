@@ -1,8 +1,8 @@
 
 import pytest
 
-from simplebot.commands import parse_command_docstring
 from simplebot.bot import Replies
+from simplebot.commands import parse_command_docstring
 
 
 def test_parse_command_docstring():
