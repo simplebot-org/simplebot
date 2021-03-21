@@ -3,7 +3,7 @@ import os
 import shutil
 import threading
 from tempfile import NamedTemporaryFile
-from typing import Generator, Union
+from typing import Generator, List, Union
 
 import deltachat as dc
 import py
@@ -26,7 +26,7 @@ class Replies:
     def __init__(self, message: Message, logger) -> None:
         self.incoming_message = message
         self.logger = logger
-        self._replies = []
+        self._replies: List[tuple] = []
 
     def has_replies(self) -> bool:
         return bool(self._replies)

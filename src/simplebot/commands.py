@@ -2,7 +2,7 @@
 import inspect
 import types
 from collections import OrderedDict
-from typing import Callable, Generator, Optional, Set, Tuple
+from typing import Callable, Dict, Generator, Optional, Set, Tuple
 
 from .hookspec import deltabot_hookimpl
 
@@ -16,10 +16,9 @@ class NotFound(LookupError):
 
 class Commands:
     def __init__(self, bot) -> None:
-        self.bot = bot
         self.logger = bot.logger
-        self._cmd_defs = OrderedDict()
-        self.bot.plugins.add_module("commands", self)
+        self._cmd_defs: Dict[str, CommandDef] = OrderedDict()
+        bot.plugins.add_module("commands", self)
 
     def register(self, name: str, func: Callable, admin: bool = False) -> None:
         """ register a command function that acts on each incoming non-system message.
@@ -50,7 +49,7 @@ class Commands:
         return self._cmd_defs.copy()
 
     @deltabot_hookimpl
-    def deltabot_incoming_message(self, message, replies) -> Optional[bool]:
+    def deltabot_incoming_message(self, bot, message, replies) -> Optional[bool]:
         if not message.text.startswith(CMD_PREFIX):
             return None
         args = message.text.split()
@@ -58,7 +57,7 @@ class Commands:
         orig_cmd_name = args.pop(0)
 
         if '@' in orig_cmd_name:
-            suffix = '@' + self.bot.self_contact.addr
+            suffix = '@' + bot.self_contact.addr
             if orig_cmd_name.endswith(suffix):
                 orig_cmd_name = orig_cmd_name[:-len(suffix)]
             else:
@@ -74,7 +73,7 @@ class Commands:
             args.insert(0, newarg)
             payload = (newarg + " " + payload).rstrip()
 
-        if not cmd_def or (cmd_def.admin and not self.bot.is_admin(
+        if not cmd_def or (cmd_def.admin and not bot.is_admin(
                 message.get_sender_contact().addr)):
             reply = "unknown command {!r}".format(orig_cmd_name)
             self.logger.warn(reply)
@@ -82,11 +81,11 @@ class Commands:
                 replies.add(text=reply)
             return True
 
-        cmd = IncomingCommand(bot=self.bot, cmd_def=cmd_def, message=message,
+        cmd = IncomingCommand(bot=bot, cmd_def=cmd_def, message=message,
                               args=args, payload=payload)
-        self.bot.logger.info("processing command {}".format(cmd))
+        bot.logger.info("processing command {}".format(cmd))
         try:
-            res = cmd.cmd_def(command=cmd, replies=replies, bot=self.bot, payload=cmd.payload, args=cmd.args, message=cmd.message)
+            res = cmd.cmd_def(command=cmd, replies=replies, bot=bot, payload=cmd.payload, args=cmd.args, message=cmd.message)
         except Exception as ex:
             self.logger.exception(ex)
         else:
@@ -95,12 +94,11 @@ class Commands:
 
     @deltabot_hookimpl
     def deltabot_init(self, bot) -> None:
-        assert bot == self.bot
         self.register("/help", self.command_help)
 
-    def command_help(self, command, replies) -> None:
+    def command_help(self, bot, command, replies) -> None:
         """ reply with help message about available commands. """
-        is_admin = self.bot.is_admin(
+        is_admin = bot.is_admin(
             command.message.get_sender_contact().addr)
         l = []
         l.append("➡️ Commands:\n")
@@ -108,7 +106,7 @@ class Commands:
             if not c.admin or is_admin:
                 l.append("{}: {}\n".format(c.cmd, c.short))
         l.append("\n\n")
-        pm = self.bot.plugins._pm
+        pm = bot.plugins._pm
         plugins = [pm.get_name(plug) for plug, dist in pm.list_plugin_distinfo()]
         l.append("🧩 Enabled Plugins:\n{}".format("\n".join(plugins)))
         replies.add(text="\n".join(l))

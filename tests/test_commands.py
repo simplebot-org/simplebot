@@ -65,12 +65,7 @@ class TestArgParsing:
                 l.append(command)
 
             mocker.bot.commands.register(name=name, func=my_command)
-
-            msg = mocker.make_incoming_message(text, group=group)
-            replies = Replies(msg, mocker.bot.logger)
-            mocker.replies = replies
-            mocker.bot.commands.deltabot_incoming_message(
-                message=msg, replies=replies)
+            mocker.replies = mocker.get_replies(text, group=group)
             if len(l) == 1:
                 return l[0]
 
@@ -119,9 +114,9 @@ class TestArgParsing:
 
     def test_unknown_command(self, parse_cmd, mocker):
         parse_cmd("/some_group", "/unknown", group="mockgroup")
-        assert not mocker.replies.has_replies()
+        assert not mocker.replies
         parse_cmd("/some_other", "/unknown", group=None)
-        assert mocker.replies.has_replies()
+        assert mocker.replies
 
     def test_two_commands_with_same_prefix(self, parse_cmd):
         assert parse_cmd("/execute", "/execute").cmd_def.cmd == "/execute"

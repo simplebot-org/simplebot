@@ -1,6 +1,6 @@
 
 from collections import OrderedDict
-from typing import Callable, Set, Tuple
+from typing import Callable, Dict, Set, Tuple
 
 from .commands import parse_command_docstring
 from .hookspec import deltabot_hookimpl
@@ -10,10 +10,9 @@ _filters: Set[Tuple[str, Callable, bool, bool]] = set()
 
 class Filters:
     def __init__(self, bot) -> None:
-        self.bot = bot
         self.logger = bot.logger
-        self._filter_defs = OrderedDict()
-        self.bot.plugins.add_module('filters', self)
+        self._filter_defs: Dict[str, FilterDef] = OrderedDict()
+        bot.plugins.add_module('filters', self)
 
     def register(self, name: str, func: Callable, tryfirst: bool = False, trylast: bool = False) -> None:
         """ register a filter function that acts on each incoming non-system message.
@@ -40,10 +39,10 @@ class Filters:
         return self._filter_defs.copy()
 
     @deltabot_hookimpl(trylast=True)
-    def deltabot_incoming_message(self, message, replies) -> None:
+    def deltabot_incoming_message(self, bot, message, replies) -> None:
         for name, filter_def in sorted(self._filter_defs.items(), key=lambda e: e[1].priority):
             self.logger.debug("calling filter {!r} on message id={}".format(name, message.id))
-            res = filter_def(message=message, replies=replies, bot=self.bot)
+            res = filter_def(message=message, replies=replies, bot=bot)
             assert res is None
 
 
