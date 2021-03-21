@@ -13,7 +13,7 @@ from deltachat.cutil import as_dc_charpointer
 from deltachat.message import parse_system_add_remove
 from deltachat.tracker import ConfigureTracker
 
-from .builtin.admin import get_admins
+from .builtin.admin import add_admin, del_admin, get_admins
 from .builtin.cmdline import PluginCmd
 from .commands import Commands, _cmds
 from .filters import Filters, _filters
@@ -187,7 +187,7 @@ class DeltaBot:
     # API for bot administration
     #
     def is_admin(self, contact: Union[Contact, int, str]) -> bool:
-        """ True if the given contact is registered as an administrator account.
+        """ True if the given contact is registered as bot administrator.
         """
         if isinstance(contact, str):
             addr = contact
@@ -196,6 +196,28 @@ class DeltaBot:
         else:
             addr = self.get_contact(contact).addr
         return addr in get_admins(self)
+
+    def add_admin(self, contact: Union[Contact, int, str]) -> None:
+        """ Register contact as bot administrator.
+        """
+        if isinstance(contact, str):
+            addr = contact
+        elif isinstance(contact, Contact):
+            addr = contact.addr
+        else:
+            addr = self.get_contact(contact).addr
+        add_admin(self, addr)
+
+    def del_admin(self, contact: Union[Contact, int, str]) -> None:
+        """ Remove contact from bot administrators.
+        """
+        if isinstance(contact, str):
+            addr = contact
+        elif isinstance(contact, Contact):
+            addr = contact.addr
+        else:
+            addr = self.get_contact(contact).addr
+        del_admin(self, addr)
 
     #
     # API for persistent scoped-key/value settings

@@ -64,15 +64,10 @@ class AdminCmd:
             self._list(bot, out)
 
     def _add(self, bot, addr) -> None:
-        existing = list(x for x in bot.get(self.db_key, default="").split("\n") if x.strip())
-        assert "," not in addr
-        existing.append(addr)
-        bot.set(self.db_key, "\n".join(existing))
+        add_admin(bot, addr)
 
     def _del(self, bot, addr) -> None:
-        existing = list(x for x in bot.get(self.db_key, default="").split("\n") if x.strip())
-        existing.remove(addr)
-        bot.set(self.db_key, "\n".join(existing))
+        del_admin(bot, addr)
 
     def _list(self, bot, out) -> None:
         out.line('Administrators:\n{}'.format(
@@ -125,7 +120,24 @@ def get_banned_list(bot) -> str:
 
 
 def get_admins(bot) -> list:
-    return bot.get('administrators', default='').split('\n')
+    return bot.get(AdminCmd.db_key, default='').split('\n')
+
+
+def add_admin(bot, addr) -> None:
+    existing = set()
+    for a in bot.get(AdminCmd.db_key, default="").split("\n"):
+        existing.add(a)
+    assert "," not in addr
+    existing.add(addr)
+    bot.set(AdminCmd.db_key, "\n".join(existing))
+
+
+def del_admin(bot, addr) -> None:
+    existing = set()
+    for a in bot.get(AdminCmd.db_key, default="").split("\n"):
+        existing.add(a)
+    existing.remove(addr)
+    bot.set(AdminCmd.db_key, "\n".join(existing))
 
 
 class TestCommandAdmin:
