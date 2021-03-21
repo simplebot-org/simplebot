@@ -103,16 +103,34 @@ def mocker(mock_bot):
                         setattr(self.msg, name, value)
             return MsgWrapper(msg_in, quote, contact)
 
-        def run_command(self, text):
-            msg = self.make_incoming_message(text)
-            replies = Replies(msg, self.bot.logger)
-            self.bot.commands.deltabot_incoming_message(message=msg, replies=replies)
-            l = replies.send_reply_messages()
+        def get_one_reply(
+                self, text: str = None, html: str = None,
+                filename: str = None, viewtype: str = None,
+                group: Union[str, Chat] = None, impersonate: str = None,
+                addr: str = "Alice <alice@example.org>",
+                quote: Message = None) -> Message:
+            l = self.get_replies(
+                text=text, html=html, filename=filename, viewtype=viewtype,
+                group=group, impersonate=impersonate, addr=addr, quote=quote)
             if not l:
-                raise ValueError("no reply for command {!r}".format(text))
+                raise ValueError("no reply for message {!r}".format(text))
             if len(l) > 1:
                 raise ValueError("more than one reply for {!r}".format(text))
             return l[0]
+
+        def get_replies(
+                self, text: str = None, html: str = None,
+                filename: str = None, viewtype: str = None,
+                group: Union[str, Chat] = None, impersonate: str = None,
+                addr: str = "Alice <alice@example.org>",
+                quote: Message = None) -> list:
+            msg = self.make_incoming_message(
+                text=text, html=html, filename=filename, viewtype=viewtype,
+                group=group, impersonate=impersonate, addr=addr, quote=quote)
+            replies = Replies(msg, self.bot.logger)
+            self.bot.plugins.hook.deltabot_incoming_message(
+                message=msg, replies=replies, bot=self.bot)
+            return replies.send_reply_messages()
 
     return Mocker()
 

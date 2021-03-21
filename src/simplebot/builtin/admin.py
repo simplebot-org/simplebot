@@ -142,11 +142,11 @@ def del_admin(bot, addr) -> None:
 
 class TestCommandAdmin:
     def test_mock_cmd_ban(self, mocker):
-        reply_msg = mocker.run_command("/ban foo@example.com")
+        reply_msg = mocker.get_one_reply("/ban foo@example.com")
         assert reply_msg.text.lower().startswith("banned:")
-        reply_msg = mocker.run_command("/ban")
+        reply_msg = mocker.get_one_reply("/ban")
         assert not reply_msg.text.lower().startswith("banned:")
 
     def test_mock_cmd_unban(self, mocker):
-        reply_msg = mocker.run_command("/unban foo@example.com")
+        reply_msg = mocker.get_one_reply("/unban foo@example.com")
         assert reply_msg.text.lower().startswith("unbanned:")

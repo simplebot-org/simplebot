@@ -21,7 +21,7 @@ def test_parse_command_docstring():
 
 
 def test_run_help(mocker):
-    reply = mocker.run_command("/help")
+    reply = mocker.get_one_reply("/help")
     assert "/help" in reply.text
 
 

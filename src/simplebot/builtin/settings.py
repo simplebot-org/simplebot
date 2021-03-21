@@ -111,13 +111,13 @@ def dump_settings(bot, scope) -> list:
 
 class TestCommandSettings:
     def test_mock_get_set_empty_settings(self, mocker):
-        reply_msg = mocker.run_command("/set")
+        reply_msg = mocker.get_one_reply("/set")
         assert reply_msg.text.startswith("no settings")
 
     def test_mock_set_works(self, mocker):
-        reply_msg = mocker.run_command("/set hello world")
+        reply_msg = mocker.get_one_reply("/set hello world")
         assert "old" in reply_msg.text
-        msg_reply = mocker.run_command("/set")
+        msg_reply = mocker.get_one_reply("/set")
         assert "hello=world" == msg_reply.text
 
     def test_get_set_functional(self, bot_tester):
