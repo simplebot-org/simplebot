@@ -57,7 +57,7 @@ class TestArgParsing:
 
     @pytest.fixture
     def parse_cmd(self, mock_bot, mocker):
-        def proc(name, text, group=False):
+        def proc(name, text, group=None):
             l = []
 
             def my_command(command, replies):
@@ -117,9 +117,9 @@ class TestArgParsing:
         assert parse_cmd("/some_other", "/some_other").cmd_def.cmd == "/some_other"
 
     def test_unknown_command(self, parse_cmd, mocker):
-        parse_cmd("/some_group", "/unknown", group=True)
+        parse_cmd("/some_group", "/unknown", group="mockgroup")
         assert not mocker.replies.has_replies()
-        parse_cmd("/some_other", "/unknown", group=False)
+        parse_cmd("/some_other", "/unknown", group=None)
         assert mocker.replies.has_replies()
 
     def test_two_commands_with_same_prefix(self, parse_cmd, mock_bot):

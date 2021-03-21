@@ -2,12 +2,14 @@
 import os
 from email.utils import parseaddr
 from queue import Queue
+from typing import Union
 
 import py
 import pytest
 from _pytest.pytester import LineMatcher
 from deltachat import account_hookimpl
 from deltachat.message import Message
+from deltachat.chat import Chat
 
 from .bot import Replies
 from .main import make_bot_from_args
@@ -58,21 +60,48 @@ def make_bot(request, account, plugin_module, started=True):
 @pytest.fixture
 def mocker(mock_bot):
     class Mocker:
-        def __init__(self):
+        def __init__(self) -> None:
             self.bot = mock_bot
             self.account = mock_bot.account
 
-        def make_incoming_message(self, text, group=False, addr="Alice <alice@example.org>"):
-            msg = Message.new_empty(self.account, "text")
-            msg.set_text(text)
+        def make_incoming_message(
+                self, text: str = None, html: str = None,
+                filename: str = None, viewtype: str = None,
+                group: Union[str, Chat] = None, impersonate: str = None,
+                addr: str = "Alice <alice@example.org>",
+                quote: Message = None) -> Message:
+            if filename and not os.path.exists(filename):
+                filename = os.path.join(
+                    self.bot.account.get_blobdir(), filename)
+                with open(filename, 'wb'):
+                    pass
+
+            replies = Replies(self.bot, self.bot.logger)
+            msg = replies._create_message(text=text, html=html, viewtype=viewtype, filename=filename, quote=quote, sender=impersonate)
+
             name, routeable_addr = parseaddr(addr)
             contact = self.account.create_contact(routeable_addr, name=name)
-            if group:
-                chat = self.account.create_group_chat("mockgroup", contacts=[contact])
+            if isinstance(group, Chat):
+                chat = group
+            elif isinstance(group, str):
+                chat = self.account.create_group_chat(
+                    group, contacts=[contact])
             else:
                 chat = self.account.create_chat(contact)
             msg_in = chat.prepare_message(msg)
-            return msg_in
+            class MsgWrapper:
+                def __init__ (self, msg, quote, contact):
+                    self.msg = msg
+                    self.quote = quote
+                    self.get_sender_contact = lambda: contact
+                def __getattr__(self, name, /):
+                    return self.msg.__getattribute__(name)
+                def __setattr__(self, name, value, /):
+                    if name in ('quote', 'msg'):
+                        super().__setattr__(name, value)
+                    else:
+                        setattr(self.msg, name, value)
+            return MsgWrapper(msg_in, quote, contact)
 
         def run_command(self, text):
             msg = self.make_incoming_message(text)

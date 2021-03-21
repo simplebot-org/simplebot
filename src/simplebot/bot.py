@@ -55,7 +55,7 @@ class Replies:
             if os.path.basename(filename) != filename:
                 raise ValueError("if bytefile is specified, filename must a basename, not path")
 
-        self._replies.append((text, filename, bytefile, chat, quote, html, sender, viewtype))
+        self._replies.append((text, html, viewtype, filename, bytefile, sender, quote, chat))
 
     def send_reply_messages(self) -> list:
         l = []
@@ -66,59 +66,68 @@ class Replies:
         return l
 
     def _send_replies_to_core(self) -> Generator[Message, None, None]:
-        for text, filename, bytefile, chat, quote, html, sender, view_type in self._replies:
-            if bytefile:
-                blobdir = self.incoming_message.account.get_blobdir()
-                parts = filename.split('.', maxsplit=1)
-                if len(parts) == 2:
-                    prefix, suffix = parts
-                    prefix += '-'
-                    suffix = '.' + suffix
-                else:
-                    prefix = filename + '-'
-                    suffix = None
-                with NamedTemporaryFile(dir=blobdir, prefix=prefix, suffix=suffix, delete=False) as fp:
-                    filename = fp.name
-                with open(filename, "wb") as f:
-                    f.write(bytefile.read())
-
-            _view_type_mapping = {
-                'text': const.DC_MSG_TEXT,
-                'image': const.DC_MSG_IMAGE,
-                'gif': const.DC_MSG_GIF,
-                'audio': const.DC_MSG_AUDIO,
-                'video': const.DC_MSG_VIDEO,
-                'file': const.DC_MSG_FILE,
-                'sticker': const.DC_MSG_STICKER,
-            }
-            if not view_type:
-                if filename:
-                    view_type = "file"
-                else:
-                    view_type = "text"
-            view_type_code = _view_type_mapping.get(view_type, view_type)
-            msg = Message(self.incoming_message.account, ffi.gc(
-                lib.dc_msg_new(self.incoming_message.account._dc_context, view_type_code),
-                lib.dc_msg_unref
-            ))
-
-            if quote is not None:
-                msg.quote = quote
-            if text:
-                msg.set_text(text)
-            if html:
-                lib.dc_msg_set_html(msg._dc_msg, as_dc_charpointer(html))
-            if filename:
-                msg.set_file(filename)
-            if sender:
-                lib.dc_msg_set_override_sender_name(
-                    msg._dc_msg, as_dc_charpointer(sender))
+        for text, html, viewtype, filename, bytefile, sender, quote, chat in self._replies:
+            msg = self._create_message(text, html, viewtype, filename,
+                                       bytefile, sender, quote)
             if chat is None:
                 chat = self.incoming_message.chat
             msg = chat.send_msg(msg)
             yield msg
 
         self._replies[:] = []
+
+    def _create_message(self, text: str = None, html: str = None,
+                        viewtype: str = None, filename: str = None,
+                        bytefile=None, sender: str = None,
+                        quote: Message = None) -> Message:
+        if bytefile:
+            blobdir = self.incoming_message.account.get_blobdir()
+            parts = filename.split('.', maxsplit=1)
+            if len(parts) == 2:
+                prefix, suffix = parts
+                prefix += '-'
+                suffix = '.' + suffix
+            else:
+                prefix = filename + '-'
+                suffix = None
+            with NamedTemporaryFile(dir=blobdir, prefix=prefix, suffix=suffix, delete=False) as fp:
+                filename = fp.name
+            with open(filename, "wb") as f:
+                f.write(bytefile.read())
+
+        _view_type_mapping = {
+            'text': const.DC_MSG_TEXT,
+            'image': const.DC_MSG_IMAGE,
+            'gif': const.DC_MSG_GIF,
+            'audio': const.DC_MSG_AUDIO,
+            'video': const.DC_MSG_VIDEO,
+            'file': const.DC_MSG_FILE,
+            'sticker': const.DC_MSG_STICKER,
+        }
+        if not viewtype:
+            if filename:
+                viewtype = "file"
+            else:
+                viewtype = "text"
+        view_type_code = _view_type_mapping.get(viewtype, viewtype)
+        msg = Message(self.incoming_message.account, ffi.gc(
+            lib.dc_msg_new(self.incoming_message.account._dc_context, view_type_code),
+            lib.dc_msg_unref
+        ))
+
+        if quote is not None:
+            msg.quote = quote
+        if text:
+            msg.set_text(text)
+        if html:
+            lib.dc_msg_set_html(msg._dc_msg, as_dc_charpointer(html))
+        if filename:
+            msg.set_file(filename)
+        if sender:
+            lib.dc_msg_set_override_sender_name(
+                msg._dc_msg, as_dc_charpointer(sender))
+
+        return msg
 
 
 class DeltaBot:
