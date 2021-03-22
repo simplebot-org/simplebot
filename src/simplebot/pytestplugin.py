@@ -1,5 +1,6 @@
 
 import os
+import re
 from email.utils import parseaddr
 from queue import Queue
 from typing import Union
@@ -35,7 +36,7 @@ def make_bot(request, account, plugin_module, started=True):
     # we use a new plugin manager for each test
     pm = make_plugin_manager()
 
-    argv = ["simplebot", "--account", basedir]
+    argv = ["simplebot", "--stdlog=debug", "--account", basedir]
 
     # initialize command line
     parser = get_base_parser(pm, argv)
@@ -76,8 +77,9 @@ def mocker(mock_bot):
                 with open(filename, 'wb'):
                     pass
 
-            replies = Replies(self.bot, self.bot.logger)
-            msg = replies._create_message(text=text, html=html, viewtype=viewtype, filename=filename, quote=quote, sender=impersonate)
+            msg = Replies(self.bot, self.bot.logger)._create_message(
+                text=text, html=html, viewtype=viewtype,
+                filename=filename, quote=quote, sender=impersonate)
 
             name, routeable_addr = parseaddr(addr)
             contact = self.account.create_contact(routeable_addr, name=name)
@@ -108,10 +110,11 @@ def mocker(mock_bot):
                 filename: str = None, viewtype: str = None,
                 group: Union[str, Chat] = None, impersonate: str = None,
                 addr: str = "Alice <alice@example.org>",
-                quote: Message = None) -> Message:
+                quote: Message = None, filters: str = None) -> Message:
             l = self.get_replies(
                 text=text, html=html, filename=filename, viewtype=viewtype,
-                group=group, impersonate=impersonate, addr=addr, quote=quote)
+                group=group, impersonate=impersonate, addr=addr,
+                quote=quote, filters=filters)
             if not l:
                 raise ValueError("no reply for message {!r}".format(text))
             if len(l) > 1:
@@ -123,7 +126,12 @@ def mocker(mock_bot):
                 filename: str = None, viewtype: str = None,
                 group: Union[str, Chat] = None, impersonate: str = None,
                 addr: str = "Alice <alice@example.org>",
-                quote: Message = None) -> list:
+                quote: Message = None, filters: str = None) -> list:
+            if filters:
+                regex = re.compile(filters)
+                for name in list(self.bot.filters._filter_defs.keys()):
+                    if not regex.match(name):
+                        del self.bot.filters._filter_defs[name]
             msg = self.make_incoming_message(
                 text=text, html=html, filename=filename, viewtype=viewtype,
                 group=group, impersonate=impersonate, addr=addr, quote=quote)
