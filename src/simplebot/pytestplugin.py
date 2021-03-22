@@ -118,7 +118,7 @@ def mocker(mock_bot):
             if not l:
                 raise ValueError("no reply for message {!r}".format(text))
             if len(l) > 1:
-                raise ValueError("more than one reply for {!r}".format(text))
+                raise ValueError("more than one reply for {!r}, replies={}".format(text, l))
             return l[0]
 
         def get_replies(
