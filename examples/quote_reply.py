@@ -27,15 +27,15 @@ def mycalc(payload, message, replies):
     replies.add(text=reply, quote=message)
 
 
-class TestMyCalc:
+class TestQuoteReply:
     def test_mock_calc(self, mocker):
-        reply_msg = mocker.run_command("/mycalc 1+1")
+        reply_msg = mocker.get_one_reply("/mycalc 1+1")
         assert reply_msg.text.endswith("2")
 
     def test_mock_calc_fail(self, mocker):
-        reply_msg = mocker.run_command("/mycalc 1w+1")
+        reply_msg = mocker.get_one_reply("/mycalc 1w+1")
         assert "ExpressionError" in reply_msg.text
 
     def test_bot_mycalc(self, bot_tester):
-        msg_reply = bot_tester.send_command("/mycalc 10*13+2")
+        msg_reply = bot_tester.get_one_reply("/mycalc 10*13+2")
         assert msg_reply.text.endswith("132")

@@ -51,3 +51,11 @@ def message_info(message, replies):
         lines.append('Member Count: {}'.format(len(chat.get_contacts())))
 
     replies.add(text='\n'.join(lines))
+
+
+class TestDeltaChatApi:
+    def test_message_info(self, mocker):
+        addr = 'addr@example.org'
+        msg = mocker.get_one_reply(
+            text='deltachat_api', addr=addr, filters=__name__)
+        assert addr in msg.text

@@ -7,8 +7,9 @@ This plugin uses a 3rd party lib so you will need to install it first:
 
 """
 
-import simplebot
 import wikiquote
+
+import simplebot
 
 
 @simplebot.command
@@ -20,3 +21,7 @@ def quote(message, replies):
     else:
         replies.add(text='"{}"\n\n― {}'.format(text, author))
 
+
+class TestImpersonating:
+    def test_impersonating(self, mocker):
+        mocker.get_one_reply(text='/quote', group='mockgroup')
