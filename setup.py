@@ -20,7 +20,7 @@ if __name__ == "__main__":
         long_description_content_type='text/markdown',
         author='The SimpleBot Contributors',
         author_email='adbenitez@nauta.cu, holger@merlinux.eu',
-        url='https://github.com/SimpleBot-Inc/simplebot',
+        url='https://github.com/simplebot-org/simplebot',
         package_dir={'': 'src'},
         packages=setuptools.find_packages('src'),
         classifiers=['Development Status :: 4 - Beta',
