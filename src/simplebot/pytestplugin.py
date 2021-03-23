@@ -96,9 +96,9 @@ def mocker(mock_bot):
                     self.msg = msg
                     self.quote = quote
                     self.get_sender_contact = lambda: contact
-                def __getattr__(self, name, /):
+                def __getattr__(self, name):
                     return self.msg.__getattribute__(name)
-                def __setattr__(self, name, value, /):
+                def __setattr__(self, name, value):
                     if name in ('quote', 'msg'):
                         super().__setattr__(name, value)
                     else:
