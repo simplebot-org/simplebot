@@ -6,6 +6,7 @@
 [![Downloads](https://pepy.tech/badge/simplebot)](https://pepy.tech/project/simplebot)
 [![GitHub license](https://img.shields.io/github/license/simplebot-org/simplebot)](https://github.com/simplebot-org/simplebot/blob/master/LICENSE)
 [![CI](https://github.com/simplebot-org/simplebot/actions/workflows/python-ci.yml/badge.svg)](https://github.com/simplebot-org/simplebot/actions/workflows/python-ci.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Contributors](https://img.shields.io/github/contributors/simplebot-org/simplebot.svg)](https://github.com/simplebot-org/simplebot/graphs/contributors)
 
 > An extensible Delta Chat bot.
