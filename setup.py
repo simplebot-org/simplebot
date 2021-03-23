@@ -1,3 +1,4 @@
+"""Setup SimpleBot installation."""
 
 import os
 import re
@@ -8,9 +9,19 @@ if __name__ == "__main__":
     with open('README.md') as f:
         long_desc = f.read()
 
-    with open(os.path.join('src', 'simplebot', '__init__.py')) as fh:
+    init_path = os.path.join('src', 'simplebot', '__init__.py')
+    with open(init_path, encoding='utf-8') as fh:
         version = re.search(
             r"__version__ = '(.*?)'", fh.read(), re.M).group(1)
+
+    with open('requirements.txt', encoding='utf-8') as req:
+        install_requires = [
+            line.replace('==', '>=') for line in req.read().split('\n')
+            if line and not line.startswith(('#', '-'))]
+    with open('requirements-test.txt', encoding='utf-8') as req:
+        test_deps = [
+            line.replace('==', '>=') for line in req.read().split('\n')
+            if line and not line.startswith(('#', '-'))]
 
     setuptools.setup(
         name='simplebot',
@@ -34,14 +45,11 @@ if __name__ == "__main__":
             [console_scripts]
             simplebot=simplebot.main:main
             [pytest11]
-            deltabot.pytestplugin=simplebot.pytestplugin
+            simplebot.pytestplugin=simplebot.pytestplugin
         ''',
         python_requires='>=3.5',
-        install_requires=[
-            'deltachat>=1.40.2.dev',
-            'py',
-            'Pillow',
-        ],
+        install_requires=install_requires,
+        extras_require={'test': test_deps},
         include_package_data=True,
         zip_safe=False,
     )

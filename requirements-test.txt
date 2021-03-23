@@ -1,0 +1,4 @@
+xkcd==2.4.2
+wikiquote==0.1.14
+# deltachat tests dep:
+requests==2.25.0
