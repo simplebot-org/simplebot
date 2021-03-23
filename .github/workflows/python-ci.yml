@@ -26,6 +26,7 @@ jobs:
         python -m pip install requests  # deltachat tests requirements
         python -m pip install --pre -U -i https://m.devpi.net/dc/master deltachat
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        python -m pip install .
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
