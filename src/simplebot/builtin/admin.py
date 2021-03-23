@@ -1,4 +1,3 @@
-
 from ..commands import command_decorator
 from ..hookspec import deltabot_hookimpl
 
@@ -19,7 +18,7 @@ class ban:
 
     def run(self, bot, args, out) -> None:
         ban_addr(bot, args.addr)
-        out.line('Banned: {}'.format(args.addr))
+        out.line("Banned: {}".format(args.addr))
 
 
 class unban:
@@ -30,7 +29,7 @@ class unban:
 
     def run(self, bot, args, out) -> None:
         unban_addr(bot, args.addr)
-        out.line('Unbanned: {}'.format(args.addr))
+        out.line("Unbanned: {}".format(args.addr))
 
 
 class list_banned:
@@ -42,18 +41,27 @@ class list_banned:
 
 class AdminCmd:
     """administrator tools."""
-    name = 'admin'
-    db_key = 'administrators'
+
+    name = "admin"
+    db_key = "administrators"
 
     def add_arguments(self, parser) -> None:
         parser.add_argument(
-            '-a', '--add', help="grant administrator rights to an address.",
-            metavar="ADDR")
+            "-a",
+            "--add",
+            help="grant administrator rights to an address.",
+            metavar="ADDR",
+        )
         parser.add_argument(
-            '-d', '--del', help="revoke administrator rights to an address.",
-            metavar="ADDR", dest='_del')
-        parser.add_argument('-l', '--list', help="list administrators.",
-                            action='store_true')
+            "-d",
+            "--del",
+            help="revoke administrator rights to an address.",
+            metavar="ADDR",
+            dest="_del",
+        )
+        parser.add_argument(
+            "-l", "--list", help="list administrators.", action="store_true"
+        )
 
     def run(self, bot, args, out) -> None:
         if args.add:
@@ -70,11 +78,12 @@ class AdminCmd:
         del_admin(bot, addr)
 
     def _list(self, bot, out) -> None:
-        out.line('Administrators:\n{}'.format(
-            bot.get(self.db_key, default='(Empty list)')))
+        out.line(
+            "Administrators:\n{}".format(bot.get(self.db_key, default="(Empty list)"))
+        )
 
 
-@command_decorator(name='/ban', admin=True)
+@command_decorator(name="/ban", admin=True)
 def cmd_ban(command, replies) -> None:
     """Ban the given address or list banned addresses if no address is given.
 
@@ -82,14 +91,14 @@ def cmd_ban(command, replies) -> None:
     /ban foo@example.com
     /ban
     """
-    if '@' in command.payload:
+    if "@" in command.payload:
         ban_addr(command.bot, command.payload)
-        replies.add(text='Banned: {}'.format(command.payload))
+        replies.add(text="Banned: {}".format(command.payload))
     else:
         replies.add(text=get_banned_list(command.bot))
 
 
-@command_decorator(name='/unban', admin=True)
+@command_decorator(name="/unban", admin=True)
 def cmd_unban(command, replies) -> None:
     """Unban the given address.
 
@@ -97,7 +106,7 @@ def cmd_unban(command, replies) -> None:
     /unban foo@example.com
     """
     unban_addr(command.bot, command.payload)
-    replies.add(text='Unbanned: {}'.format(command.payload))
+    replies.add(text="Unbanned: {}".format(command.payload))
 
 
 def ban_addr(bot, addr: str) -> None:
@@ -116,11 +125,11 @@ def get_banned_list(bot) -> str:
     addrs = []
     for contact in bot.account.get_blocked_contacts():
         addrs.append(contact.addr)
-    return 'Banned addresses:\n{}'.format('\n'.join(addrs) or '(Empty list)')
+    return "Banned addresses:\n{}".format("\n".join(addrs) or "(Empty list)")
 
 
 def get_admins(bot) -> list:
-    return bot.get(AdminCmd.db_key, default='').split('\n')
+    return bot.get(AdminCmd.db_key, default="").split("\n")
 
 
 def add_admin(bot, addr) -> None:

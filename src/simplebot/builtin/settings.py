@@ -1,4 +1,3 @@
-
 import os
 
 from ..commands import command_decorator
@@ -14,24 +13,38 @@ def slash_scoped_key(key: str) -> tuple:
     i = key.find("/")
     if i == -1:
         raise ValueError("key {!r} does not contain a '/' scope delimiter")
-    return (key[:i], key[i + 1:])
+    return (key[:i], key[i + 1 :])
 
 
 class DB:
     """low level settings."""
+
     def add_arguments(self, parser) -> None:
         parser.add_argument(
-            '-l', '--list', help="list all key,values.", metavar='SCOPE',
-            nargs='?')
+            "-l", "--list", help="list all key,values.", metavar="SCOPE", nargs="?"
+        )
         parser.add_argument(
-            '-g', '--get', help="get a low level setting.", metavar="KEY",
-            type=slash_scoped_key)
+            "-g",
+            "--get",
+            help="get a low level setting.",
+            metavar="KEY",
+            type=slash_scoped_key,
+        )
         parser.add_argument(
-            '-s', '--set', help="set a low level setting.",
-            metavar=('KEY', 'VALUE'), nargs=2)
+            "-s",
+            "--set",
+            help="set a low level setting.",
+            metavar=("KEY", "VALUE"),
+            nargs=2,
+        )
         parser.add_argument(
-            '-d', '--del', help="delete a low level setting.", metavar="KEY",
-            type=slash_scoped_key, dest='_del')
+            "-d",
+            "--del",
+            help="delete a low level setting.",
+            metavar="KEY",
+            type=slash_scoped_key,
+            dest="_del",
+        )
 
     def run(self, bot, args, out) -> None:
         if args.get:
@@ -72,7 +85,7 @@ class DB:
             out.line("key '{}/{}' deleted".format(scope, key))
 
 
-@command_decorator(name='/set')
+@command_decorator(name="/set")
 def cmd_set(bot, payload, message, replies) -> None:
     """show all user settings or set a value for a setting.
 

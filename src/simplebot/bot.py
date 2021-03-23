@@ -1,4 +1,3 @@
-
 import os
 import shutil
 import threading
@@ -18,8 +17,11 @@ from .builtin.cmdline import PluginCmd
 from .commands import Commands, _cmds
 from .filters import Filters, _filters
 from .plugins import Plugins, get_global_plugin_manager
-from .utils import (parse_system_image_changed, parse_system_title_changed,
-                    set_builtin_avatar)
+from .utils import (
+    parse_system_image_changed,
+    parse_system_title_changed,
+    set_builtin_avatar,
+)
 
 
 class Replies:
@@ -31,10 +33,19 @@ class Replies:
     def has_replies(self) -> bool:
         return bool(self._replies)
 
-    def add(self, text: str = None, *, html: str = None, viewtype: str = None,
-            filename: str = None, bytefile=None, sender: str = None,
-            quote: Message = None, chat: Chat = None) -> None:
-        """ Schedule a reply message.
+    def add(
+        self,
+        text: str = None,
+        *,
+        html: str = None,
+        viewtype: str = None,
+        filename: str = None,
+        bytefile=None,
+        sender: str = None,
+        quote: Message = None,
+        chat: Chat = None
+    ) -> None:
+        """Schedule a reply message.
 
         :param text: a text message to include in the reply.
         :param html: an html body to include in the reply message.
@@ -53,22 +64,39 @@ class Replies:
             if not filename:
                 raise ValueError("missing filename suggestion, needed with bytefile")
             if os.path.basename(filename) != filename:
-                raise ValueError("if bytefile is specified, filename must a basename, not path")
+                raise ValueError(
+                    "if bytefile is specified, filename must a basename, not path"
+                )
 
-        self._replies.append((text, html, viewtype, filename, bytefile, sender, quote, chat))
+        self._replies.append(
+            (text, html, viewtype, filename, bytefile, sender, quote, chat)
+        )
 
     def send_reply_messages(self) -> list:
         l = []
         for msg in self._send_replies_to_core():
-            self.logger.info("reply id={} chat={} sent with text: {!r}".format(
-                msg.id, msg.chat, msg.text[:50]))
+            self.logger.info(
+                "reply id={} chat={} sent with text: {!r}".format(
+                    msg.id, msg.chat, msg.text[:50]
+                )
+            )
             l.append(msg)
         return l
 
     def _send_replies_to_core(self) -> Generator[Message, None, None]:
-        for text, html, viewtype, filename, bytefile, sender, quote, chat in self._replies:
-            msg = self._create_message(text, html, viewtype, filename,
-                                       bytefile, sender, quote)
+        for (
+            text,
+            html,
+            viewtype,
+            filename,
+            bytefile,
+            sender,
+            quote,
+            chat,
+        ) in self._replies:
+            msg = self._create_message(
+                text, html, viewtype, filename, bytefile, sender, quote
+            )
             if chat is None:
                 chat = self.incoming_message.chat
             msg = chat.send_msg(msg)
@@ -76,33 +104,41 @@ class Replies:
 
         self._replies[:] = []
 
-    def _create_message(self, text: str = None, html: str = None,
-                        viewtype: str = None, filename: str = None,
-                        bytefile=None, sender: str = None,
-                        quote: Message = None) -> Message:
+    def _create_message(
+        self,
+        text: str = None,
+        html: str = None,
+        viewtype: str = None,
+        filename: str = None,
+        bytefile=None,
+        sender: str = None,
+        quote: Message = None,
+    ) -> Message:
         if bytefile:
             blobdir = self.incoming_message.account.get_blobdir()
-            parts = filename.split('.', maxsplit=1)
+            parts = filename.split(".", maxsplit=1)
             if len(parts) == 2:
                 prefix, suffix = parts
-                prefix += '-'
-                suffix = '.' + suffix
+                prefix += "-"
+                suffix = "." + suffix
             else:
-                prefix = filename + '-'
+                prefix = filename + "-"
                 suffix = None
-            with NamedTemporaryFile(dir=blobdir, prefix=prefix, suffix=suffix, delete=False) as fp:
+            with NamedTemporaryFile(
+                dir=blobdir, prefix=prefix, suffix=suffix, delete=False
+            ) as fp:
                 filename = fp.name
             with open(filename, "wb") as f:
                 f.write(bytefile.read())
 
         _view_type_mapping = {
-            'text': const.DC_MSG_TEXT,
-            'image': const.DC_MSG_IMAGE,
-            'gif': const.DC_MSG_GIF,
-            'audio': const.DC_MSG_AUDIO,
-            'video': const.DC_MSG_VIDEO,
-            'file': const.DC_MSG_FILE,
-            'sticker': const.DC_MSG_STICKER,
+            "text": const.DC_MSG_TEXT,
+            "image": const.DC_MSG_IMAGE,
+            "gif": const.DC_MSG_GIF,
+            "audio": const.DC_MSG_AUDIO,
+            "video": const.DC_MSG_VIDEO,
+            "file": const.DC_MSG_FILE,
+            "sticker": const.DC_MSG_STICKER,
         }
         if not viewtype:
             if filename:
@@ -110,10 +146,15 @@ class Replies:
             else:
                 viewtype = "text"
         view_type_code = _view_type_mapping.get(viewtype, viewtype)
-        msg = Message(self.incoming_message.account, ffi.gc(
-            lib.dc_msg_new(self.incoming_message.account._dc_context, view_type_code),
-            lib.dc_msg_unref
-        ))
+        msg = Message(
+            self.incoming_message.account,
+            ffi.gc(
+                lib.dc_msg_new(
+                    self.incoming_message.account._dc_context, view_type_code
+                ),
+                lib.dc_msg_unref,
+            ),
+        )
 
         if quote is not None:
             msg.quote = quote
@@ -124,15 +165,15 @@ class Replies:
         if filename:
             msg.set_file(filename)
         if sender:
-            lib.dc_msg_set_override_sender_name(
-                msg._dc_msg, as_dc_charpointer(sender))
+            lib.dc_msg_set_override_sender_name(msg._dc_msg, as_dc_charpointer(sender))
 
         return msg
 
 
 class DeltaBot:
-    def __init__(self, account: Account, logger, plugin_manager=None,
-                 args: tuple = ()) -> None:
+    def __init__(
+        self, account: Account, logger, plugin_manager=None, args: tuple = ()
+    ) -> None:
         # by default we will use the global instance of the
         # plugin_manager.
         if plugin_manager is None:
@@ -159,23 +200,26 @@ class DeltaBot:
         # process dc events and turn them into simplebot ones
         self._eventhandler = IncomingEventHandler(self)
 
-        plugin_manager.hook.deltabot_init.call_historic(kwargs=dict(bot=self, args=args))
+        plugin_manager.hook.deltabot_init.call_historic(
+            kwargs=dict(bot=self, args=args)
+        )
         # add manually added python modules as plugins
-        mods = self.get(PluginCmd.db_key, '').split('\n')
+        mods = self.get(PluginCmd.db_key, "").split("\n")
         while mods:
             pymodule = mods.pop(0)
-            if os.path.isdir(pymodule) and not os.path.exists(os.path.join(pymodule, '__init__.py')):
+            if os.path.isdir(pymodule) and not os.path.exists(
+                os.path.join(pymodule, "__init__.py")
+            ):
                 for m in os.listdir(pymodule):
                     m = os.path.join(pymodule, m)
-                    if m.endswith('.py') or os.path.isdir(m):
+                    if m.endswith(".py") or os.path.isdir(m):
                         mods.append(m)
             elif pymodule:
                 if os.path.exists(pymodule):
                     mod = py.path.local(pymodule).pyimport()
-                    self.plugins.add_module(
-                        name=os.path.basename(pymodule), module=mod)
+                    self.plugins.add_module(name=os.path.basename(pymodule), module=mod)
                 else:
-                    self.logger.warning('Plugin not found: %s', pymodule)
+                    self.logger.warning("Plugin not found: %s", pymodule)
 
         for args in _cmds:
             self.commands.register(*args)
@@ -187,8 +231,7 @@ class DeltaBot:
     # API for bot administration
     #
     def is_admin(self, contact: Union[Contact, int, str]) -> bool:
-        """ True if the given contact is registered as bot administrator.
-        """
+        """True if the given contact is registered as bot administrator."""
         if isinstance(contact, str):
             addr = contact
         elif isinstance(contact, Contact):
@@ -198,8 +241,7 @@ class DeltaBot:
         return addr in get_admins(self)
 
     def add_admin(self, contact: Union[Contact, int, str]) -> None:
-        """ Register contact as bot administrator.
-        """
+        """Register contact as bot administrator."""
         if isinstance(contact, str):
             addr = contact
         elif isinstance(contact, Contact):
@@ -209,8 +251,7 @@ class DeltaBot:
         add_admin(self, addr)
 
     def del_admin(self, contact: Union[Contact, int, str]) -> None:
-        """ Remove contact from bot administrators.
-        """
+        """Remove contact from bot administrators."""
         if isinstance(contact, str):
             addr = contact
         elif isinstance(contact, Contact):
@@ -244,7 +285,7 @@ class DeltaBot:
         return res if res is not None else default
 
     def list_settings(self, scope: str = None) -> list:
-        """ list bot settings for the given scope.
+        """list bot settings for the given scope.
 
         If scope is not specified, all settings are returned.
         """
@@ -252,8 +293,11 @@ class DeltaBot:
         l = self.plugins._pm.hook.deltabot_list_settings()
         if scope is not None:
             scope_prefix = scope + "/"
-            l = [(x[0][len(scope_prefix):], x[1])
-                 for x in l if x[0].startswith(scope_prefix)]
+            l = [
+                (x[0][len(scope_prefix) :], x[1])
+                for x in l
+                if x[0].startswith(scope_prefix)
+            ]
         return l
 
     #
@@ -265,7 +309,7 @@ class DeltaBot:
         return self.account.get_self_contact()
 
     def get_contact(self, ref: Union[str, int, Contact]) -> Contact:
-        """ return Contact object (create one if needed) for the specified 'ref'.
+        """return Contact object (create one if needed) for the specified 'ref'.
 
         ref can be a Contact, email address string or contact id.
         """
@@ -277,7 +321,7 @@ class DeltaBot:
             return ref
 
     def get_chat(self, ref: Union[Message, Contact, str, int]) -> Chat:
-        """ Return a 1:1 chat (creating one if needed) from the specified ref object.
+        """Return a 1:1 chat (creating one if needed) from the specified ref object.
 
         ref can be a Message, Contact, email address string or chat-id integer.
         """
@@ -307,20 +351,22 @@ class DeltaBot:
         """ perform initial email/password bot account configuration.  """
         assert not self.is_configured() or self.account.get_config("addr") == email
 
-        self.account.update_config(dict(
-            addr=email,
-            mail_pw=password,
-            bot=1,
-            # set some useful bot defaults on the account
-            delete_server_after=1,
-            delete_device_after=2592000,
-            save_mime_headers=1,
-            e2ee_enabled=1,
-            sentbox_watch=0,
-            mvbox_watch=0,
-            bcc_self=0,
-            selfstatus="I'm a Delta Chat bot 🤖. Send me /help for more info.\n\nSource code: https://github.com/simplebot-org/simplebot",
-        ))
+        self.account.update_config(
+            dict(
+                addr=email,
+                mail_pw=password,
+                bot=1,
+                # set some useful bot defaults on the account
+                delete_server_after=1,
+                delete_device_after=2592000,
+                save_mime_headers=1,
+                e2ee_enabled=1,
+                sentbox_watch=0,
+                mvbox_watch=0,
+                bcc_self=0,
+                selfstatus="I'm a Delta Chat bot 🤖. Send me /help for more info.\n\nSource code: https://github.com/simplebot-org/simplebot",
+            )
+        )
 
         tracker = ConfigureTracker(self.account)
         with self.account.temp_plugin(tracker) as configtracker:
@@ -329,11 +375,11 @@ class DeltaBot:
                 configtracker.wait_finish()
             except configtracker.ConfigureFailed as ex:
                 success = False
-                self.logger.error('Failed to configure: {}'.format(ex))
+                self.logger.error("Failed to configure: {}".format(ex))
             else:
                 set_builtin_avatar(self)
                 success = True
-                self.logger.info('Successfully configured {}'.format(email))
+                self.logger.info("Successfully configured {}".format(email))
             return success
 
     #
@@ -371,27 +417,23 @@ class CheckAll:
             try:
                 message = self.bot.account.get_message_by_id(msg_id)
                 headers = message.get_mime_headers() or dict()
-                if 'Chat-Version' in headers or message.is_encrypted():
+                if "Chat-Version" in headers or message.is_encrypted():
                     replies = Replies(message, logger=logger)
                     logger.info(
-                        "processing incoming fresh message id={}".format(
-                            message.id))
+                        "processing incoming fresh message id={}".format(message.id)
+                    )
                     if message.is_system_message():
                         self.handle_system_message(message, replies)
                     elif not message.get_sender_contact().is_blocked():
                         self.bot.plugins.hook.deltabot_incoming_message(
-                            message=message,
-                            bot=self.bot,
-                            replies=replies
+                            message=message, bot=self.bot, replies=replies
                         )
                     replies.send_reply_messages()
                 else:
                     logger.debug("ignoring classic email id=%s", msg_id)
-                logger.info(
-                    "processing message id={} FINISHED".format(msg_id))
+                logger.info("processing message id={} FINISHED".format(msg_id))
             except Exception as ex:
-                logger.exception(
-                    "processing message={} failed: {}".format(msg_id, ex))
+                logger.exception("processing message={} failed: {}".format(msg_id, ex))
             self.db.pop_msg(msg_id)
         logger.info("CheckAll perform-loop finish")
 
@@ -401,21 +443,29 @@ class CheckAll:
         res = parse_system_image_changed(message.text)
         if res:
             actor, deleted = res
-            logger.info('calling hook deltabot_image_changed')
+            logger.info("calling hook deltabot_image_changed")
             self.bot.plugins.hook.deltabot_image_changed(
-                message=message, replies=replies, chat=message.chat,
+                message=message,
+                replies=replies,
+                chat=message.chat,
                 actor=self.bot.account.create_contact(actor),
-                deleted=deleted, bot=self.bot)
+                deleted=deleted,
+                bot=self.bot,
+            )
             return
 
         res = parse_system_title_changed(message.text, message.chat.get_name())
         if res is not None:
             old_title, actor = res
-            logger.info('calling hook deltabot_title_changed')
+            logger.info("calling hook deltabot_title_changed")
             self.bot.plugins.hook.deltabot_title_changed(
-                message=message, replies=replies, chat=message.chat,
+                message=message,
+                replies=replies,
+                chat=message.chat,
                 actor=self.bot.account.create_contact(actor),
-                old=old_title, bot=self.bot)
+                old=old_title,
+                bot=self.bot,
+            )
             return
 
         res = parse_system_add_remove(message.text)
@@ -424,13 +474,19 @@ class CheckAll:
             hook_name = "deltabot_member_{}".format(action)
             meth = getattr(self.bot.plugins.hook, hook_name)
             logger.info("calling hook {}".format(hook_name))
-            meth(message=message, replies=replies, chat=message.chat,
-                 actor=self.bot.account.create_contact(actor), bot=self.bot,
-                 contact=self.bot.account.create_contact(affected))
+            meth(
+                message=message,
+                replies=replies,
+                chat=message.chat,
+                actor=self.bot.account.create_contact(actor),
+                bot=self.bot,
+                contact=self.bot.account.create_contact(affected),
+            )
             return
 
-        logger.info("ignoring system message id={} text: {}".format(
-            message.id, message.text))
+        logger.info(
+            "ignoring system message id={} text: {}".format(message.id, message.text)
+        )
 
 
 class IncomingEventHandler:
@@ -444,9 +500,11 @@ class IncomingEventHandler:
 
     def start(self) -> None:
         self.logger.info("starting bot-event-handler THREAD")
-        self.db = self.bot.plugins._pm.get_plugin(name='db')
+        self.db = self.bot.plugins._pm.get_plugin(name="db")
         self.bot.account.add_account_plugin(self)
-        self._thread = t = threading.Thread(target=self.event_worker, name="bot-event-handler", daemon=True)
+        self._thread = t = threading.Thread(
+            target=self.event_worker, name="bot-event-handler", daemon=True
+        )
         t.start()
 
     def stop(self) -> None:
@@ -466,9 +524,14 @@ class IncomingEventHandler:
         # we always accept incoming messages to remove the need  for
         # bot authors to having to deal with deaddrop/contact requests.
         message.create_chat()
-        self.logger.info("incoming message from {} id={} chat={} text={!r}".format(
-            message.get_sender_contact().addr,
-            message.id, message.chat.id, message.text[:50]))
+        self.logger.info(
+            "incoming message from {} id={} chat={} text={!r}".format(
+                message.get_sender_contact().addr,
+                message.id,
+                message.chat.id,
+                message.text[:50],
+            )
+        )
 
         self.db.put_msg(message.id)
         # message is now in DB, schedule a check
@@ -491,5 +554,8 @@ class IncomingEventHandler:
 
     @account_hookimpl
     def ac_message_delivered(self, message: Message) -> None:
-        self.logger.info("message id={} chat={} delivered to smtp".format(
-            message.id, message.chat.id))
+        self.logger.info(
+            "message id={} chat={} delivered to smtp".format(
+                message.id, message.chat.id
+            )
+        )

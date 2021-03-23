@@ -1,4 +1,3 @@
-
 import pytest
 
 from simplebot.bot import Replies
@@ -14,6 +13,7 @@ def test_parse_command_docstring():
 
         long description.
         """
+
     short, long, args = parse_command_docstring(func, args="command replies".split())
     assert short == "short description."
     assert long == "long description."
@@ -54,7 +54,6 @@ def test_register(mock_bot):
 
 
 class TestArgParsing:
-
     @pytest.fixture
     def parse_cmd(self, mocker):
         def proc(name, text, group=None):

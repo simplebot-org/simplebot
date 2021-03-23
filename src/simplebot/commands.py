@@ -1,4 +1,3 @@
-
 import inspect
 import types
 from collections import OrderedDict
@@ -6,7 +5,7 @@ from typing import Callable, Dict, Generator, Optional, Set, Tuple
 
 from .hookspec import deltabot_hookimpl
 
-CMD_PREFIX = '/'
+CMD_PREFIX = "/"
 _cmds: Set[Tuple[str, Callable, bool]] = set()
 
 
@@ -21,23 +20,33 @@ class Commands:
         bot.plugins.add_module("commands", self)
 
     def register(self, name: str, func: Callable, admin: bool = False) -> None:
-        """ register a command function that acts on each incoming non-system message.
+        """register a command function that acts on each incoming non-system message.
 
         :param name: name of the command, example "/test"
         :param func: function can accept 'bot', 'command'(:class:`simplebot.commands.IncomingCommand`), 'message', 'payload' and 'replies'(:class:`simplebot.bot.Replies`) arguments.
         :param admin: if True the command will be available for bot administrators only
         """
-        short, long, args = parse_command_docstring(func, args=["command", "replies", "bot", "payload", "args", "message"])
+        short, long, args = parse_command_docstring(
+            func, args=["command", "replies", "bot", "payload", "args", "message"]
+        )
         for cand_name in iter_underscore_subparts(name):
             if cand_name in self._cmd_defs:
-                raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
-                                 name, cand_name))
+                raise ValueError(
+                    "command {!r} fails to register, conflicts with: {!r}".format(
+                        name, cand_name
+                    )
+                )
         for reg_name in self._cmd_defs:
             if reg_name.startswith(name + "_"):
-                raise ValueError("command {!r} fails to register, conflicts with: {!r}".format(
-                                 name, reg_name))
+                raise ValueError(
+                    "command {!r} fails to register, conflicts with: {!r}".format(
+                        name, reg_name
+                    )
+                )
 
-        cmd_def = CommandDef(name, short=short, long=long, func=func, args=args, admin=admin)
+        cmd_def = CommandDef(
+            name, short=short, long=long, func=func, args=args, admin=admin
+        )
         self._cmd_defs[name] = cmd_def
         self.logger.debug("registered new command {!r}".format(name))
 
@@ -56,10 +65,10 @@ class Commands:
         payload = message.text.split(maxsplit=1)[1] if len(args) > 1 else ""
         orig_cmd_name = args.pop(0)
 
-        if '@' in orig_cmd_name:
-            suffix = '@' + bot.self_contact.addr
+        if "@" in orig_cmd_name:
+            suffix = "@" + bot.self_contact.addr
             if orig_cmd_name.endswith(suffix):
-                orig_cmd_name = orig_cmd_name[:-len(suffix)]
+                orig_cmd_name = orig_cmd_name[: -len(suffix)]
             else:
                 return True
 
@@ -73,19 +82,28 @@ class Commands:
             args.insert(0, newarg)
             payload = (newarg + " " + payload).rstrip()
 
-        if not cmd_def or (cmd_def.admin and not bot.is_admin(
-                message.get_sender_contact().addr)):
+        if not cmd_def or (
+            cmd_def.admin and not bot.is_admin(message.get_sender_contact().addr)
+        ):
             reply = "unknown command {!r}".format(orig_cmd_name)
             self.logger.warn(reply)
             if not message.chat.is_group():
                 replies.add(text=reply)
             return True
 
-        cmd = IncomingCommand(bot=bot, cmd_def=cmd_def, message=message,
-                              args=args, payload=payload)
+        cmd = IncomingCommand(
+            bot=bot, cmd_def=cmd_def, message=message, args=args, payload=payload
+        )
         bot.logger.info("processing command {}".format(cmd))
         try:
-            res = cmd.cmd_def(command=cmd, replies=replies, bot=bot, payload=cmd.payload, args=cmd.args, message=cmd.message)
+            res = cmd.cmd_def(
+                command=cmd,
+                replies=replies,
+                bot=bot,
+                payload=cmd.payload,
+                args=cmd.args,
+                message=cmd.message,
+            )
         except Exception as ex:
             self.logger.exception(ex)
         else:
@@ -98,8 +116,7 @@ class Commands:
 
     def command_help(self, bot, command, replies) -> None:
         """ reply with help message about available commands. """
-        is_admin = bot.is_admin(
-            command.message.get_sender_contact().addr)
+        is_admin = bot.is_admin(command.message.get_sender_contact().addr)
         l = []
         l.append("➡️ Commands:\n")
         for c in self._cmd_defs.values():
@@ -114,6 +131,7 @@ class Commands:
 
 class CommandDef:
     """ Definition of a '/COMMAND' with args. """
+
     def __init__(self, cmd, short, long, func, args, admin=False) -> None:
         if cmd[0] != CMD_PREFIX:
             raise ValueError("cmd {!r} must start with {!r}".format(cmd, CMD_PREFIX))
@@ -136,6 +154,7 @@ class CommandDef:
 
 class IncomingCommand:
     """ incoming command request. """
+
     def __init__(self, bot, cmd_def, args, payload, message) -> None:
         self.bot = bot
         self.cmd_def = cmd_def
@@ -145,7 +164,8 @@ class IncomingCommand:
 
     def __repr__(self) -> str:
         return "<IncomingCommand {!r} payload={!r} msg={}>".format(
-            self.cmd_def.cmd[0], self.payload, self.message.id)
+            self.cmd_def.cmd[0], self.payload, self.message.id
+        )
 
 
 def parse_command_docstring(func, args) -> tuple:
@@ -154,13 +174,17 @@ def parse_command_docstring(func, args) -> tuple:
         raise ValueError("{!r} needs to have a docstring".format(func))
     funcargs = set(inspect.getargs(func.__code__).args)
     if isinstance(func, types.MethodType):
-        funcargs.discard('self')
+        funcargs.discard("self")
     for arg in funcargs:
         if arg not in args:
-            raise ValueError("{!r} requests an invalid argument: {!r}, valid arguments: {!r}".format(func, arg, args))
+            raise ValueError(
+                "{!r} requests an invalid argument: {!r}, valid arguments: {!r}".format(
+                    func, arg, args
+                )
+            )
 
     lines = description.strip().split("\n", maxsplit=1)
-    return lines.pop(0), ''.join(lines).strip(), funcargs
+    return lines.pop(0), "".join(lines).strip(), funcargs
 
 
 def iter_underscore_subparts(name) -> Generator[str, None, None]:
@@ -170,13 +194,15 @@ def iter_underscore_subparts(name) -> Generator[str, None, None]:
         parts.pop()
 
 
-def command_decorator(func: Callable = None, name: str = None,
-                      admin: bool = False) -> Callable:
+def command_decorator(
+    func: Callable = None, name: str = None, admin: bool = False
+) -> Callable:
     """Register decorated function as bot command.
 
     Check documentation of method `simplebot.commands.Commands.register` to
     see all parameters the decorated function can accept.
     """
+
     def _decorator(func) -> Callable:
         _cmds.add((name or CMD_PREFIX + func.__name__, func, admin))
         return func

@@ -24,4 +24,4 @@ def quote(message, replies):
 
 class TestImpersonating:
     def test_impersonating(self, mocker):
-        mocker.get_one_reply(text='/quote', group='mockgroup')
+        mocker.get_one_reply(text="/quote", group="mockgroup")

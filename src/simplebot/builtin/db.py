@@ -1,4 +1,3 @@
-
 import os
 import sqlite3
 
@@ -14,49 +13,46 @@ def deltabot_init(bot) -> None:
 class DBManager:
     def __init__(self, db_path: str) -> None:
         self.db = sqlite3.connect(
-            db_path, check_same_thread=False, isolation_level=None)
+            db_path, check_same_thread=False, isolation_level=None
+        )
         self.db.row_factory = sqlite3.Row
         with self.db:
             self.db.execute(
-                'CREATE TABLE IF NOT EXISTS config'
-                ' (keyname TEXT PRIMARY KEY,value TEXT)')
+                "CREATE TABLE IF NOT EXISTS config"
+                " (keyname TEXT PRIMARY KEY,value TEXT)"
+            )
             self.db.execute(
-                'CREATE TABLE IF NOT EXISTS msgs'
-                ' (id INTEGER PRIMARY KEY)')
+                "CREATE TABLE IF NOT EXISTS msgs" " (id INTEGER PRIMARY KEY)"
+            )
 
     def put_msg(self, msg_id: int) -> None:
         with self.db:
-            self.db.execute(
-                'INSERT INTO msgs VALUES (?)', (msg_id,))
+            self.db.execute("INSERT INTO msgs VALUES (?)", (msg_id,))
 
     def pop_msg(self, msg_id: int) -> None:
         with self.db:
-            self.db.execute(
-                'DELETE FROM msgs WHERE id=?', (msg_id,))
+            self.db.execute("DELETE FROM msgs WHERE id=?", (msg_id,))
 
     def get_msgs(self) -> list:
-        return [r[0] for r in self.db.execute('SELECT * FROM msgs').fetchall()]
+        return [r[0] for r in self.db.execute("SELECT * FROM msgs").fetchall()]
 
     @deltabot_hookimpl
     def deltabot_store_setting(self, key: str, value: str) -> None:
         with self.db:
             if value is not None:
-                self.db.execute(
-                    'REPLACE INTO config VALUES (?,?)', (key, value))
+                self.db.execute("REPLACE INTO config VALUES (?,?)", (key, value))
             else:
-                self.db.execute(
-                    'DELETE FROM config WHERE keyname=?', (key, ))
+                self.db.execute("DELETE FROM config WHERE keyname=?", (key,))
 
     @deltabot_hookimpl
     def deltabot_get_setting(self, key: str) -> None:
-        row = self.db.execute(
-            'SELECT * FROM config WHERE keyname=?', (key,)).fetchone()
-        return row and row['value']
+        row = self.db.execute("SELECT * FROM config WHERE keyname=?", (key,)).fetchone()
+        return row and row["value"]
 
     @deltabot_hookimpl
     def deltabot_list_settings(self) -> list:
-        rows = self.db.execute('SELECT * FROM config').fetchall()
-        return [(row['keyname'], row["value"]) for row in rows]
+        rows = self.db.execute("SELECT * FROM config").fetchall()
+        return [(row["keyname"], row["value"]) for row in rows]
 
     @deltabot_hookimpl
     def deltabot_shutdown(self, bot) -> None:

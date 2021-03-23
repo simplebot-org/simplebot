@@ -1,4 +1,3 @@
-
 import pluggy
 
 from .hookspec import DeltaBotSpecs, spec_name

@@ -15,8 +15,11 @@ def deltabot_init(bot):
 class GroupLoggingPlugin:
     @simplebot.hookimpl
     def deltabot_incoming_message(self, message):
-        message.chat.send_text("bot: incoming_message sys={} body={!r}".format(
-            message.is_system_message(), message.text))
+        message.chat.send_text(
+            "bot: incoming_message sys={} body={!r}".format(
+                message.is_system_message(), message.text
+            )
+        )
 
     @simplebot.hookimpl
     def deltabot_member_added(self, chat, contact, actor, message, replies):

@@ -41,9 +41,7 @@ class MyArgumentParser(argparse.ArgumentParser):
         if name is None:
             name = cls.__name__.lower()
         subparser = self.subparsers.add_parser(
-            name=name,
-            description=description,
-            help=doc
+            name=name, description=description, help=doc
         )
         subparser.Action = argparse.Action
 
@@ -86,15 +84,17 @@ class MyArgumentParser(argparse.ArgumentParser):
                 self.out.line(self.description.strip())
                 self.out.line()
                 for name, p in self.subparsers.choices.items():
-                    self.out.line("{:20s} {}".format(
-                        name, p.description.split("\n")[0].strip()))
+                    self.out.line(
+                        "{:20s} {}".format(name, p.description.split("\n")[0].strip())
+                    )
                 self.out.line()
                 self.out.ok_finish("please specify a subcommand", red=True)
 
-            funcargs = set(inspect.getargs(
-                args.subcommand_instance.run.__code__).args)
-            if not bot and 'bot' in funcargs:
-                msg = "No default account is set so \"--account\" argument is required to use \"{}\" subcommand.".format(args.command)
+            funcargs = set(inspect.getargs(args.subcommand_instance.run.__code__).args)
+            if not bot and "bot" in funcargs:
+                msg = 'No default account is set so "--account" argument is required to use "{}" subcommand.'.format(
+                    args.command
+                )
                 self.out.fail(msg)
             kwargs = dict(bot=bot, args=args, out=self.out)
             for key in list(kwargs.keys()):
@@ -124,7 +124,7 @@ class CmdlineOutput:
 
 
 def try_argcomplete(parser) -> None:
-    if os.environ.get('_ARGCOMPLETE'):
+    if os.environ.get("_ARGCOMPLETE"):
         try:
             import argcomplete
         except ImportError:
@@ -144,7 +144,7 @@ def get_base_parser(plugin_manager, argv) -> MyArgumentParser:
     # preliminary get the basedir
     args, remaining = parser.parse_known_args(argv[1:])
     if not args.basedir:
-        if args.command == 'init':
+        if args.command == "init":
             args.basedir = get_account_path(args.emailaddr)
         else:
             addr = get_default_account()
@@ -162,5 +162,5 @@ def parse_docstring(txt) -> tuple:
     if i == -1:
         doc = txt
     else:
-        doc = txt[:i + 1]
+        doc = txt[: i + 1]
     return doc, description

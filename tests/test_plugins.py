@@ -1,4 +1,3 @@
-
 from queue import Queue
 
 import pluggy
@@ -31,7 +30,7 @@ def test_setuptools_plugin(monkeypatch, request):
     monkeypatch.setattr(
         pluggy.manager.PluginManager,
         "load_setuptools_entrypoints",
-        load_setuptools_entrypoints
+        load_setuptools_entrypoints,
     )
     _ = request.getfixturevalue("mock_bot")
     assert l == [("simplebot.plugins", None)]
@@ -58,7 +57,7 @@ def test_deltabot_init_hooks(monkeypatch, request):
     monkeypatch.setattr(
         pluggy.manager.PluginManager,
         "load_setuptools_entrypoints",
-        load_setuptools_entrypoints
+        load_setuptools_entrypoints,
     )
     bot = request.getfixturevalue("mock_stopped_bot")
     assert q.get(timeout=10) == 1

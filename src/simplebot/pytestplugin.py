@@ -1,4 +1,3 @@
-
 import os
 import re
 from email.utils import parseaddr
@@ -66,78 +65,119 @@ def mocker(mock_bot):
             self.account = mock_bot.account
 
         def make_incoming_message(
-                self, text: str = None, html: str = None,
-                filename: str = None, viewtype: str = None,
-                group: Union[str, Chat] = None, impersonate: str = None,
-                addr: str = "Alice <alice@example.org>",
-                quote: Message = None) -> Message:
+            self,
+            text: str = None,
+            html: str = None,
+            filename: str = None,
+            viewtype: str = None,
+            group: Union[str, Chat] = None,
+            impersonate: str = None,
+            addr: str = "Alice <alice@example.org>",
+            quote: Message = None,
+        ) -> Message:
             if filename and not os.path.exists(filename):
-                filename = os.path.join(
-                    self.bot.account.get_blobdir(), filename)
-                with open(filename, 'wb'):
+                filename = os.path.join(self.bot.account.get_blobdir(), filename)
+                with open(filename, "wb"):
                     pass
 
             msg = Replies(self.bot, self.bot.logger)._create_message(
-                text=text, html=html, viewtype=viewtype,
-                filename=filename, quote=quote, sender=impersonate)
+                text=text,
+                html=html,
+                viewtype=viewtype,
+                filename=filename,
+                quote=quote,
+                sender=impersonate,
+            )
 
             name, routeable_addr = parseaddr(addr)
             contact = self.account.create_contact(routeable_addr, name=name)
             if isinstance(group, Chat):
                 chat = group
             elif isinstance(group, str):
-                chat = self.account.create_group_chat(
-                    group, contacts=[contact])
+                chat = self.account.create_group_chat(group, contacts=[contact])
             else:
                 chat = self.account.create_chat(contact)
             msg_in = chat.prepare_message(msg)
+
             class MsgWrapper:
-                def __init__ (self, msg, quote, contact):
+                def __init__(self, msg, quote, contact):
                     self.msg = msg
                     self.quote = quote
                     self.get_sender_contact = lambda: contact
+
                 def __getattr__(self, name):
                     return self.msg.__getattribute__(name)
+
                 def __setattr__(self, name, value):
-                    if name in ('quote', 'msg'):
+                    if name in ("quote", "msg"):
                         super().__setattr__(name, value)
                     else:
                         setattr(self.msg, name, value)
+
             return MsgWrapper(msg_in, quote, contact)
 
         def get_one_reply(
-                self, text: str = None, html: str = None,
-                filename: str = None, viewtype: str = None,
-                group: Union[str, Chat] = None, impersonate: str = None,
-                addr: str = "Alice <alice@example.org>",
-                quote: Message = None, filters: str = None) -> Message:
+            self,
+            text: str = None,
+            html: str = None,
+            filename: str = None,
+            viewtype: str = None,
+            group: Union[str, Chat] = None,
+            impersonate: str = None,
+            addr: str = "Alice <alice@example.org>",
+            quote: Message = None,
+            filters: str = None,
+        ) -> Message:
             l = self.get_replies(
-                text=text, html=html, filename=filename, viewtype=viewtype,
-                group=group, impersonate=impersonate, addr=addr,
-                quote=quote, filters=filters)
+                text=text,
+                html=html,
+                filename=filename,
+                viewtype=viewtype,
+                group=group,
+                impersonate=impersonate,
+                addr=addr,
+                quote=quote,
+                filters=filters,
+            )
             if not l:
                 raise ValueError("no reply for message {!r}".format(text))
             if len(l) > 1:
-                raise ValueError("more than one reply for {!r}, replies={}".format(text, l))
+                raise ValueError(
+                    "more than one reply for {!r}, replies={}".format(text, l)
+                )
             return l[0]
 
         def get_replies(
-                self, text: str = None, html: str = None,
-                filename: str = None, viewtype: str = None,
-                group: Union[str, Chat] = None, impersonate: str = None,
-                addr: str = "Alice <alice@example.org>",
-                quote: Message = None, filters: str = None) -> list:
+            self,
+            text: str = None,
+            html: str = None,
+            filename: str = None,
+            viewtype: str = None,
+            group: Union[str, Chat] = None,
+            impersonate: str = None,
+            addr: str = "Alice <alice@example.org>",
+            quote: Message = None,
+            filters: str = None,
+        ) -> list:
             if filters:
                 regex = re.compile(filters)
                 for name in list(self.bot.filters._filter_defs.keys()):
                     if not regex.match(name):
                         del self.bot.filters._filter_defs[name]
             msg = self.make_incoming_message(
-                text=text, html=html, filename=filename, viewtype=viewtype,
-                group=group, impersonate=impersonate, addr=addr, quote=quote)
+                text=text,
+                html=html,
+                filename=filename,
+                viewtype=viewtype,
+                group=group,
+                impersonate=impersonate,
+                addr=addr,
+                quote=quote,
+            )
             replies = Replies(msg, self.bot.logger)
             self.bot.plugins.hook.deltabot_incoming_message(
-                message=msg, replies=replies, bot=self.bot)
+                message=msg, replies=replies, bot=self.bot
+            )
             return replies.send_reply_messages()
 
     return Mocker()
@@ -237,8 +277,11 @@ class CmdlineRunner:
         res = self.invoke(args)
         if res.exit_code == 0 or (code is not None and res.exit_code != code):
             print(res.output)
-            raise Exception("got exit code {!r}, expected {!r}, output: {}".format(
-                res.exit_code, code, res.output))
+            raise Exception(
+                "got exit code {!r}, expected {!r}, output: {}".format(
+                    res.exit_code, code, res.output
+                )
+            )
         return _perform_match(res.output, fnl)
 
 

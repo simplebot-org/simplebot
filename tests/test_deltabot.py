@@ -1,4 +1,3 @@
-
 import io
 
 import pytest
@@ -78,7 +77,7 @@ class TestReplies:
         assert s == "content"
 
     def test_file_content(self, replies):
-        bytefile = io.BytesIO(b'bytecontent')
+        bytefile = io.BytesIO(b"bytecontent")
         replies.add(text="hello", filename="something.txt", bytefile=bytefile)
 
         l = replies.send_reply_messages()

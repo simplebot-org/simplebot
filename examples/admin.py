@@ -27,30 +27,31 @@ def status(bot, payload, replies):
 
     Example: /status I am way too cool.
     """
-    bot.account.set_config('selfstatus', payload)
-    replies.add(text='Status updated.')
+    bot.account.set_config("selfstatus", payload)
+    replies.add(text="Status updated.")
 
 
 class TestAdmin:
     def test_kick(self, mocker):
-        admin = 'admin@example.org'
+        admin = "admin@example.org"
         mocker.bot.add_admin(admin)
 
-        addr = 'user1@example.org'
-        quote = mocker.make_incoming_message(addr=addr, group='mockgroup')
+        addr = "user1@example.org"
+        quote = mocker.make_incoming_message(addr=addr, group="mockgroup")
         assert addr in [c.addr for c in quote.chat.get_contacts()]
 
         replies = mocker.get_replies(
-            text='/kick', addr=admin, quote=quote, group=quote.chat)
+            text="/kick", addr=admin, quote=quote, group=quote.chat
+        )
         assert not replies
         assert addr not in [c.addr for c in quote.chat.get_contacts()]
 
     def test_status(self, mocker):
-        admin = 'admin@example.org'
+        admin = "admin@example.org"
         mocker.bot.add_admin(admin)
 
-        status = 'My test\nstatus.'
-        assert mocker.bot.account.get_config('selfstatus') != status
+        status = "My test\nstatus."
+        assert mocker.bot.account.get_config("selfstatus") != status
 
-        mocker.get_one_reply(text='/status ' + status, addr=admin)
-        assert mocker.bot.account.get_config('selfstatus') == status
+        mocker.get_one_reply(text="/status " + status, addr=admin)
+        assert mocker.bot.account.get_config("selfstatus") == status
