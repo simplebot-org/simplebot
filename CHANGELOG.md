@@ -1,5 +1,7 @@
 # Changelog
 
+## [Unreleased][unreleased]
+
 ## [1.0.1]
 
 - **From upstream:** major rewrite of deltabot to use new deltachat core python bindings
@@ -22,5 +24,7 @@
 
 - initial release
 
+
+[unreleased]: https://github.com/simplebot-org/simplebot/compare/v1.0.1...HEAD
 
 [1.0.1]: https://github.com/simplebot-org/simplebot/compare/v0.10.0...v1.0.1

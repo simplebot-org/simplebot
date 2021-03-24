@@ -23,7 +23,7 @@ To test unreleased version:
 
 ```sh
 pip install --pre -U -i https://m.devpi.net/dc/master deltachat
-pip install https://github.com/simplebot-org/simplebot/archive/dev.zip
+pip install https://github.com/simplebot-org/simplebot/archive/master.zip
 ```
 
 > **⚠️ NOTE:** If Delta Chat Python bindings package is not available for your platform you will need to compile and install the bindings manually, check [deltachat documentation](https://github.com/deltachat/deltachat-core-rust/blob/master/python/README.rst) for more info.
@@ -55,7 +55,7 @@ pip install https://github.com/simplebot-org/simplebot/archive/dev.zip
 
 SimpleBot is a base bot that relies on plugins to add functionality, for official plugins check [simplebot_plugins](https://github.com/simplebot-org/simplebot_plugins)
 
-Everyone can publish they own plugins, search in PyPI to discover cool [SimpleBot plugins](https://pypi.org/search/?q=simplebot&o=&c=Environment+%3A%3A+Plugins)
+Everyone can publish their own plugins, search in PyPI to discover cool [SimpleBot plugins](https://pypi.org/search/?q=simplebot&o=&c=Environment+%3A%3A+Plugins)
 
 > **⚠️ NOTE:** Plugins installed as Python packages (for example with `pip`) are global to all accounts you register in the bot, to separate plugins per account you need to run each account in its own virtual environment.
 
