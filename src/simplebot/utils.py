@@ -53,7 +53,11 @@ def get_account_path(address: str) -> str:
 def get_accounts() -> list:
     accounts_dir = os.path.join(get_config_folder(), "accounts")
     accounts = []
-    for folder in os.listdir(accounts_dir):
+    if os.path.exists(accounts_dir):
+        folders = os.listdir(accounts_dir)
+    else:
+        folders = []
+    for folder in folders:
         accounts.append((unquote(folder), os.path.join(accounts_dir, folder)))
     return accounts
 
@@ -71,7 +75,12 @@ def get_default_account() -> str:
     path = os.path.join(get_config_folder(), "global.cfg")
     if os.path.exists(path):
         config.read(path)
-    return config["DEFAULT"].get("default_account")
+    def_account = config["DEFAULT"].get("default_account")
+    if not def_account:
+        accounts = get_accounts()
+        if len(accounts) == 1:
+            def_account = accounts[0]
+    return def_account
 
 
 def image_tint(path: str, tint: str) -> Image:
