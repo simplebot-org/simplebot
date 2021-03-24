@@ -39,12 +39,16 @@ if __name__ == "__main__":
         packages=setuptools.find_packages("src"),
         classifiers=[
             "Development Status :: 4 - Beta",
-            "Intended Audience :: Users",
+            "Intended Audience :: Developers",
+            "Intended Audience :: System Administrators",
+            "Intended Audience :: End Users/Desktop",
             "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
             "Operating System :: POSIX",
-            "Operating System :: MacOS :: MacOS X",
             "Topic :: Utilities",
             "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.6",
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
         ],
         entry_points="""
             [console_scripts]
