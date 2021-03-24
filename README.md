@@ -13,15 +13,20 @@
 
 ## Install
 
-To install simplebot run the following commands (preferably in a `virtualenv`):
+To install the latest stable version of SimpleBot run the following command (preferably in a [virtual environment](https://packaging.python.org/tutorials/installing-packages/#creating-and-using-virtual-environments)):
 
 ```sh
-pip3 install -U pip wheel
-pip3 install --pre -U -i https://m.devpi.net/dc/master deltachat
-pip3 install https://github.com/simplebot-org/simplebot/archive/master.zip
+pip install simplebot
 ```
 
-**NOTE:** If Delta Chat Python bindings package is not available for your platform you will need to compile and install the bindings manually, check [deltachat documentation](https://github.com/deltachat/deltachat-core-rust/blob/master/python/README.rst) for more info.
+To test unreleased version:
+
+```sh
+pip install --pre -U -i https://m.devpi.net/dc/master deltachat
+pip install https://github.com/simplebot-org/simplebot/archive/master.zip
+```
+
+> **⚠️ NOTE:** If Delta Chat Python bindings package is not available for your platform you will need to compile and install the bindings manually, check [deltachat documentation](https://github.com/deltachat/deltachat-core-rust/blob/master/python/README.rst) for more info.
 
 
 ## Quick Start: Running a bot+plugins
@@ -34,26 +39,25 @@ pip3 install https://github.com/simplebot-org/simplebot/archive/master.zip
 	simplebot init "$ADDR" "$PASSWORD"
 	```
 
-2. Install some official plugins:
+2. Install some plugins:
 
 	```sh
-	git clone https://github.com/simplebot-org/simplebot_plugins
-	python3 simplebot_plugins/scripts/install_plugin.py
+	pip install simplebot-echo
 	```
 
 3. Start the bot:
 
 	```sh
-	simplebot -a $ADDR serve
+	simplebot serve
 	```
 
 ## Plugins
 
-SimpleBot is a base bot that relies on plugins to add functionality, for official plugins see:
+SimpleBot is a base bot that relies on plugins to add functionality, for official plugins check [simplebot_plugins](https://github.com/simplebot-org/simplebot_plugins)
 
-https://github.com/simplebot-org/simplebot_plugins
+Everyone can publish they own plugins, search in PyPI to discover cool [SimpleBot plugins](https://pypi.org/search/?q=simplebot&o=&c=Environment+%3A%3A+Plugins)
 
-**NOTE:** Plugins installed as Python packages (for example with ``pip``) are global to all accounts you register in the bot, to separate plugins per account you need to run each account in its own virtual environment.
+> **⚠️ NOTE:** Plugins installed as Python packages (for example with `pip`) are global to all accounts you register in the bot, to separate plugins per account you need to run each account in its own virtual environment.
 
 ## Creating per account plugins
 
@@ -73,10 +77,10 @@ def echo(message, replies):
 That is it! you have created a plugin that will transform simplebot in an "echo bot" that will echo back any text message you send to it. Now tell simplebot to register your plugin:
 
 ```sh
-simplebot -a $ADDR plugin --add ./echo.py
+simplebot plugin --add ./echo.py
 ```
 
-Now you can run the bot with `simplebot -a $ADDR serve` and write to it from Delta Chat app to see your new bot in action.
+Now you can start the bot and write to it from Delta Chat app to see your new bot in action.
 
 Check the `examples` folder to see some examples about how to create plugins.
 
