@@ -54,9 +54,17 @@ jobs:
           if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo ::set-output name=match::true
           fi
-      - uses: casperdcl/deploy-pypi@v2
+      - name: Create PyPI release
+        uses: casperdcl/deploy-pypi@v2
         with:
           password: ${{ secrets.PYPI_TOKEN }}
           build: true
           # only upload if a tag is pushed (otherwise just build & check)
           upload: ${{ github.event_name == 'push' && steps.check-tag.outputs.match == 'true' }}
+      - name: Create GitHub release
+        if: ${{ github.event_name == 'push' && steps.check-tag.outputs.match == 'true' }}
+        uses: Roang-zero1/github-create-release-action@master
+        with:
+          version_regex: ^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
