@@ -23,7 +23,7 @@ To test unreleased version:
 
 ```sh
 pip install --pre -U -i https://m.devpi.net/dc/master deltachat
-pip install https://github.com/simplebot-org/simplebot/archive/master.zip
+pip install https://github.com/simplebot-org/simplebot/archive/dev.zip
 ```
 
 > **⚠️ NOTE:** If Delta Chat Python bindings package is not available for your platform you will need to compile and install the bindings manually, check [deltachat documentation](https://github.com/deltachat/deltachat-core-rust/blob/master/python/README.rst) for more info.
