@@ -1,7 +1,7 @@
 <p align="center"><img height="180" width="180" src="https://github.com/simplebot-org/simplebot/raw/master/artwork/Bot.svg"></p>
 <h1 align="center">SimpleBot</h1>
 
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/simplebot-org/simplebot)
+![GitHub release (latest)](https://img.shields.io/github/v/release/simplebot-org/simplebot)
 [![Supported Versions](https://img.shields.io/pypi/pyversions/simplebot.svg)](https://pypi.org/project/simplebot)
 [![Downloads](https://pepy.tech/badge/simplebot)](https://pepy.tech/project/simplebot)
 [![GitHub license](https://img.shields.io/github/license/simplebot-org/simplebot)](https://github.com/simplebot-org/simplebot/blob/master/LICENSE)
