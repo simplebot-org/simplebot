@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased][unreleased]
+## [1.1.0]
 
 - Improved pytestplugin to allow simulating incoming messages with encryption errors (#68)
 
@@ -27,6 +27,8 @@
 - initial release
 
 
-[unreleased]: https://github.com/simplebot-org/simplebot/compare/v1.0.1...HEAD
+[unreleased]: https://github.com/simplebot-org/simplebot/compare/v1.1.0...HEAD
+
+[1.1.0]: https://github.com/simplebot-org/simplebot/compare/v1.0.1...v1.1.0
 
 [1.0.1]: https://github.com/simplebot-org/simplebot/compare/v0.10.0...v1.0.1
