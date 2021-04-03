@@ -109,7 +109,7 @@ def mocker(mock_bot):
                     return self.msg.__getattribute__(name)
 
                 def __setattr__(self, name, value):
-                    if name in ("quote", "msg"):
+                    if name in ("quote", "msg", "error"):
                         super().__setattr__(name, value)
                     else:
                         setattr(self.msg, name, value)
@@ -127,6 +127,7 @@ def mocker(mock_bot):
             addr: str = "Alice <alice@example.org>",
             quote: Message = None,
             filters: str = None,
+            msg: Message = None,
         ) -> Message:
             l = self.get_replies(
                 text=text,
@@ -138,6 +139,7 @@ def mocker(mock_bot):
                 addr=addr,
                 quote=quote,
                 filters=filters,
+                msg=msg,
             )
             if not l:
                 raise ValueError("no reply for message {!r}".format(text))
@@ -158,22 +160,24 @@ def mocker(mock_bot):
             addr: str = "Alice <alice@example.org>",
             quote: Message = None,
             filters: str = None,
+            msg: Message = None,
         ) -> list:
             if filters:
                 regex = re.compile(filters)
                 for name in list(self.bot.filters._filter_defs.keys()):
                     if not regex.match(name):
                         del self.bot.filters._filter_defs[name]
-            msg = self.make_incoming_message(
-                text=text,
-                html=html,
-                filename=filename,
-                viewtype=viewtype,
-                group=group,
-                impersonate=impersonate,
-                addr=addr,
-                quote=quote,
-            )
+            if not msg:
+                msg = self.make_incoming_message(
+                    text=text,
+                    html=html,
+                    filename=filename,
+                    viewtype=viewtype,
+                    group=group,
+                    impersonate=impersonate,
+                    addr=addr,
+                    quote=quote,
+                )
             replies = Replies(msg, self.bot.logger)
             self.bot.plugins.hook.deltabot_incoming_message(
                 message=msg, replies=replies, bot=self.bot

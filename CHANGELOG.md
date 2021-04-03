@@ -2,6 +2,8 @@
 
 ## [Unreleased][unreleased]
 
+- Improved pytestplugin to allow simulating incoming messages with encryption errors (#68)
+
 ## [1.0.1]
 
 - **From upstream:** major rewrite of deltabot to use new deltachat core python bindings
