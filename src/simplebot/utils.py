@@ -3,7 +3,7 @@ import logging
 import os
 import re
 from tempfile import NamedTemporaryFile
-from typing import Optional
+from typing import List, Optional, Tuple
 from urllib.parse import quote, unquote
 
 from deltachat.message import extract_addr
@@ -50,7 +50,7 @@ def get_account_path(address: str) -> str:
     return os.path.join(get_config_folder(), "accounts", quote(address))
 
 
-def get_accounts() -> list:
+def get_accounts() -> List[Tuple[str, str]]:
     accounts_dir = os.path.join(get_config_folder(), "accounts")
     accounts = []
     if os.path.exists(accounts_dir):
@@ -79,7 +79,7 @@ def get_default_account() -> str:
     if not def_account:
         accounts = get_accounts()
         if len(accounts) == 1:
-            def_account = accounts[0]
+            def_account = accounts[0][1]
     return def_account
 
 
