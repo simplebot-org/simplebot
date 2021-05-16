@@ -27,14 +27,14 @@ def test_run_help(mocker):
 
 def test_partial_args(mock_bot):
     def my_command(replies):
-        """ this command only needs the "replies" argument """
+        """this command only needs the "replies" argument"""
 
     mock_bot.commands.register(name="/example", func=my_command)
 
 
 def test_fail_args(mock_bot):
     def my_command(unknown_arg):
-        """ invalid """
+        """invalid"""
 
     with pytest.raises(ValueError):
         mock_bot.commands.register(name="/example", func=my_command)
@@ -42,7 +42,7 @@ def test_fail_args(mock_bot):
 
 def test_register(mock_bot):
     def my_command(command, replies):
-        """ my commands example. """
+        """my commands example."""
 
     mock_bot.commands.register(name="/example", func=my_command)
     assert "/example" in mock_bot.commands.dict()
@@ -60,7 +60,7 @@ class TestArgParsing:
             l = []
 
             def my_command(command, replies):
-                """ my commands example. """
+                """my commands example."""
                 l.append(command)
 
             mocker.bot.commands.register(name=name, func=my_command)

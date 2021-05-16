@@ -6,7 +6,7 @@ deltabot_hookimpl = pluggy.HookimplMarker(spec_name)
 
 
 class DeltaBotSpecs:
-    """ per DeltaBot instance hook specifications. """
+    """per DeltaBot instance hook specifications."""
 
     @deltabot_hookspec
     def deltabot_init_parser(self, parser):
@@ -41,7 +41,7 @@ class DeltaBotSpecs:
 
     @deltabot_hookspec
     def deltabot_shutdown(self, bot):
-        """ shutdown all resources of the bot. """
+        """shutdown all resources of the bot."""
 
     @deltabot_hookspec(firstresult=True)
     def deltabot_incoming_message(self, message, bot, replies):
@@ -100,20 +100,20 @@ class DeltaBotSpecs:
 
     @deltabot_hookspec(firstresult=True)
     def deltabot_store_setting(self, key, value):
-        """ store a named bot setting persistently. """
+        """store a named bot setting persistently."""
 
     @deltabot_hookspec(firstresult=True)
     def deltabot_get_setting(self, key):
-        """ get a named persistent bot setting."""
+        """get a named persistent bot setting."""
 
     @deltabot_hookspec(firstresult=True)
     def deltabot_list_settings(self):
-        """ get a list of persistent (key, value) tuples. """
+        """get a list of persistent (key, value) tuples."""
 
     @deltabot_hookspec
     def deltabot_ban(self, bot, contact):
-        """ When a contact have been banned. """
+        """When a contact have been banned."""
 
     @deltabot_hookspec
     def deltabot_unban(self, bot, contact):
-        """ When a contact have been unbanned. """
+        """When a contact have been unbanned."""

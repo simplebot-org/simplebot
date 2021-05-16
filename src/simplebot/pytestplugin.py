@@ -311,7 +311,7 @@ def _perform_match(output, fnl):
 
 @pytest.fixture
 def cmd():
-    """ invoke a command line subcommand with a unique plugin manager. """
+    """invoke a command line subcommand with a unique plugin manager."""
     return CmdlineRunner()
 
 

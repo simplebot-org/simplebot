@@ -2,7 +2,7 @@ import pytest
 
 
 def hitchhiker(message, replies):
-    """ my incoming message filter example. """
+    """my incoming message filter example."""
     if "42" in message.text:
         replies.add(text="correct answer!")
     else:
@@ -30,7 +30,7 @@ def test_filters_not_called_on_commands(bot_tester):
     l = []
 
     def always_answer(message, replies):
-        """ always"""
+        """always"""
         l.append(1)
 
     bot_tester.bot.filters.register(name="always_answer", func=always_answer)
@@ -40,7 +40,7 @@ def test_filters_not_called_on_commands(bot_tester):
 
 def test_pseudo_downloader(bot_tester):
     def downloader(message, replies):
-        """ pseudo downloader of https"""
+        """pseudo downloader of https"""
         if "https" in message.text:
             replies.add(text="downloaded", filename=__file__)
 

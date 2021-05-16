@@ -16,14 +16,14 @@ and web-serving of Delta Chat Bots.  New sub commands may be added via plugins.
 
 class MyArgumentParser(argparse.ArgumentParser):
     class ArgumentError(Exception):
-        """ an error from the argparse subsystem. """
+        """an error from the argparse subsystem."""
 
     def error(self, error) -> None:
         """raise errors instead of printing and raising SystemExit"""
         raise self.ArgumentError(error)
 
     def add_generic_option(self, *flags, **kwargs) -> None:
-        """ add a generic argument option. """
+        """add a generic argument option."""
         if not hasattr(self, "subparsers"):
             raise ValueError("can not add generic option to sub command")
         if not (flags and flags[0].startswith("-")):
@@ -33,7 +33,7 @@ class MyArgumentParser(argparse.ArgumentParser):
         action.inipath = inipath
 
     def add_subcommand(self, cls) -> None:
-        """ Add a subcommand to simplebot. """
+        """Add a subcommand to simplebot."""
         if not hasattr(self, "subparsers"):
             raise ValueError("can not add sub command to subcommand")
         doc, description = parse_docstring(cls.__doc__)

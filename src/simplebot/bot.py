@@ -264,7 +264,7 @@ class DeltaBot:
     # API for persistent scoped-key/value settings
     #
     def set(self, name: str, value: str, scope: str = "global") -> str:
-        """ Store a bot setting with the given scope. """
+        """Store a bot setting with the given scope."""
         assert "/" not in scope and "/" not in name
         old_val = self.get(name, scope=scope)
         key = scope + "/" + name
@@ -272,13 +272,13 @@ class DeltaBot:
         return old_val
 
     def delete(self, name: str, scope: str = "global") -> None:
-        """ Delete a bot setting with the given scope. """
+        """Delete a bot setting with the given scope."""
         assert "/" not in scope
         key = scope + "/" + name
         self.plugins._pm.hook.deltabot_store_setting(key=key, value=None)
 
     def get(self, name: str, default: str = None, scope: str = "global") -> str:
-        """ Get a bot setting from the given scope. """
+        """Get a bot setting from the given scope."""
         assert "/" not in scope
         key = scope + "/" + name
         res = self.plugins._pm.hook.deltabot_get_setting(key=key)
@@ -305,7 +305,7 @@ class DeltaBot:
     #
     @property
     def self_contact(self) -> Contact:
-        """ this bot's contact (with .addr and .display_name attributes). """
+        """this bot's contact (with .addr and .display_name attributes)."""
         return self.account.get_self_contact()
 
     def get_contact(self, ref: Union[str, int, Contact]) -> Contact:
@@ -336,7 +336,7 @@ class DeltaBot:
                 return None
 
     def create_group(self, name: str, contacts=[]) -> Chat:
-        """ Create a new group chat. """
+        """Create a new group chat."""
         return self.account.create_group_chat(name, contacts)
 
     #
@@ -344,11 +344,11 @@ class DeltaBot:
     #
 
     def is_configured(self) -> bool:
-        """ Return True if this bot account is successfully configured. """
+        """Return True if this bot account is successfully configured."""
         return bool(self.account.is_configured())
 
     def perform_configure_address(self, email: str, password: str) -> bool:
-        """ perform initial email/password bot account configuration.  """
+        """perform initial email/password bot account configuration."""
         assert not self.is_configured() or self.account.get_config("addr") == email
 
         self.account.update_config(
@@ -386,7 +386,7 @@ class DeltaBot:
     # start/wait/shutdown API
     #
     def start(self) -> None:
-        """ Start bot threads and processing messages. """
+        """Start bot threads and processing messages."""
         self.plugins.hook.deltabot_start(bot=self)
         addr = self.account.get_config("addr")
         self.logger.info("bot listening at: {}".format(addr))
@@ -394,12 +394,12 @@ class DeltaBot:
         self.account.start_io()
 
     def wait_shutdown(self) -> None:
-        """ Wait and block until bot account is shutdown. """
+        """Wait and block until bot account is shutdown."""
         self.account.wait_shutdown()
         self._eventhandler.stop()
 
     def trigger_shutdown(self) -> None:
-        """ Trigger a shutdown of the bot. """
+        """Trigger a shutdown of the bot."""
         self._eventhandler.stop()
         self.plugins.hook.deltabot_shutdown(bot=self)
         self.account.shutdown()

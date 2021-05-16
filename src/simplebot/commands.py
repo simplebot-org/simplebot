@@ -10,7 +10,7 @@ _cmds: Set[Tuple[str, Callable, bool]] = set()
 
 
 class NotFound(LookupError):
-    """Command was not found. """
+    """Command was not found."""
 
 
 class Commands:
@@ -51,7 +51,7 @@ class Commands:
         self.logger.debug("registered new command {!r}".format(name))
 
     def unregister(self, name: str) -> Callable:
-        """ unregister a command function by name. """
+        """unregister a command function by name."""
         return self._cmd_defs.pop(name)
 
     def dict(self) -> dict:
@@ -115,7 +115,7 @@ class Commands:
         self.register("/help", self.command_help)
 
     def command_help(self, bot, command, replies) -> None:
-        """ reply with help message about available commands. """
+        """reply with help message about available commands."""
         is_admin = bot.is_admin(command.message.get_sender_contact().addr)
         l = []
         l.append("➡️ Commands:\n")
@@ -130,7 +130,7 @@ class Commands:
 
 
 class CommandDef:
-    """ Definition of a '/COMMAND' with args. """
+    """Definition of a '/COMMAND' with args."""
 
     def __init__(self, cmd, short, long, func, args, admin=False) -> None:
         if cmd[0] != CMD_PREFIX:
@@ -153,7 +153,7 @@ class CommandDef:
 
 
 class IncomingCommand:
-    """ incoming command request. """
+    """incoming command request."""
 
     def __init__(self, bot, cmd_def, args, payload, message) -> None:
         self.bot = bot

@@ -37,7 +37,7 @@ class Filters:
         self.logger.debug("registered new filter {!r}".format(name))
 
     def unregister(self, name: str) -> Callable:
-        """ unregister a filter function. """
+        """unregister a filter function."""
         return self._filter_defs.pop(name)
 
     def dict(self) -> dict:
@@ -56,7 +56,7 @@ class Filters:
 
 
 class FilterDef:
-    """ Definition of a Filter that acts on incoming messages. """
+    """Definition of a Filter that acts on incoming messages."""
 
     def __init__(self, name, short, long, func, args, priority) -> None:
         self.name = name

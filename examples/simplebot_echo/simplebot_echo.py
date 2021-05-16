@@ -15,7 +15,7 @@ def echo(payload, replies):
 
 @simplebot.filter
 def echo_filter(message, replies):
-    """ Echoes back received message."""
+    """Echoes back received message."""
     replies.add(text=message.text)
 
 
