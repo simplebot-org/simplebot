@@ -1,6 +1,6 @@
-pytest==6.2.3
+pytest==6.2.4
 # needed by examples:
 xkcd==2.4.2
-wikiquote==0.1.14
+wikiquote==0.1.15
 # deltachat tests dep:
 requests==2.25.1
