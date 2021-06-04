@@ -58,6 +58,7 @@ if __name__ == "__main__":
             simplebot.pytestplugin=simplebot.pytestplugin
         """,
         python_requires=">=3.5",
+        dependency_links=['https://m.devpi.net/dc/master'],
         install_requires=install_requires,
         extras_require={"test": test_deps},
         include_package_data=True,
