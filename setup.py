@@ -37,6 +37,7 @@ if __name__ == "__main__":
         url="https://github.com/simplebot-org/simplebot",
         package_dir={"": "src"},
         packages=setuptools.find_packages("src"),
+        keywords="deltachat bot email",
         classifiers=[
             "Development Status :: 4 - Beta",
             "Intended Audience :: Developers",
