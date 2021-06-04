@@ -1,6 +1,7 @@
 # Changelog
 
 ## [1.1.1]
+
 - fix bug in `simplebot.utils.get_default_account()` (#72)
 
 ## [1.1.0]
