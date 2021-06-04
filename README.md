@@ -70,7 +70,7 @@ import simplebot
 
 @simplebot.filter
 def echo(message, replies):
-""" Echoes back received message."""
+    """Echoes back received message."""
     replies.add(text=message.text)
 ```
 
