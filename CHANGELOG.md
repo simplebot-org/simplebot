@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- ignore messages from other bots using the new Delta Chat API.
+
 ## [1.1.1]
 
 - fix bug in `simplebot.utils.get_default_account()` (#72)

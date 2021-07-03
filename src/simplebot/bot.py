@@ -521,6 +521,10 @@ class IncomingEventHandler:
 
     @account_hookimpl
     def ac_incoming_message(self, message: Message) -> None:
+        if message.is_bot() and not message.is_system_message():
+            self.logger.debug("ignoring message from bot id=%s", message.id)
+            return
+
         # we always accept incoming messages to remove the need  for
         # bot authors to having to deal with deaddrop/contact requests.
         message.create_chat()
