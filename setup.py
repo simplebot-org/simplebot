@@ -1,35 +1,33 @@
 """Setup SimpleBot installation."""
 
 import os
-import re
 
 import setuptools
+
+
+def load_requirements(path: str) -> list:
+    with open(path, encoding="utf-8") as file:
+        return [
+            line.replace("==", ">=")
+            for line in file.read().split("\n")
+            if line and not line.startswith(("#", "-"))
+        ]
+
 
 if __name__ == "__main__":
     with open("README.md") as f:
         long_desc = f.read()
 
-    init_path = os.path.join("src", "simplebot", "__init__.py")
-    with open(init_path, encoding="utf-8") as fh:
-        version = re.search(r"__version__ = \"(.*?)\"", fh.read(), re.M).group(1)
-
-    with open("requirements.txt", encoding="utf-8") as req:
-        install_requires = [
-            line.replace("==", ">=")
-            for line in req.read().split("\n")
-            if line and not line.startswith(("#", "-"))
-        ]
-    with open("requirements-test.txt", encoding="utf-8") as req:
-        test_deps = [
-            line.replace("==", ">=")
-            for line in req.read().split("\n")
-            if line and not line.startswith(("#", "-"))
-        ]
-
     setuptools.setup(
         name="simplebot",
+        setup_requires=["setuptools_scm"],
+        use_scm_version={
+            "root": ".",
+            "relative_to": __file__,
+            "tag_regex": r"^(?P<prefix>v)?(?P<version>[^\+]+)(?P<suffix>.*)?$",
+            "git_describe_command": "git describe --dirty --tags --long --match v*.*.*",
+        },
         description="SimpleBot: Extensible bot for Delta Chat",
-        version=version,
         long_description=long_desc,
         long_description_content_type="text/markdown",
         author="The SimpleBot Contributors",
@@ -59,8 +57,8 @@ if __name__ == "__main__":
         """,
         python_requires=">=3.5",
         dependency_links=["https://m.devpi.net/dc/master"],
-        install_requires=install_requires,
-        extras_require={"test": test_deps},
+        install_requires=load_requirements("requirements.txt"),
+        extras_require={"test": load_requirements("requirements-test.txt")},
         include_package_data=True,
         zip_safe=False,
     )

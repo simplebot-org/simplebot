@@ -1,6 +1,12 @@
+from pkg_resources import DistributionNotFound, get_distribution
+
 from .bot import DeltaBot  # noqa
 from .commands import command_decorator as command
 from .filters import filter_decorator as filter
 from .hookspec import deltabot_hookimpl as hookimpl  # noqa
 
-__version__ = "1.1.1"
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    __version__ = "0.0.0.dev0-unknown"
