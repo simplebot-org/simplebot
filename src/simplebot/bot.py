@@ -112,6 +112,7 @@ class Replies:
         quote: Message = None,
     ) -> Message:
         if bytefile:
+            assert filename is not None, "bytefile given but filename not provided"
             blobdir = self.incoming_message.account.get_blobdir()
             parts = filename.split(".", maxsplit=1)
             if len(parts) == 2:
