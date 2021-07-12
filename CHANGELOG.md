@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - ignore messages from other bots using the new Delta Chat API.
+- allow to get account configuration values with `set_config` command.
 
 ## [1.1.1]
 

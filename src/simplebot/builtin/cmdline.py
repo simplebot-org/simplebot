@@ -264,11 +264,15 @@ class set_status:
 
 
 class set_config:
-    """set low level account configuration."""
+    """set low level account configuration or get current value if no new value is given."""
 
     def add_arguments(self, parser) -> None:
         parser.add_argument("key", type=str, help="configuration key")
-        parser.add_argument("value", type=str, help="configuration new value")
+        parser.add_argument(
+            "value", type=str, help="configuration new value", nargs="?"
+        )
 
-    def run(self, bot, args) -> None:
-        bot.account.set_config(args.key, args.value)
+    def run(self, bot, args, out) -> None:
+        if args.value is not None:
+            bot.account.set_config(args.key, args.value)
+        out.line(f"{args.key}={bot.account.get_config(args.key)}")
