@@ -24,4 +24,8 @@ def quote(message, replies):
 
 class TestImpersonating:
     def test_impersonating(self, mocker):
-        mocker.get_one_reply(text="/quote", group="mockgroup")
+        msg = mocker.get_one_reply(text="/quote")
+        assert not msg.override_sender_name
+
+        msg = mocker.get_one_reply(text="/quote", group="mockgroup")
+        assert msg.override_sender_name
