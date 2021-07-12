@@ -1,6 +1,6 @@
-import pluggy
+import pluggy  # type: ignore
 
-from .hookspec import DeltaBotSpecs, spec_name
+from .hookspec import SPEC_NAME, DeltaBotSpecs
 
 
 class Plugins:
@@ -43,7 +43,7 @@ def get_global_plugin_manager():
 def make_plugin_manager():
     from .builtin import admin, cmdline, db, log, settings
 
-    pm = pluggy.PluginManager(spec_name)
+    pm = pluggy.PluginManager(SPEC_NAME)
     pm.add_hookspecs(DeltaBotSpecs)
 
     # register builtin modules

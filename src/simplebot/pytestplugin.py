@@ -316,6 +316,6 @@ def cmd():
 
 
 @pytest.fixture
-def mycmd(cmd, tmpdir, request):
+def mycmd(cmd, tmpdir):
     cmd.set_basedir(tmpdir.mkdir("account").strpath)
     return cmd

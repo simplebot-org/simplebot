@@ -1,8 +1,8 @@
 from pkg_resources import DistributionNotFound, get_distribution
 
 from .bot import DeltaBot  # noqa
-from .commands import command_decorator as command
-from .filters import filter_decorator as filter
+from .commands import command_decorator as command  # noqa
+from .filters import filter_decorator as filter  # noqa
 from .hookspec import deltabot_hookimpl as hookimpl  # noqa
 
 try:

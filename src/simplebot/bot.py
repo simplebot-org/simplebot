@@ -1,16 +1,15 @@
 import os
-import shutil
 import threading
 from tempfile import NamedTemporaryFile
 from typing import Generator, List, Union
 
-import deltachat as dc
+import deltachat as dc  # type: ignore
 import py
 from deltachat import Account, Chat, Contact, Message, account_hookimpl, const
-from deltachat.capi import ffi, lib
-from deltachat.cutil import as_dc_charpointer
-from deltachat.message import parse_system_add_remove
-from deltachat.tracker import ConfigureTracker
+from deltachat.capi import ffi, lib  # type: ignore
+from deltachat.cutil import as_dc_charpointer  # type: ignore
+from deltachat.message import parse_system_add_remove  # type: ignore
+from deltachat.tracker import ConfigureTracker  # type: ignore
 
 from .builtin.admin import add_admin, del_admin, get_admins
 from .builtin.cmdline import PluginCmd
@@ -335,9 +334,9 @@ class DeltaBot:
             except ValueError:
                 return None
 
-    def create_group(self, name: str, contacts=[]) -> Chat:
+    def create_group(self, name: str, contacts: list = None) -> Chat:
         """Create a new group chat."""
-        return self.account.create_group_chat(name, contacts)
+        return self.account.create_group_chat(name, contacts or [])
 
     #
     # configuration related API

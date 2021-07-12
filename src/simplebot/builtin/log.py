@@ -48,6 +48,6 @@ def test_logger_loglevel(capfd, tmpdir):
     logger = make_logger(tmpdir.strpath, stdout_loglevel=logging.INFO)
     logger.info("hello")
     logger.debug("world")
-    out, err = capfd.readouterr()
+    err = capfd.readouterr()[1]
     assert "hello" in err
     assert "world" not in err

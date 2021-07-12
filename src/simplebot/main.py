@@ -2,7 +2,7 @@ import os
 import sys
 from typing import Optional
 
-from deltachat import Account
+from deltachat import Account  # type: ignore
 
 from .bot import DeltaBot
 from .parser import MyArgumentParser, get_base_parser

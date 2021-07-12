@@ -1,11 +1,10 @@
 """Setup SimpleBot installation."""
 
-import os
-
-import setuptools
+import setuptools  # type: ignore
 
 
 def load_requirements(path: str) -> list:
+    """Load requirements from the given relative path."""
     with open(path, encoding="utf-8") as file:
         return [
             line.replace("==", ">=")

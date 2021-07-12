@@ -1,8 +1,8 @@
-import pluggy
+import pluggy  # type: ignore
 
-spec_name = "deltabot"
-deltabot_hookspec = pluggy.HookspecMarker(spec_name)
-deltabot_hookimpl = pluggy.HookimplMarker(spec_name)
+SPEC_NAME = "deltabot"
+deltabot_hookspec = pluggy.HookspecMarker(SPEC_NAME)
+deltabot_hookimpl = pluggy.HookimplMarker(SPEC_NAME)
 
 
 class DeltaBotSpecs:

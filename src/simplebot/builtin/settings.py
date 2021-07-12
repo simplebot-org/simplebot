@@ -1,5 +1,3 @@
-import os
-
 from ..commands import command_decorator
 from ..hookspec import deltabot_hookimpl
 
@@ -131,7 +129,7 @@ class TestCommandSettings:
         reply_msg = mocker.get_one_reply("/set hello world")
         assert "old" in reply_msg.text
         msg_reply = mocker.get_one_reply("/set")
-        assert "hello=world" == msg_reply.text
+        assert msg_reply.text == "hello=world"
 
     def test_get_set_functional(self, bot_tester):
         msg_reply = bot_tester.send_command("/set hello world")

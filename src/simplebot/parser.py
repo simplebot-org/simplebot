@@ -142,7 +142,7 @@ def get_base_parser(plugin_manager, argv) -> MyArgumentParser:
     plugin_manager.hook.deltabot_init_parser(parser=parser)
 
     # preliminary get the basedir
-    args, remaining = parser.parse_known_args(argv[1:])
+    args = parser.parse_known_args(argv[1:])[0]
     if not args.basedir:
         if args.command == "init":
             args.basedir = get_account_path(args.emailaddr)

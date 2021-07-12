@@ -6,10 +6,10 @@ from tempfile import NamedTemporaryFile
 from typing import List, Optional, Tuple
 from urllib.parse import quote, unquote
 
-from deltachat.message import extract_addr
-from PIL import Image
-from PIL.ImageColor import getcolor, getrgb
-from PIL.ImageOps import grayscale
+from deltachat.message import extract_addr  # type: ignore
+from PIL import Image  # type: ignore
+from PIL.ImageColor import getcolor, getrgb  # type: ignore
+from PIL.ImageOps import grayscale  # type: ignore
 
 # disable Pillow debugging to stdout
 logging.getLogger("PIL").setLevel(logging.ERROR)

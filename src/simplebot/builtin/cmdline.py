@@ -74,7 +74,7 @@ def deltabot_init_parser(parser) -> None:
 @deltabot_hookimpl
 def deltabot_init(bot, args) -> None:
     if args.show_ffi:
-        from deltachat.events import FFIEventLogger
+        from deltachat.events import FFIEventLogger  # type: ignore
 
         log = FFIEventLogger(bot.account)
         bot.account.add_account_plugin(log)
