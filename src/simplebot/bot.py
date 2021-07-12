@@ -6,8 +6,6 @@ from typing import Generator, List, Union
 import deltachat as dc  # type: ignore
 import py
 from deltachat import Account, Chat, Contact, Message, account_hookimpl, const
-from deltachat.capi import ffi, lib  # type: ignore
-from deltachat.cutil import as_dc_charpointer  # type: ignore
 from deltachat.message import parse_system_add_remove  # type: ignore
 from deltachat.tracker import ConfigureTracker  # type: ignore
 
@@ -130,41 +128,23 @@ class Replies:
             with open(filename, "wb") as f:
                 f.write(bytefile.read())
 
-        _view_type_mapping = {
-            "text": const.DC_MSG_TEXT,
-            "image": const.DC_MSG_IMAGE,
-            "gif": const.DC_MSG_GIF,
-            "audio": const.DC_MSG_AUDIO,
-            "video": const.DC_MSG_VIDEO,
-            "file": const.DC_MSG_FILE,
-            "sticker": const.DC_MSG_STICKER,
-        }
         if not viewtype:
             if filename:
                 viewtype = "file"
             else:
                 viewtype = "text"
-        view_type_code = _view_type_mapping.get(viewtype, viewtype)
-        msg = Message(
-            self.incoming_message.account,
-            ffi.gc(
-                lib.dc_msg_new(
-                    self.incoming_message.account._dc_context, view_type_code
-                ),
-                lib.dc_msg_unref,
-            ),
-        )
+        msg = Message.new_empty(self.incoming_message.account, viewtype)
 
         if quote is not None:
             msg.quote = quote
         if text:
             msg.set_text(text)
         if html:
-            lib.dc_msg_set_html(msg._dc_msg, as_dc_charpointer(html))
+            msg.set_html(html)
         if filename:
             msg.set_file(filename)
         if sender:
-            lib.dc_msg_set_override_sender_name(msg._dc_msg, as_dc_charpointer(sender))
+            msg.set_override_sender_name(sender)
 
         return msg
 
