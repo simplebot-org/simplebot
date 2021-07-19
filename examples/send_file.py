@@ -28,4 +28,4 @@ class TestSendFile:
         msg = mocker.get_one_reply("/xkcd")
         assert msg.text.startswith("#")
         assert msg.filename
-        # assert msg.is_image()
+        assert msg.is_image()
