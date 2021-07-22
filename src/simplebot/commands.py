@@ -1,12 +1,12 @@
 import inspect
 import types
 from collections import OrderedDict
-from typing import Any, Callable, Dict, Generator, Optional, Set
+from typing import Callable, Dict, Generator, Optional, Set
 
 from .hookspec import deltabot_hookimpl
 
 CMD_PREFIX = "/"
-_cmds: Set[Dict[str, Any]] = set()
+_cmds: Set[tuple] = set()
 
 
 class NotFound(LookupError):
@@ -209,7 +209,7 @@ def command_decorator(func: Callable = None, **kwargs) -> Callable:
 
     def _decorator(func) -> Callable:
         kwargs["func"] = func
-        _cmds.add(kwargs)
+        _cmds.add(tuple(sorted(kwargs.items())))
         return func
 
     if func is None:

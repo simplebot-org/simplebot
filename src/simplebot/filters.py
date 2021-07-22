@@ -1,10 +1,10 @@
 from collections import OrderedDict
-from typing import Any, Callable, Dict, Set
+from typing import Callable, Dict, Optional, Set
 
 from .commands import parse_command_docstring
 from .hookspec import deltabot_hookimpl
 
-_filters: Set[Dict[str, Any]] = set()
+_filters: Set[tuple] = set()
 
 
 class Filters:
@@ -106,7 +106,7 @@ def filter_decorator(func: Callable = None, **kwargs) -> Callable:
 
     def _decorator(func) -> Callable:
         kwargs["func"] = func
-        _filters.add(kwargs)
+        _filters.add(tuple(sorted(kwargs.items())))
         return func
 
     if func is None:

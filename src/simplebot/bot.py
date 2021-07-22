@@ -201,11 +201,11 @@ class DeltaBot:
                 else:
                     self.logger.warning("Plugin not found: %s", pymodule)
 
-        for kwargs in _cmds:
-            self.commands.register(**kwargs)
+        for items in _cmds:
+            self.commands.register(**dict(items))
 
-        for kwargs in _filters:
-            self.filters.register(**kwargs)
+        for items in _filters:
+            self.filters.register(**dict(items))
 
     #
     # API for bot administration
