@@ -342,7 +342,6 @@ class DeltaBot:
                 save_mime_headers=1,
                 e2ee_enabled=1,
                 sentbox_watch=0,
-                mvbox_watch=0,
                 bcc_self=0,
                 selfstatus="I'm a Delta Chat bot 🤖. Send me /help for more info.\n\nSource code: https://github.com/simplebot-org/simplebot",
             )
