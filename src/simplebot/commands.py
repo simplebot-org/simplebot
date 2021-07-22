@@ -118,7 +118,7 @@ class Commands:
 
     @deltabot_hookimpl
     def deltabot_init(self, bot) -> None:
-        self.register("/help", self.command_help)
+        self.register(func=self.command_help, name="/help")
 
     def command_help(self, bot, command, replies) -> None:
         """reply with help message about available commands."""
