@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+	 .w3-card-2{box-shadow:0 2px 4px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12) !important; margin-bottom: 15px;}
+	 .w3-container:after,.w3-container:before{content:"";display:table;clear:both}
+	 .w3-container{padding:0.01em 16px}
+	 .w3-delta,.w3-hover-delta:hover{color:#fff !important;background-color:#5a6f78 !important}
+	</style>
+    </head>
+    <body>
+	<div class="w3-card-2">
+	    <header class="w3-container w3-delta">
+		<h2>➡️ Commands</h2>
+	    </header>
+	    <div class="w3-container">
+		{% for c in cmds %}
+		    <a href="mailto:{{ addr }}?body={{ c.cmd }}">{{ c.cmd }}</a> {{ c.short }}
+		    <br>
+		    {% for line in c.long.split("\n") %}
+			{{ line }}<br>
+		    {% endfor %}
+		    <hr/>
+		{% endfor %}
+	    </div>
+	</div>
+	{% if plugins %}
+	    <div class="w3-card-2">
+		<header class="w3-container w3-delta">
+		    <h2>🧩 Enabled Plugins</h2>
+		</header>
+		<div class="w3-container">
+		    <ul>
+			{% for plugin in plugins %}
+			    <li>{{ plugin }}</li>
+			{% endfor %}
+		    </ul>
+		</div>
+	    </div>
+	{% endif %}
+    </body>
+</html>

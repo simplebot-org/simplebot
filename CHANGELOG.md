@@ -5,6 +5,7 @@
 - ignore messages from other bots using the new Delta Chat API.
 - allow to get account configuration values with `set_config` command.
 - allow to register administrators-only filters.
+- send bot's help as HTML message.
 - **breaking change:** improved command and filter registration.
 - **breaking change:** changed configuration folder to `~/.simplebot`
 
