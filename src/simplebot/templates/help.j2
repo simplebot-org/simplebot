@@ -16,19 +16,20 @@
 		<h2>➡️ Commands</h2>
 	    </header>
 	    <div class="w3-container">
-		<br>
-		{% for c in cmds %}
-		    {% if not loop.index == 1 %}
-			<hr/>
-		    {% endif %}
-		    <a href="mailto:{{ addr }}?body={{ c.cmd }}">{{ c.cmd }}</a> {{ c.short }}
-		    <br>
-		    {% if c.long %}
-			{% for line in c.long.split("\n") %}
-			    {{ line }}<br>
-			{% endfor %}
-		    {% endif %}
-		{% endfor %}
+		<p>
+		    {% for c in cmds %}
+			{% if not loop.index == 1 %}
+			    <hr/>
+			{% endif %}
+			<a href="mailto:{{ addr }}?body={{ c.cmd }}">{{ c.cmd }}</a> {{ c.short }}
+			<br>
+			{% if c.long %}
+			    {% for line in c.long.split("\n") %}
+				{{ line }}<br>
+			    {% endfor %}
+			{% endif %}
+		    {% endfor %}
+		</p>
 	    </div>
 	</div>
 	{% if plugins %}
