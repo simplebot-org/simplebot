@@ -26,7 +26,9 @@ def set_builtin_avatar(bot, name: str = "adaptive-default") -> bool:
     if name.startswith("adaptive-"):
         color = "#" + hex(bot.get_chat(bot.self_contact).get_color())[2:].zfill(6)
         blobdir = bot.account.get_blobdir()
-        with NamedTemporaryFile(dir=blobdir, suffix=ext, delete=False) as fp:
+        with NamedTemporaryFile(
+            dir=blobdir, prefix="avatar-", suffix=ext, delete=False
+        ) as fp:
             result_path = fp.name
         image_tint(path, color).save(result_path)
         path = result_path
