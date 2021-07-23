@@ -130,7 +130,9 @@ class Commands:
                 cmds.append(c)
         pm = bot.plugins._pm
         plugins = [pm.get_name(plug) for plug, dist in pm.list_plugin_distinfo()]
-        html = help_template.render(addr=bot.self_contact.addr, cmds=cmds, plugins=plugins)
+        html = help_template.render(
+            addr=bot.self_contact.addr, cmds=cmds, plugins=plugins
+        )
         replies.add(text="ℹ️ Help", html=html)
 
 
