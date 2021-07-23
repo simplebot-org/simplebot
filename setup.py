@@ -53,6 +53,7 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.6",
             "Programming Language :: Python :: 3.7",
             "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
         ],
         entry_points="""
             [console_scripts]
@@ -60,7 +61,7 @@ if __name__ == "__main__":
             [pytest11]
             simplebot.pytestplugin=simplebot.pytestplugin
         """,
-        python_requires=">=3.5",
+        python_requires=">=3.6",
         dependency_links=["https://m.devpi.net/dc/master"],
         install_requires=load_requirements("requirements/requirements.txt"),
         extras_require={
