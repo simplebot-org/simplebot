@@ -43,7 +43,7 @@ def get_builtin_avatars() -> list:
 
 
 def get_config_folder() -> str:
-    return os.path.join(os.path.expanduser("~"), ".config", "simplebot")
+    return os.path.join(os.path.expanduser("~"), ".simplebot")
 
 
 def get_account_path(address: str) -> str:
