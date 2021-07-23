@@ -1,16 +1,22 @@
 """Setup SimpleBot installation."""
 
+import os
+
 import setuptools  # type: ignore
 
 
 def load_requirements(path: str) -> list:
     """Load requirements from the given relative path."""
     with open(path, encoding="utf-8") as file:
-        return [
-            line.replace("==", ">=")
-            for line in file.read().split("\n")
-            if line and not line.startswith(("#", "-"))
-        ]
+        requirements = []
+        for line in file.read().split("\n"):
+            if line.startswith("-r"):
+                dirname = os.path.dirname(path)
+                filename = line.split(maxsplit=1)[1]
+                requirements.extend(load_requirements(os.path.join(dirname, filename)))
+            elif line and not line.startswith("#"):
+                requirements.append(line.replace("==", ">="))
+        return requirements
 
 
 if __name__ == "__main__":
@@ -56,8 +62,11 @@ if __name__ == "__main__":
         """,
         python_requires=">=3.5",
         dependency_links=["https://m.devpi.net/dc/master"],
-        install_requires=load_requirements("requirements.txt"),
-        extras_require={"test": load_requirements("requirements-test.txt")},
+        install_requires=load_requirements("requirements/requirements.txt"),
+        extras_require={
+            "test": load_requirements("requirements/requirements-test.txt"),
+            "dev": load_requirements("requirements/requirements-dev.txt"),
+        },
         include_package_data=True,
         zip_safe=False,
     )

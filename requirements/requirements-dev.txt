@@ -1,0 +1,4 @@
+-r requirements.txt
+-r requirements-test.txt
+black==21.6b0
+flake8==3.9.2
