@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- ignore messages from other bots using the new Delta Chat API.
+- ignore messages from other bots using the new Delta Chat API. Added `deltabot_incoming_bot_message` hook to process messages from bots.
 - allow to get account configuration values with `set_config` command.
 - allow to register administrators-only filters.
 - send bot's help as HTML message.

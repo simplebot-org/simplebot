@@ -45,9 +45,17 @@ class DeltaBotSpecs:
 
     @deltabot_hookspec(firstresult=True)
     def deltabot_incoming_message(self, message, bot, replies):
-        """process an incoming fresh message.
+        """process an incoming fresh non-automated message.
 
-        :param message: The original system message that reports the addition.
+        :param message: The incoming message.
+        :param replies: call replies.add() to schedule a reply.
+        """
+
+    @deltabot_hookspec(firstresult=True)
+    def deltabot_incoming_bot_message(self, message, bot, replies):
+        """process an incoming fresh automated message.
+
+        :param message: The incoming message.
         :param replies: call replies.add() to schedule a reply.
         """
 

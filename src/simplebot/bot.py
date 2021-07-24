@@ -404,9 +404,14 @@ class CheckAll:
                     if message.is_system_message():
                         self.handle_system_message(message, replies)
                     elif not message.get_sender_contact().is_blocked():
-                        self.bot.plugins.hook.deltabot_incoming_message(
-                            message=message, bot=self.bot, replies=replies
-                        )
+                        if message.is_bot():
+                            self.bot.plugins.hook.deltabot_incoming_bot_message(
+                                message=message, bot=self.bot, replies=replies
+                            )
+                        else:
+                            self.bot.plugins.hook.deltabot_incoming_message(
+                                message=message, bot=self.bot, replies=replies
+                            )
                     replies.send_reply_messages()
                 else:
                     logger.debug("ignoring classic email id=%s", msg_id)
@@ -500,10 +505,6 @@ class IncomingEventHandler:
 
     @account_hookimpl
     def ac_incoming_message(self, message: Message) -> None:
-        if message.is_bot() and not message.is_system_message():
-            self.logger.debug("ignoring message from bot id=%s", message.id)
-            return
-
         # we always accept incoming messages to remove the need  for
         # bot authors to having to deal with deaddrop/contact requests.
         message.create_chat()
