@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Callable, Dict, Optional, Set
+from typing import Callable, Dict, Set
 
 from .commands import parse_command_docstring
 from .hookspec import deltabot_hookimpl

@@ -5,7 +5,7 @@ from typing import Generator, List, Optional, Union
 
 import deltachat as dc  # type: ignore
 import py
-from deltachat import Account, Chat, Contact, Message, account_hookimpl, const
+from deltachat import Account, Chat, Contact, Message, account_hookimpl
 from deltachat.message import parse_system_add_remove  # type: ignore
 from deltachat.tracker import ConfigureTracker  # type: ignore
 
