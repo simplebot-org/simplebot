@@ -6,6 +6,7 @@
 - allow to get account configuration values with `set_config` command.
 - allow to register administrators-only filters.
 - send bot's help as HTML message.
+- **breaking change:** plugins must register their "user preferences" with `DeltaBot.add_preference()` then the setting will be available to users with `/set` command.
 - **breaking change:** improved command and filter registration.
 - **breaking change:** changed configuration folder to `~/.simplebot`
 

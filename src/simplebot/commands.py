@@ -125,9 +125,11 @@ class Commands:
         """reply with help message about available commands."""
         is_admin = bot.is_admin(command.message.get_sender_contact().addr)
         cmds = []
+        has_prefs = bool(bot.get_preferences())
         for c in self._cmd_defs.values():
             if not c.admin or is_admin:
-                cmds.append(c)
+                if c.cmd != "/set" or has_prefs:
+                    cmds.append(c)
         pm = bot.plugins._pm
         plugins = [pm.get_name(plug) for plug, dist in pm.list_plugin_distinfo()]
         html = help_template.render(

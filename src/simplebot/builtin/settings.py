@@ -85,39 +85,44 @@ class DB:
 
 @command_decorator(name="/set")
 def cmd_set(bot, payload, message, replies) -> None:
-    """show all user settings or set a value for a setting.
+    """show all available settings or set a value for a setting.
 
     Examples:
 
     # show all settings
     /set
 
-    # unset one setting
-    /set name
+    # unset one setting named "mysetting"
+    /set_mysetting
 
-    # set one setting
-    /set name value
+    # set one setting named "mysetting"
+    /set_mysetting value
     """
     addr = message.get_sender_contact().addr
     if not payload:
-        text = "\n".join(dump_settings(bot, scope=addr))
+        text = dump_settings(bot, scope=addr)
     else:
         args = payload.split(maxsplit=1)
-        if len(args) == 1:
-            args.append(None)
-        name, value = args
-        old = bot.set(name, value and value.strip(), scope=addr)
-        text = "old: {0}={1!r}\nnew: {0}={2!r}".format(name, old, value)
+        name = args[0]
+        if bot.get_preference_description(name) is None:
+            text = "Invalid setting. Available settings:"
+            for name, desc in bot.get_preferences():
+                text += f"\n\n/set_{name}: {desc}"
+        else:
+            value = None if len(args) == 1 else args[1]
+            old = bot.set(name, value and value.strip(), scope=addr)
+            text = "old: {0}={1!r}\nnew: {0}={2!r}".format(name, old, value)
     replies.add(text=text)
 
 
-def dump_settings(bot, scope) -> list:
+def dump_settings(bot, scope) -> str:
     lines = []
-    for name, value in bot.list_settings(scope=scope):
-        lines.append("{}={}".format(name, value))
+    for name, desc in bot.get_preferences():
+        value = bot.get(name, scope=scope)
+        lines.append(f"/set_{name} = {value}\nDescription: {desc}\n")
     if not lines:
-        lines.append("no settings")
-    return lines
+        return "no settings"
+    return "\n".join(lines)
 
 
 class TestCommandSettings:

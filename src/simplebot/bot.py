@@ -1,7 +1,7 @@
 import os
 import threading
 from tempfile import NamedTemporaryFile
-from typing import Generator, List, Union
+from typing import Generator, List, Optional, Union
 
 import deltachat as dc  # type: ignore
 import py
@@ -257,7 +257,9 @@ class DeltaBot:
         key = scope + "/" + name
         self.plugins._pm.hook.deltabot_store_setting(key=key, value=None)
 
-    def get(self, name: str, default: str = None, scope: str = "global") -> str:
+    def get(
+        self, name: str, default: str = None, scope: str = "global"
+    ) -> Optional[str]:
         """Get a bot setting from the given scope."""
         assert "/" not in scope
         key = scope + "/" + name
@@ -279,6 +281,27 @@ class DeltaBot:
                 if x[0].startswith(scope_prefix)
             ]
         return l
+
+    def add_preference(self, name: str, description: str) -> None:
+        """add a preference users can set with /set command.
+
+        The given description will be shown to the users.
+        """
+        assert description is not None
+        if self.get_preference_description(name) != description:
+            self.set(name, description, scope="preferences")
+
+    def get_preference_description(self, name: str) -> Optional[str]:
+        """Return preference description or None if the preference doesn't exist."""
+        return self.get(name, scope="preferences")
+
+    def delete_preference(self, name: str) -> None:
+        """delete a preference, it will no longer be available to users."""
+        self.delete(name, scope="preferences")
+
+    def get_preferences(self) -> List[tuple]:
+        """get list of preferences available to users."""
+        return self.list_settings(scope="preferences")
 
     #
     # API for getting at and creating contacts and chats
