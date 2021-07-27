@@ -21,9 +21,7 @@ class DBManager:
                 "CREATE TABLE IF NOT EXISTS config"
                 " (keyname TEXT PRIMARY KEY,value TEXT)"
             )
-            self.db.execute(
-                "CREATE TABLE IF NOT EXISTS msgs" " (id INTEGER PRIMARY KEY)"
-            )
+            self.db.execute("CREATE TABLE IF NOT EXISTS msgs (id INTEGER PRIMARY KEY)")
 
     def put_msg(self, msg_id: int) -> None:
         with self.db:
@@ -51,7 +49,7 @@ class DBManager:
 
     @deltabot_hookimpl
     def deltabot_list_settings(self) -> list:
-        rows = self.db.execute("SELECT * FROM config").fetchall()
+        rows = self.db.execute("SELECT * FROM config")
         return [(row["keyname"], row["value"]) for row in rows]
 
     @deltabot_hookimpl
