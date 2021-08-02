@@ -8,6 +8,9 @@ from ..hookspec import deltabot_hookimpl
 def deltabot_init(bot) -> None:
     db_path = os.path.join(os.path.dirname(bot.account.db_path), "bot.db")
     bot.plugins.add_module("db", DBManager(db_path))
+    # delete all preferences on init to avoid preferences from deleted plugins
+    for name, _ in bot.get_preferences():
+        bot.delete_preference(name)
 
 
 class DBManager:

@@ -288,8 +288,7 @@ class DeltaBot:
         The given description will be shown to the users.
         """
         assert description is not None
-        if self.get_preference_description(name) != description:
-            self.set(name, description, scope="preferences")
+        self.set(name, description, scope="preferences")
 
     def get_preference_description(self, name: str) -> Optional[str]:
         """Return preference description or None if the preference doesn't exist."""
