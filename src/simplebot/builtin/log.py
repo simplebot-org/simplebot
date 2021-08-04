@@ -35,7 +35,7 @@ def make_logger(logdir, stdout_loglevel) -> logging.Logger:
 
     log_path = os.path.join(logdir, "bot.log")
     fhandler = logging.handlers.RotatingFileHandler(
-        log_path, backupCount=5, maxBytes=2000000
+        log_path, backupCount=3, maxBytes=2000000
     )
     fhandler.setLevel(logging.DEBUG)
     fhandler.setFormatter(formatter)
