@@ -40,7 +40,7 @@ class Replies:
         bytefile=None,
         sender: str = None,
         quote: Message = None,
-        chat: Chat = None
+        chat: Chat = None,
     ) -> None:
         """Schedule a reply message.
 
@@ -72,7 +72,7 @@ class Replies:
     def send_reply_messages(self) -> list:
         l = []
         for msg in self._send_replies_to_core():
-            self.logger.info(
+            self.logger.debug(
                 "reply id={} chat={} sent with text: {!r}".format(
                     msg.id, msg.chat, msg.text[:50]
                 )
@@ -377,11 +377,11 @@ class DeltaBot:
                 configtracker.wait_finish()
             except configtracker.ConfigureFailed as ex:
                 success = False
-                self.logger.error("Failed to configure: {}".format(ex))
+                self.logger.error("Failed to configure: %s", ex)
             else:
                 set_builtin_avatar(self)
                 success = True
-                self.logger.info("Successfully configured {}".format(email))
+                self.logger.info("Successfully configured %s", email)
             return success
 
     #
@@ -391,7 +391,7 @@ class DeltaBot:
         """Start bot threads and processing messages."""
         self.plugins.hook.deltabot_start(bot=self)
         addr = self.account.get_config("addr")
-        self.logger.info("bot listening at: {}".format(addr))
+        self.logger.info("bot listening at: %s", addr)
         self._eventhandler.start()
         self.account.start_io()
 
@@ -414,16 +414,14 @@ class CheckAll:
 
     def perform(self) -> None:
         logger = self.bot.logger
-        logger.info("CheckAll perform-loop start")
+        logger.debug("CheckAll perform-loop start")
         for msg_id in self.db.get_msgs():
             try:
                 message = self.bot.account.get_message_by_id(msg_id)
                 headers = message.get_mime_headers() or dict()
                 if "Chat-Version" in headers or message.is_encrypted():
                     replies = Replies(message, logger=logger)
-                    logger.info(
-                        "processing incoming fresh message id={}".format(message.id)
-                    )
+                    logger.info("processing incoming fresh message id=%s", message.id)
                     if message.is_system_message():
                         self.handle_system_message(message, replies)
                     elif not message.get_sender_contact().is_blocked():
@@ -438,11 +436,11 @@ class CheckAll:
                     replies.send_reply_messages()
                 else:
                     logger.debug("ignoring classic email id=%s", msg_id)
-                logger.info("processing message id={} FINISHED".format(msg_id))
+                logger.info("processing message id=%s FINISHED", msg_id)
             except Exception as ex:
-                logger.exception("processing message={} failed: {}".format(msg_id, ex))
+                logger.exception("processing message=%s failed: %s", msg_id, ex)
             self.db.pop_msg(msg_id)
-        logger.info("CheckAll perform-loop finish")
+        logger.debug("CheckAll perform-loop finish")
 
     def handle_system_message(self, message: Message, replies: Replies) -> None:
         logger = self.bot.logger
@@ -450,7 +448,7 @@ class CheckAll:
         res = parse_system_image_changed(message.text)
         if res:
             actor, deleted = res
-            logger.info("calling hook deltabot_image_changed")
+            logger.debug("calling hook deltabot_image_changed")
             self.bot.plugins.hook.deltabot_image_changed(
                 message=message,
                 replies=replies,
@@ -464,7 +462,7 @@ class CheckAll:
         res = parse_system_title_changed(message.text, message.chat.get_name())
         if res is not None:
             old_title, actor = res
-            logger.info("calling hook deltabot_title_changed")
+            logger.debug("calling hook deltabot_title_changed")
             self.bot.plugins.hook.deltabot_title_changed(
                 message=message,
                 replies=replies,
@@ -478,9 +476,9 @@ class CheckAll:
         res = parse_system_add_remove(message.text)
         if res:
             action, affected, actor = res
-            hook_name = "deltabot_member_{}".format(action)
+            hook_name = f"deltabot_member_{action}"
             meth = getattr(self.bot.plugins.hook, hook_name)
-            logger.info("calling hook {}".format(hook_name))
+            logger.debug("calling hook %s", hook_name)
             meth(
                 message=message,
                 replies=replies,
@@ -491,9 +489,7 @@ class CheckAll:
             )
             return
 
-        logger.info(
-            "ignoring system message id={} text: {}".format(message.id, message.text)
-        )
+        logger.debug("ignoring system message id=%s text: %s", message.id, message.text)
 
 
 class IncomingEventHandler:
@@ -506,7 +502,7 @@ class IncomingEventHandler:
         self._running = True
 
     def start(self) -> None:
-        self.logger.info("starting bot-event-handler THREAD")
+        self.logger.debug("starting bot-event-handler THREAD")
         self.db = self.bot.plugins._pm.get_plugin(name="db")
         self.bot.account.add_account_plugin(self)
         self._thread = t = threading.Thread(
@@ -531,7 +527,7 @@ class IncomingEventHandler:
         # we always accept incoming messages to remove the need  for
         # bot authors to having to deal with deaddrop/contact requests.
         message.create_chat()
-        self.logger.info(
+        self.logger.debug(
             "incoming message from {} id={} chat={} text={!r}".format(
                 message.get_sender_contact().addr,
                 message.id,
@@ -561,8 +557,6 @@ class IncomingEventHandler:
 
     @account_hookimpl
     def ac_message_delivered(self, message: Message) -> None:
-        self.logger.info(
-            "message id={} chat={} delivered to smtp".format(
-                message.id, message.chat.id
-            )
+        self.logger.debug(
+            "message id=%s chat=%s delivered to smtp", message.id, message.chat.id
         )

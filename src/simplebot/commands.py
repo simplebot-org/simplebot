@@ -101,7 +101,7 @@ class Commands:
         cmd = IncomingCommand(
             bot=bot, cmd_def=cmd_def, message=message, args=args, payload=payload
         )
-        bot.logger.info("processing command {}".format(cmd))
+        bot.logger.debug("processing command {}".format(cmd))
         try:
             res = cmd.cmd_def(
                 command=cmd,
@@ -173,7 +173,7 @@ class IncomingCommand:
 
     def __repr__(self) -> str:
         return "<IncomingCommand {!r} payload={!r} msg={}>".format(
-            self.cmd_def.cmd[0], self.payload, self.message.id
+            self.cmd_def.cmd, self.payload, self.message.id
         )
 
 
