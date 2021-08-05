@@ -8,6 +8,7 @@
 - send bot's help as HTML message.
 - disable "move to DeltaChat folder" (mvbox_move setting) by default.
 - log less info if not in "debug" mode.
+- help command now also includes filters descriptions.
 - **breaking change:** plugins must register their "user preferences" with `DeltaBot.add_preference()` then the setting will be available to users with `/set` command.
 - **breaking change:** improved command and filter registration.
 - **breaking change:** changed configuration folder to `~/.simplebot`

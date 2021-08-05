@@ -14,6 +14,7 @@ from .builtin.cmdline import PluginCmd
 from .commands import Commands, _cmds
 from .filters import Filters, _filters
 from .plugins import Plugins, get_global_plugin_manager
+from .templates import help_template
 from .utils import (
     parse_system_image_changed,
     parse_system_title_changed,
@@ -183,6 +184,10 @@ class DeltaBot:
         plugin_manager.hook.deltabot_init.call_historic(
             kwargs=dict(bot=self, args=args)
         )
+
+        # register /help command
+        self.commands.register(func=self._help, name="/help")
+
         # add manually added python modules as plugins
         mods = self.get(PluginCmd.db_key, "").split("\n")
         while mods:
@@ -405,6 +410,34 @@ class DeltaBot:
         self._eventhandler.stop()
         self.plugins.hook.deltabot_shutdown(bot=self)
         self.account.shutdown()
+
+    #
+    # help command
+    #
+    def _help(self, bot, command, replies) -> None:
+        """get the bot's help."""
+        is_admin = bot.is_admin(command.message.get_sender_contact().addr)
+
+        cmds = []
+        has_prefs = bool(bot.get_preferences())
+        for c in self.commands._cmd_defs.values():
+            if not c.admin or is_admin:
+                if c.cmd != "/set" or has_prefs:
+                    cmds.append(c)
+
+        filters = []
+        for f in self.filters._filter_defs.values():
+            if not f.admin or is_admin:
+                filters.append(c)
+
+        plugins = []
+        for plug, dist in bot.plugins._pm.list_plugin_distinfo():
+            plugins.append(bot.plugins._pm.get_name(plug))
+
+        html = help_template.render(
+            addr=bot.self_contact.addr, cmds=cmds, filters=filters, plugins=plugins
+        )
+        replies.add(text="ℹ️ Help", html=html)
 
 
 class CheckAll:

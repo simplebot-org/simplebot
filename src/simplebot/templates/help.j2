@@ -11,27 +11,54 @@
 	</style>
     </head>
     <body>
-	<div class="w3-card-2">
-	    <header class="w3-container w3-delta">
-		<h2>➡️ Commands</h2>
-	    </header>
-	    <div class="w3-container">
-		<p>
-		    {% for c in cmds %}
-			{% if not loop.index == 1 %}
-			    <hr/>
-			{% endif %}
-			<a href="mailto:{{ addr }}?body={{ c.cmd }}">{{ c.cmd }}</a> {{ c.short }}
-			<br>
-			{% if c.long %}
-			    {% for line in c.long.split("\n") %}
-				{{ line }}<br>
-			    {% endfor %}
-			{% endif %}
-		    {% endfor %}
-		</p>
+	{% if filters %}
+	    <div class="w3-card-2">
+		<header class="w3-container w3-delta">
+		    <h2>Help</h2>
+		</header>
+		<div class="w3-container">
+		    <p>
+			{% for f in filters %}
+			    {% if loop.index != 1 %}
+				<hr/>
+			    {% endif %}
+			    {{ f.short }}
+			    <br>
+			    {% if f.long %}
+				{% for line in f.long.split("\n") %}
+				    {{ line }}<br>
+				{% endfor %}
+			    {% endif %}
+			{% endfor %}
+		    </p>
+		</div>
 	    </div>
-	</div>
+	{% endif %}
+
+	{% if cmds %}
+	    <div class="w3-card-2">
+		<header class="w3-container w3-delta">
+		    <h2>➡️ Commands</h2>
+		</header>
+		<div class="w3-container">
+		    <p>
+			{% for c in cmds %}
+			    {% if loop.index != 1 %}
+				<hr/>
+			    {% endif %}
+			    <a href="mailto:{{ addr }}?body={{ c.cmd }}">{{ c.cmd }}</a> {{ c.short }}
+			    <br>
+			    {% if c.long %}
+				{% for line in c.long.split("\n") %}
+				    {{ line }}<br>
+				{% endfor %}
+			    {% endif %}
+			{% endfor %}
+		    </p>
+		</div>
+	    </div>
+	{% endif %}
+
 	{% if plugins %}
 	    <div class="w3-card-2">
 		<header class="w3-container w3-delta">

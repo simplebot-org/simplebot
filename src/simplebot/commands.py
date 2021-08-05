@@ -4,7 +4,6 @@ from collections import OrderedDict
 from typing import Callable, Dict, Generator, Optional, Set
 
 from .hookspec import deltabot_hookimpl
-from .templates import help_template
 
 CMD_PREFIX = "/"
 _cmds: Set[tuple] = set()
@@ -116,26 +115,6 @@ class Commands:
         else:
             assert res is None, res
         return True
-
-    @deltabot_hookimpl
-    def deltabot_init(self, bot) -> None:
-        self.register(func=self.command_help, name="/help")
-
-    def command_help(self, bot, command, replies) -> None:
-        """reply with help message about available commands."""
-        is_admin = bot.is_admin(command.message.get_sender_contact().addr)
-        cmds = []
-        has_prefs = bool(bot.get_preferences())
-        for c in self._cmd_defs.values():
-            if not c.admin or is_admin:
-                if c.cmd != "/set" or has_prefs:
-                    cmds.append(c)
-        pm = bot.plugins._pm
-        plugins = [pm.get_name(plug) for plug, dist in pm.list_plugin_distinfo()]
-        html = help_template.render(
-            addr=bot.self_contact.addr, cmds=cmds, plugins=plugins
-        )
-        replies.add(text="ℹ️ Help", html=html)
 
 
 class CommandDef:
