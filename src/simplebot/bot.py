@@ -428,7 +428,7 @@ class DeltaBot:
         filters = []
         for f in self.filters._filter_defs.values():
             if not f.admin or is_admin:
-                filters.append(c)
+                filters.append(f)
 
         plugins = []
         for plug, dist in bot.plugins._pm.list_plugin_distinfo():
