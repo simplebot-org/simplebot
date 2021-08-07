@@ -333,7 +333,7 @@ class DeltaBot:
         ref can be a Message, Contact, email address string or chat-id integer.
         """
         if isinstance(ref, dc.message.Message):
-            return self.account._create_chat_by_message_id(ref.id)
+            return ref.chat
         if isinstance(ref, (dc.contact.Contact, str)):
             return self.account.create_chat(ref)
         if isinstance(ref, int):
