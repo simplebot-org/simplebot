@@ -21,7 +21,7 @@ def deltabot_init(bot):
 
 
 @simplebot.command
-def quote(message, replies):
+def quote(bot, message, replies):
     """Get quote of the day from Wikiquote."""
     lang = bot.get("locale", scope=message.get_sender_contact().addr)
     text, author = wikiquote.quote_of_the_day(lang=lang)
