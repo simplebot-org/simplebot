@@ -22,7 +22,7 @@ def test_parse_command_docstring():
 
 def test_run_help(mocker):
     reply = mocker.get_one_reply("/help")
-    assert "/help" in reply.text
+    assert "/help" in reply.html
 
 
 def test_partial_args(mock_bot):
