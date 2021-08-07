@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.0]
 
 - ignore messages from other bots using the new Delta Chat API. Added `deltabot_incoming_bot_message` hook to process messages from bots.
 - allow to get account configuration values with `set_config` command.
@@ -44,7 +44,9 @@
 - initial release
 
 
-[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.0.0...HEAD
+
+[2.0.0]: https://github.com/simplebot-org/simplebot/compare/v1.1.1...v2.0.0
 
 [1.1.1]: https://github.com/simplebot-org/simplebot/compare/v1.1.0...v1.1.1
 
