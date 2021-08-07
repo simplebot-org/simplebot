@@ -10,10 +10,10 @@ import simplebot
 @simplebot.hookimpl
 def deltabot_init(bot):
     if os.environ.get("LANG", "").startswith("es_"):  # Spanish locale
-        name = "/eco"
+        name = "/mi_eco"
         description = "Repite el texto enviado"
     else:
-        name = "/echo"
+        name = "/my_echo"
         description = "Echoes back the given text"
     admin_only = os.environ.get("BOT_ADMIN_ONLY") == "1"
     bot.commands.register(
@@ -37,11 +37,11 @@ def echo_filter(message, replies):
 
 class TestSendFile:
     def test_cmd(self, mocker):
-        msgs = mocker.get_replies("/echo hello")
+        msgs = mocker.get_replies("/my_echo hello")
         if len(msgs) == 1:
             msg = msgs[0]
         else:
-            msg = mocker.get_one_reply("/eco hello")
+            msg = mocker.get_one_reply("/mi_eco hello")
         assert msg.text == "hello"
 
     def test_filter(self, mocker):
