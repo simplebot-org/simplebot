@@ -53,7 +53,7 @@ pip install git+https://github.com/simplebot-org/simplebot
 
 ## Plugins
 
-SimpleBot is a base bot that relies on plugins to add functionality, for official plugins check [simplebot_plugins](https://github.com/simplebot-org/simplebot_plugins)
+SimpleBot is a base bot that relies on plugins to add functionality.
 
 Everyone can publish their own plugins, search in PyPI to discover cool [SimpleBot plugins](https://pypi.org/search/?q=simplebot&o=&c=Environment+%3A%3A+Plugins)
 
