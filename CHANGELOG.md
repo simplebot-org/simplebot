@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.0]
+
+- mark messages as read so MDN work, if enabled.
+
 ## [2.0.0]
 
 - ignore messages from other bots using the new Delta Chat API. Added `deltabot_incoming_bot_message` hook to process messages from bots.
@@ -44,7 +48,9 @@
 - initial release
 
 
-[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.1.0...HEAD
+
+[2.1.0]: https://github.com/simplebot-org/simplebot/compare/v2.0.0...v2.1.0
 
 [2.0.0]: https://github.com/simplebot-org/simplebot/compare/v1.1.1...v2.0.0
 
