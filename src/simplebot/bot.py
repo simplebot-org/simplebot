@@ -449,9 +449,9 @@ class CheckAll:
         logger = self.bot.logger
         logger.debug("CheckAll perform-loop start")
         for msg_id in self.db.get_msgs():
-            message = None
             try:
                 message = self.bot.account.get_message_by_id(msg_id)
+                message.mark_seen()
                 headers = message.get_mime_headers() or dict()
                 if "Chat-Version" in headers or message.is_encrypted():
                     replies = Replies(message, logger=logger)
@@ -474,8 +474,6 @@ class CheckAll:
             except Exception as ex:
                 logger.exception("processing message=%s failed: %s", msg_id, ex)
             self.db.pop_msg(msg_id)
-            if message is not None:
-                message.mark_seen()
         logger.debug("CheckAll perform-loop finish")
 
     def handle_system_message(self, message: Message, replies: Replies) -> None:

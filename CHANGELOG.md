@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- mark messages as read before processing them.
+
 ## [2.1.0]
 
 - mark messages as read so MDN work, if enabled.
