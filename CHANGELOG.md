@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- show shield badge in commands/filters for bot administrators.
+
 ## [2.1.1]
 
 - mark messages as read before processing them.
