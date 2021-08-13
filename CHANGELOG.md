@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.1.1]
 
 - mark messages as read before processing them.
 
@@ -52,7 +52,9 @@
 - initial release
 
 
-[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.1.1...HEAD
+
+[2.1.1]: https://github.com/simplebot-org/simplebot/compare/v2.1.0...v2.1.1
 
 [2.1.0]: https://github.com/simplebot-org/simplebot/compare/v2.0.0...v2.1.0
 
