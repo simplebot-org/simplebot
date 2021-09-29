@@ -35,7 +35,7 @@ class Commands:
         short, long, args = parse_command_docstring(
             func, args=["command", "replies", "bot", "payload", "args", "message"]
         )
-        for cand_name in iter_underscore_subparts(name):
+        for cand_name in iter_underscore_subparts(name.lower()):
             if cand_name in self._cmd_defs:
                 raise ValueError(
                     "command {!r} fails to register, conflicts with: {!r}".format(
@@ -43,7 +43,7 @@ class Commands:
                     )
                 )
         for reg_name in self._cmd_defs:
-            if reg_name.startswith(name + "_"):
+            if reg_name.startswith(name.lower() + "_"):
                 raise ValueError(
                     "command {!r} fails to register, conflicts with: {!r}".format(
                         name, reg_name
@@ -53,12 +53,12 @@ class Commands:
         cmd_def = CommandDef(
             name, short=short, long=long, func=func, args=args, admin=admin
         )
-        self._cmd_defs[name] = cmd_def
+        self._cmd_defs[name.lower()] = cmd_def
         self.logger.debug("registered new command {!r}".format(name))
 
     def unregister(self, name: str) -> Callable:
         """unregister a command function by name."""
-        return self._cmd_defs.pop(name)
+        return self._cmd_defs.pop(name.lower())
 
     def dict(self) -> dict:
         return self._cmd_defs.copy()
@@ -80,8 +80,7 @@ class Commands:
 
         parts = orig_cmd_name.split("_")
         while parts:
-            cmd_name = "_".join(parts)
-            cmd_def = self._cmd_defs.get(cmd_name)
+            cmd_def = self._cmd_defs.get("_".join(parts).lower())
             if cmd_def is not None:
                 break
             newarg = parts.pop()

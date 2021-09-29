@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - show shield badge in commands/filters for bot administrators.
+- make commands case insensitive, now `/Help` is equivalent to `/help`.
 
 ## [2.1.1]
 
