@@ -4,7 +4,6 @@ from tempfile import NamedTemporaryFile
 from typing import Generator, List, Optional, Union
 
 import deltachat as dc  # type: ignore
-
 import py
 from deltachat import Account, Chat, Contact, Message, account_hookimpl
 from deltachat.capi import lib
@@ -456,8 +455,18 @@ class CheckAll:
                 message = self.bot.account.get_message_by_id(msg_id)
                 message.mark_seen()
                 headers = message.get_mime_headers() or dict()
-                can_encrypt = from_dc_charpointer(lib.dc_get_contact_encrinfo(self.bot.account._dc_context, message.get_sender_contact().id)).splitlines()[0].lower() != "no encryption."
-                is_deltalab = ("Chat-Version" in headers and "Subject" not in headers)
+                can_encrypt = (
+                    from_dc_charpointer(
+                        lib.dc_get_contact_encrinfo(
+                            self.bot.account._dc_context,
+                            message.get_sender_contact().id,
+                        )
+                    )
+                    .splitlines()[0]
+                    .lower()
+                    != "no encryption."
+                )
+                is_deltalab = "Chat-Version" in headers and "Subject" not in headers
                 if message.is_encrypted() or can_encrypt or is_deltalab:
                     replies = Replies(message, logger=logger)
                     logger.info("processing incoming fresh message id=%s", message.id)
