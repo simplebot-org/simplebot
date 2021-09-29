@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.2.0]
 
 - show shield badge in commands/filters for bot administrators.
 - make commands case insensitive, now `/Help` is equivalent to `/help`.
@@ -57,7 +57,9 @@
 - initial release
 
 
-[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.2.0...HEAD
+
+[2.2.0]: https://github.com/simplebot-org/simplebot/compare/v2.1.1...v2.2.0
 
 [2.1.1]: https://github.com/simplebot-org/simplebot/compare/v2.1.0...v2.1.1
 
