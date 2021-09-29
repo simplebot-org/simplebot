@@ -28,7 +28,7 @@ def test_setuptools_plugin(monkeypatch, request):
         l.append((group, name))
 
     monkeypatch.setattr(
-        pluggy.manager.PluginManager,
+        pluggy.PluginManager,
         "load_setuptools_entrypoints",
         load_setuptools_entrypoints,
     )
@@ -55,7 +55,7 @@ def test_deltabot_init_hooks(monkeypatch, request):
         self.register(MyPlugin())
 
     monkeypatch.setattr(
-        pluggy.manager.PluginManager,
+        pluggy.PluginManager,
         "load_setuptools_entrypoints",
         load_setuptools_entrypoints,
     )
