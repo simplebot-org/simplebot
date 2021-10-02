@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- fixed bug while processing member added/removed events from self.
+
 ## [2.2.0]
 
 - show shield badge in commands/filters for bot administrators.

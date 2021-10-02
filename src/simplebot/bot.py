@@ -368,7 +368,6 @@ class DeltaBot:
                 # set some useful bot defaults on the account
                 delete_server_after=1,
                 delete_device_after=2592000,
-                save_mime_headers=1,
                 e2ee_enabled=1,
                 sentbox_watch=0,
                 mvbox_move=0,
@@ -453,19 +452,19 @@ class CheckAll:
         for msg_id in self.db.get_msgs():
             try:
                 message = self.bot.account.get_message_by_id(msg_id)
-                message.mark_seen()
-                headers = message.get_mime_headers() or dict()
-                encrinfo = from_dc_charpointer(
-                    lib.dc_get_contact_encrinfo(
-                        self.bot.account._dc_context,
-                        message.get_sender_contact().id,
+                sender = message.get_sender_contact()
+                if sender != self.bot.self_contact:
+                    message.mark_seen()
+                    encrinfo = from_dc_charpointer(
+                        lib.dc_get_contact_encrinfo(
+                            self.bot.account._dc_context,
+                            sender.id,
+                        )
                     )
-                )
-                can_encrypt = (
-                    encrinfo and encrinfo.splitlines()[0].lower() != "no encryption."
-                )
-                is_deltalab = "Chat-Version" in headers and "Subject" not in headers
-                if message.is_encrypted() or can_encrypt or is_deltalab:
+                    can_encrypt = encrinfo.splitlines()[0].lower() != "no encryption."
+                else:
+                    can_encrypt = True
+                if message.is_encrypted() or can_encrypt:
                     replies = Replies(message, logger=logger)
                     logger.info("processing incoming fresh message id=%s", message.id)
                     if message.is_system_message():
@@ -481,7 +480,7 @@ class CheckAll:
                             )
                     replies.send_reply_messages()
                 else:
-                    logger.debug("ignoring classic email id=%s", msg_id)
+                    logger.debug("ignoring message (id=%s) without autocrypt support", msg_id)
                 logger.info("processing message id=%s FINISHED", msg_id)
             except Exception as ex:
                 logger.exception("processing message=%s failed: %s", msg_id, ex)
