@@ -480,7 +480,9 @@ class CheckAll:
                             )
                     replies.send_reply_messages()
                 else:
-                    logger.debug("ignoring message (id=%s) without autocrypt support", msg_id)
+                    logger.debug(
+                        "ignoring message (id=%s) without autocrypt support", msg_id
+                    )
                 logger.info("processing message id=%s FINISHED", msg_id)
             except Exception as ex:
                 logger.exception("processing message=%s failed: %s", msg_id, ex)
