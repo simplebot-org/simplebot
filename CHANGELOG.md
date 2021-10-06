@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- close "bytefile" (passed to `Replies.add`) after reading the content.
+
 ## [2.2.1]
 
 - fixed bug while processing member added/removed events from self.

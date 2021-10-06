@@ -130,7 +130,8 @@ class Replies:
             ) as fp:
                 filename = fp.name
             with open(filename, "wb") as f:
-                f.write(bytefile.read())
+                with bytefile:
+                    f.write(bytefile.read())
 
         if not viewtype:
             if filename:
