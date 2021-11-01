@@ -1,4 +1,4 @@
 deltachat==1.58.0
 py==1.10.0
 Pillow==8.3.2
-Jinja2==3.0.1
+Jinja2==3.0.2
