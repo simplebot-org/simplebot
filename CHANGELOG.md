@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - close "bytefile" (passed to `Replies.add`) after reading the content.
+- use a custom event thread to prevent dead `EventThread`.
 
 ## [2.2.1]
 
