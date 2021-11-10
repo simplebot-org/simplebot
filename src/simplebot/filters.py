@@ -71,8 +71,8 @@ class Filters:
             self.logger.debug(
                 "calling filter {!r} on message id={}".format(name, message.id)
             )
-            res = filter_def(message=message, replies=replies, bot=bot)
-            assert res is None
+            if filter_def(message=message, replies=replies, bot=bot):
+                return
 
 
 class FilterDef:
