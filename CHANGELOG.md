@@ -4,6 +4,7 @@
 
 - close "bytefile" (passed to `Replies.add`) after reading the content.
 - use a custom event thread to prevent dead `EventThread`.
+- honor `--stdlog` value in log file.
 
 ## [2.2.1]
 
