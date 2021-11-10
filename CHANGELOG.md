@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.3.0]
 
 - close "bytefile" (passed to `Replies.add`) after reading the content.
 - use a custom event thread to prevent dead `EventThread`.
@@ -68,7 +68,9 @@
 - initial release
 
 
-[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.2.1...HEAD
+[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.3.0...HEAD
+
+[2.3.0]: https://github.com/simplebot-org/simplebot/compare/v2.2.1...v2.3.0
 
 [2.2.1]: https://github.com/simplebot-org/simplebot/compare/v2.2.0...v2.2.1
 
