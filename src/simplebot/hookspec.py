@@ -48,6 +48,7 @@ class DeltaBotSpecs:
         """process an incoming fresh non-automated message.
 
         :param message: The incoming message.
+        :param bot: The bot that triggered the event.
         :param replies: call replies.add() to schedule a reply.
         """
 
@@ -56,6 +57,7 @@ class DeltaBotSpecs:
         """process an incoming fresh automated message.
 
         :param message: The incoming message.
+        :param bot: The bot that triggered the event.
         :param replies: call replies.add() to schedule a reply.
         """
 
@@ -68,6 +70,7 @@ class DeltaBotSpecs:
         :param actor: Who added the contact (None if it was our self-addr)
         :param message: The original system message that reports the addition.
         :param replies: Can be used to register replies without directly trying to send out.
+        :param bot: The bot that triggered the event.
         """
 
     @deltabot_hookspec(firstresult=True)
@@ -82,6 +85,7 @@ class DeltaBotSpecs:
         :param actor: Who removed the contact (None if it was our self-addr)
         :param message: The original system message that reports the removal.
         :param replies: Can be used to register replies without directly trying to send out.
+        :param bot: The bot that triggered the event.
         """
 
     @deltabot_hookspec
@@ -93,6 +97,7 @@ class DeltaBotSpecs:
         :param actor: Contact that changed the title (None if it was our self-addr)
         :param message: The original system message that reports the change.
         :param replies: Can be used to register replies without directly trying to send out.
+        :param bot: The bot that triggered the event.
         """
 
     @deltabot_hookspec
@@ -104,6 +109,7 @@ class DeltaBotSpecs:
         :param actor: Contact that changed the image (None if it was our self-addr)
         :param message: The original system message that reports the change.
         :param replies: Can be used to register replies without directly trying to send out.
+        :param bot: The bot that triggered the event.
         """
 
     @deltabot_hookspec(firstresult=True)
