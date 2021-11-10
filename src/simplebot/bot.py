@@ -256,14 +256,14 @@ class DeltaBot:
         assert "/" not in scope and "/" not in name
         old_val = self.get(name, scope=scope)
         key = scope + "/" + name
-        self.plugins._pm.hook.deltabot_store_setting(key=key, value=value)
+        self.plugins.hook.deltabot_store_setting(key=key, value=value)
         return old_val
 
     def delete(self, name: str, scope: str = "global") -> None:
         """Delete a bot setting with the given scope."""
         assert "/" not in scope
         key = scope + "/" + name
-        self.plugins._pm.hook.deltabot_store_setting(key=key, value=None)
+        self.plugins.hook.deltabot_store_setting(key=key, value=None)
 
     def get(
         self, name: str, default: str = None, scope: str = "global"
@@ -271,7 +271,7 @@ class DeltaBot:
         """Get a bot setting from the given scope."""
         assert "/" not in scope
         key = scope + "/" + name
-        res = self.plugins._pm.hook.deltabot_get_setting(key=key)
+        res = self.plugins.hook.deltabot_get_setting(key=key)
         return res if res is not None else default
 
     def list_settings(self, scope: str = None) -> list:
@@ -280,7 +280,7 @@ class DeltaBot:
         If scope is not specified, all settings are returned.
         """
         assert scope is None or "/" not in scope
-        l = self.plugins._pm.hook.deltabot_list_settings()
+        l = self.plugins.hook.deltabot_list_settings()
         if scope is not None:
             scope_prefix = scope + "/"
             l = [
