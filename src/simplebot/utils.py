@@ -11,7 +11,7 @@ import deltachat
 from deltachat import hookspec
 from deltachat.account import Account
 from deltachat.capi import ffi, lib
-from deltachat.cutil import as_dc_charpointer, from_dc_charpointer
+from deltachat.cutil import as_dc_charpointer, from_optional_dc_charpointer
 from deltachat.events import EventThread, FFIEvent
 from deltachat.message import extract_addr  # type: ignore
 from PIL import Image  # type: ignore
@@ -170,7 +170,7 @@ class BotEventThread(EventThread):
             # function which provides us signature info of an event call
             evt_name = deltachat.get_dc_event_name(evt)
             if lib.dc_event_has_string_data(evt):
-                data2 = from_dc_charpointer(lib.dc_event_get_data2_str(event))
+                data2 = from_optional_dc_charpointer(lib.dc_event_get_data2_str(event))
             else:
                 data2 = lib.dc_event_get_data2_int(event)
 
