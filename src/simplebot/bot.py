@@ -426,13 +426,13 @@ class DeltaBot:
             if not c.admin or is_admin:
                 if c.cmd != "/set" or has_prefs:
                     cmds.append(c)
-        cmds.sort(lambda c: c.cmd)
+        cmds.sort(key=lambda c: c.cmd)
 
         filters = []
         for f in self.filters._filter_defs.values():
             if not f.admin or is_admin:
                 filters.append(f)
-        filters.sort(lambda f: f.name)
+        filters.sort(key=lambda f: f.name)
 
         plugins = []
         for plug, dist in bot.plugins._pm.list_plugin_distinfo():
