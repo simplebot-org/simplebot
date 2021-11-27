@@ -13,7 +13,7 @@ def validate(message):
     if message.get_sender_contact().addr in blacklist:
         # this will prevent other filters to process the message
         # NOTE: this doesn't apply to commands!
-        raise ValueError("User not allowed.")
+        return True
 
 
 @simplebot.filter
@@ -34,12 +34,12 @@ class TestFilterPriority:
     def test_validate(self, mocker):
         import pytest
 
-        mocker.get_replies(text="test validate", filters=__name__)
+        mocker.get_one_reply(text="test validate", filters=__name__)
 
-        with pytest.raises(ValueError):
-            mocker.get_replies(
-                text="test validate", addr=blacklist[1], filters=__name__
-            )
+        msgs = mocker.get_replies(
+            text="test validate", addr=blacklist[1], filters=__name__
+        )
+        assert not msgs
 
     def test_reply_salute(self, mocker):
         text = "hello"
