@@ -22,7 +22,6 @@ pip install simplebot
 To test unreleased version:
 
 ```sh
-pip install --pre -U -i https://m.devpi.net/dc/master deltachat
 pip install git+https://github.com/simplebot-org/simplebot
 ```
 
