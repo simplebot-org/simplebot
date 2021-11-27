@@ -136,6 +136,7 @@ class Init:
             "--config",
             help="set low-level account settings before configuring the account, this is useful if you use an email server with custom configurations that Delta Chat cannot guess, like not standard ports etc., common used keys: (IMAP: mail_server, mail_port, mail_security), (SMTP: send_server, send_port, send_security)",
             action="append",
+            default=[],
             nargs=2,
             metavar=("KEY", "VALUE"),
         )
