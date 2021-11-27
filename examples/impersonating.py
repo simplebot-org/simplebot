@@ -24,5 +24,5 @@ def filter_messages(bot, message, replies):
 
 class TestImpersonating:
     def test_impersonating(self, mocker):
-        msg = mocker.get_one_reply(text="hello")
+        msg = mocker.get_one_reply(text="hello", filters=__name__)
         assert msg.override_sender_name
