@@ -5,6 +5,7 @@
 - fixed to be compatible with `deltachat>=1.66.0`
 - commands, filters and plugins are now sorted alphabetically in the help.
 - allow to set custom configuration values (ex. custom servers and ports) in `init` subcommand to support servers with not standard configurations.
+- added `Dockerfile` to repo to help setting up the bot (thanks @lerdem)
 
 ## [2.3.0]
 
