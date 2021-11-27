@@ -131,11 +131,22 @@ class Init:
     def add_arguments(self, parser) -> None:
         parser.add_argument("emailaddr", type=str)
         parser.add_argument("password", type=str)
+        parser.add_argument(
+            "-c",
+            "--config",
+            help="set low-level account settings before configuring the account, this is useful if you use an email server with custom configurations that Delta Chat cannot guess, like not standard ports etc., common used keys: (IMAP: mail_server, mail_port, mail_security), (SMTP: send_server, send_port, send_security)",
+            action="append",
+            default=[],
+            nargs=2,
+            metavar=("KEY", "VALUE"),
+        )
 
     def run(self, bot, args, out) -> None:
         if "@" not in args.emailaddr:
             out.fail("invalid email address: {!r}".format(args.emailaddr))
-        success = bot.perform_configure_address(args.emailaddr, args.password)
+        success = bot.perform_configure_address(
+            args.emailaddr, args.password, **dict(args.config)
+        )
         if not success:
             out.fail("failed to configure with: {}".format(args.emailaddr))
 

@@ -357,25 +357,25 @@ class DeltaBot:
         """Return True if this bot account is successfully configured."""
         return bool(self.account.is_configured())
 
-    def perform_configure_address(self, email: str, password: str) -> bool:
+    def perform_configure_address(self, email: str, password: str, **kwargs) -> bool:
         """perform initial email/password bot account configuration."""
         assert not self.is_configured() or self.account.get_config("addr") == email
 
-        self.account.update_config(
-            dict(
-                addr=email,
-                mail_pw=password,
-                bot=1,
-                # set some useful bot defaults on the account
-                delete_server_after=1,
-                delete_device_after=2592000,
-                e2ee_enabled=1,
-                sentbox_watch=0,
-                mvbox_move=0,
-                bcc_self=0,
-                selfstatus="I'm a Delta Chat bot 🤖. Send me /help for more info.\n\nSource code: https://github.com/simplebot-org/simplebot",
-            )
+        configs = dict(
+            addr=email,
+            mail_pw=password,
+            bot=1,
+            # set some useful bot defaults on the account
+            delete_server_after=1,
+            delete_device_after=2592000,
+            e2ee_enabled=1,
+            sentbox_watch=0,
+            mvbox_move=0,
+            bcc_self=0,
+            selfstatus="I'm a Delta Chat bot 🤖. Send me /help for more info.\n\nSource code: https://github.com/simplebot-org/simplebot",
+            **kwargs,
         )
+        self.account.update_config(configs)
 
         tracker = ConfigureTracker(self.account)
         with self.account.temp_plugin(tracker) as configtracker:
