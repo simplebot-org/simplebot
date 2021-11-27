@@ -119,7 +119,7 @@ class Commands:
 class CommandDef:
     """Definition of a '/COMMAND' with args."""
 
-    def __init__(self, cmd, short, long, func, args, admin=False) -> None:
+    def __init__(self, cmd: str, short: str, long: str, func: Callable, args: list, admin=False) -> None:
         if cmd[0] != CMD_PREFIX:
             raise ValueError("cmd {!r} must start with {!r}".format(cmd, CMD_PREFIX))
         self.cmd = cmd

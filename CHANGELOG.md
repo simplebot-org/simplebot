@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- fixed to be compatible with `deltachat>=1.66.0`
+- commands, filters and plugins are now sorted alphabetically in the help.
+
 ## [2.3.0]
 
 - close "bytefile" (passed to `Replies.add`) after reading the content.
