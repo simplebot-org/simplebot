@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.4.0]
 
 - fixed to be compatible with `deltachat>=1.66.0`
 - commands, filters and plugins are now sorted alphabetically in the help.
@@ -75,7 +75,9 @@
 - initial release
 
 
-[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.4.0...HEAD
+
+[2.4.0]: https://github.com/simplebot-org/simplebot/compare/v2.3.0...v2.4.0
 
 [2.3.0]: https://github.com/simplebot-org/simplebot/compare/v2.2.1...v2.3.0
 
