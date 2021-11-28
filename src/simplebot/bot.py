@@ -1,15 +1,15 @@
 import os
 import threading
 from tempfile import NamedTemporaryFile
-from typing import Generator, List, Optional, Union
+from typing import Any, Generator, List, Optional, Union
 
-import deltachat as dc  # type: ignore
+import deltachat as dc
 import py
 from deltachat import Account, Chat, Contact, Message, account_hookimpl
 from deltachat.capi import lib
 from deltachat.cutil import from_dc_charpointer
-from deltachat.message import parse_system_add_remove  # type: ignore
-from deltachat.tracker import ConfigureTracker  # type: ignore
+from deltachat.message import parse_system_add_remove
+from deltachat.tracker import ConfigureTracker
 
 from .builtin.admin import add_admin, del_admin, get_admins
 from .builtin.cmdline import PluginCmd
@@ -76,9 +76,7 @@ class Replies:
         l = []
         for msg in self._send_replies_to_core():
             self.logger.debug(
-                "reply id={} chat={} sent with text: {!r}".format(
-                    msg.id, msg.chat, msg.text[:50]
-                )
+                f"reply id={msg.id} chat={msg.chat} sent with text: {msg.text[:50]!r}"
             )
             l.append(msg)
         return l
@@ -435,7 +433,7 @@ class DeltaBot:
         filters.sort(key=lambda f: f.name)
 
         plugins = []
-        for plug, dist in bot.plugins._pm.list_plugin_distinfo():
+        for plug, _ in bot.plugins._pm.list_plugin_distinfo():
             plugins.append(bot.plugins._pm.get_name(plug))
         plugins.sort()
 
@@ -551,6 +549,8 @@ class IncomingEventHandler:
         self._needs_check = threading.Event()
         self._needs_check.set()
         self._running = True
+        self._thread: threading.Thread
+        self.db: Any
 
     def start(self) -> None:
         self.logger.debug("starting bot-event-handler THREAD")
@@ -579,12 +579,7 @@ class IncomingEventHandler:
         # bot authors to having to deal with deaddrop/contact requests.
         message.create_chat()
         self.logger.debug(
-            "incoming message from {} id={} chat={} text={!r}".format(
-                message.get_sender_contact().addr,
-                message.id,
-                message.chat.id,
-                message.text[:50],
-            )
+            f"incoming message from {message.get_sender_contact().addr} id={message.id} chat={message.chat.id} text={message.text[:50]!r}"
         )
 
         self.db.put_msg(message.id)

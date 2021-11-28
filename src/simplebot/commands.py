@@ -20,7 +20,11 @@ class Commands:
         bot.plugins.add_module("commands", self)
 
     def register(
-        self, func: Callable, name: str = None, help: str = None, admin: bool = False
+        self,
+        func: Callable,
+        name: str = None,
+        help: str = None,  # noqa
+        admin: bool = False,
     ) -> None:
         """register a command function that acts on each incoming non-system message.
 
@@ -38,23 +42,19 @@ class Commands:
         for cand_name in iter_underscore_subparts(name.lower()):
             if cand_name in self._cmd_defs:
                 raise ValueError(
-                    "command {!r} fails to register, conflicts with: {!r}".format(
-                        name, cand_name
-                    )
+                    f"command {name!r} fails to register, conflicts with: {cand_name!r}"
                 )
         for reg_name in self._cmd_defs:
             if reg_name.startswith(name.lower() + "_"):
                 raise ValueError(
-                    "command {!r} fails to register, conflicts with: {!r}".format(
-                        name, reg_name
-                    )
+                    f"command {name!r} fails to register, conflicts with: {reg_name!r}"
                 )
 
         cmd_def = CommandDef(
             name, short=short, long=long, func=func, args=args, admin=admin
         )
         self._cmd_defs[name.lower()] = cmd_def
-        self.logger.debug("registered new command {!r}".format(name))
+        self.logger.debug(f"registered new command {name!r}")
 
     def unregister(self, name: str) -> Callable:
         """unregister a command function by name."""
@@ -90,7 +90,7 @@ class Commands:
         if not cmd_def or (
             cmd_def.admin and not bot.is_admin(message.get_sender_contact().addr)
         ):
-            reply = "unknown command {!r}".format(orig_cmd_name)
+            reply = f"unknown command {orig_cmd_name!r}"
             self.logger.warn(reply)
             if not message.chat.is_group():
                 replies.add(text=reply)
@@ -99,7 +99,7 @@ class Commands:
         cmd = IncomingCommand(
             bot=bot, cmd_def=cmd_def, message=message, args=args, payload=payload
         )
-        bot.logger.debug("processing command {}".format(cmd))
+        bot.logger.debug(f"processing command {cmd}")
         try:
             res = cmd.cmd_def(
                 command=cmd,
@@ -123,7 +123,7 @@ class CommandDef:
         self, cmd: str, short: str, long: str, func: Callable, args: list, admin=False
     ) -> None:
         if cmd[0] != CMD_PREFIX:
-            raise ValueError("cmd {!r} must start with {!r}".format(cmd, CMD_PREFIX))
+            raise ValueError(f"cmd {cmd!r} must start with {CMD_PREFIX!r}")
         self.cmd = cmd
         self.long = long
         self.short = short
@@ -152,24 +152,20 @@ class IncomingCommand:
         self.message = message
 
     def __repr__(self) -> str:
-        return "<IncomingCommand {!r} payload={!r} msg={}>".format(
-            self.cmd_def.cmd, self.payload, self.message.id
-        )
+        return f"<IncomingCommand {self.cmd_def.cmd!r} payload={self.payload!r} msg={self.message.id}>"
 
 
 def parse_command_docstring(func, args) -> tuple:
     description = func.__doc__
     if not description:
-        raise ValueError("{!r} needs to have a docstring".format(func))
+        raise ValueError(f"{func!r} needs to have a docstring")
     funcargs = set(inspect.getargs(func.__code__).args)
     if isinstance(func, types.MethodType):
         funcargs.discard("self")
     for arg in funcargs:
         if arg not in args:
             raise ValueError(
-                "{!r} requests an invalid argument: {!r}, valid arguments: {!r}".format(
-                    func, arg, args
-                )
+                f"{func!r} requests an invalid argument: {arg!r}, valid arguments: {args!r}"
             )
 
     lines = description.strip().split("\n", maxsplit=1)

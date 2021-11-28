@@ -17,7 +17,7 @@ class Filters:
         self,
         func: Callable,
         name: str = None,
-        help: str = None,
+        help: str = None,  # noqa
         tryfirst: bool = False,
         trylast: bool = False,
         admin: bool = False,
@@ -32,7 +32,7 @@ class Filters:
                         late as possible.
         :param admin: if True the filter will activate for bot administrators only.
         """
-        name = name or "{}.{}".format(func.__module__, func.__name__)
+        name = name or f"{func.__module__}.{func.__name__}"
         if help is not None:
             func.__doc__ = help
         short, long, args = parse_command_docstring(
@@ -49,9 +49,9 @@ class Filters:
             admin=admin,
         )
         if name in self._filter_defs:
-            raise ValueError("filter {!r} already registered".format(name))
+            raise ValueError(f"filter {name!r} already registered")
         self._filter_defs[name] = filter_def
-        self.logger.debug("registered new filter {!r}".format(name))
+        self.logger.debug(f"registered new filter {name!r}")
 
     def unregister(self, name: str) -> Callable:
         """unregister a filter function."""
@@ -68,9 +68,7 @@ class Filters:
         ):
             if filter_def.admin and not is_admin:
                 continue
-            self.logger.debug(
-                "calling filter {!r} on message id={}".format(name, message.id)
-            )
+            self.logger.debug(f"calling filter {name!r} on message id={message.id}")
             if filter_def(message=message, replies=replies, bot=bot):
                 return
 

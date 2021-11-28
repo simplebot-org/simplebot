@@ -2,7 +2,7 @@
 
 import os
 
-import setuptools  # type: ignore
+import setuptools
 
 
 def load_requirements(path: str) -> list:
@@ -20,7 +20,7 @@ def load_requirements(path: str) -> list:
 
 
 if __name__ == "__main__":
-    with open("README.md") as f:
+    with open("README.md", encoding="utf-8") as f:
         long_desc = f.read()
 
     setuptools.setup(

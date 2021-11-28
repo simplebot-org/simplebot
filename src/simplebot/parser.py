@@ -3,6 +3,7 @@
 import argparse
 import inspect
 import os
+from typing import Any
 
 import py
 
@@ -18,9 +19,17 @@ class MyArgumentParser(argparse.ArgumentParser):
     class ArgumentError(Exception):
         """an error from the argparse subsystem."""
 
-    def error(self, error) -> None:
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.basedir: str
+        self.subparsers: Any
+        self.generic_options: Any
+        self.plugin_manager: Any
+        self.out: Any
+
+    def error(self, message) -> None:  # noqa
         """raise errors instead of printing and raising SystemExit"""
-        raise self.ArgumentError(error)
+        raise self.ArgumentError(message)
 
     def add_generic_option(self, *flags, **kwargs) -> None:
         """add a generic argument option."""
@@ -30,7 +39,7 @@ class MyArgumentParser(argparse.ArgumentParser):
             raise ValueError("can not generically add positional args")
         inipath = kwargs.pop("inipath", None)
         action = self.generic_options.add_argument(*flags, **kwargs)
-        action.inipath = inipath
+        action.inipath = inipath  # noqa
 
     def add_subcommand(self, cls) -> None:
         """Add a subcommand to simplebot."""
@@ -59,12 +68,12 @@ class MyArgumentParser(argparse.ArgumentParser):
             cfg = py.iniconfig.IniConfig(p)
             for action in self._actions:
                 if getattr(action, "inipath", None):
-                    section, key = action.inipath.split(":")
-                    default = cfg.get(section, key)
+                    section, key = action.inipath.split(":")  # noqa
+                    default: Any = cfg.get(section, key)
                     if default:
                         action.default = default
 
-    def main_parse_argv(self, argv):
+    def main_parse_argv(self, argv) -> argparse.Namespace:
         try_argcomplete(self)
         self._merge_ini()
         try:
@@ -75,26 +84,25 @@ class MyArgumentParser(argparse.ArgumentParser):
             if not argv[1:]:
                 return self.parse_args(["-h"])
             self.print_usage()
-            self.exit(2, "%s: error: %s\n" % (self.prog, e.args[0]))
+            self.exit(2, f"{self.prog}: error: {e.args[0]}\n")
+        return None  # unreachable
 
     def main_run(self, bot, args) -> None:
         try:
             if args.command is None:
                 self.out.line(self.format_usage())
-                self.out.line(self.description.strip())
+                if self.description:
+                    self.out.line(self.description.strip())
                 self.out.line()
                 for name, p in self.subparsers.choices.items():
-                    self.out.line(
-                        "{:20s} {}".format(name, p.description.split("\n")[0].strip())
-                    )
+                    desc = p.description.split("\n")[0].strip()
+                    self.out.line(f"{name:20s} {desc}")
                 self.out.line()
                 self.out.ok_finish("please specify a subcommand", red=True)
 
             funcargs = set(inspect.getargs(args.subcommand_instance.run.__code__).args)
             if not bot and "bot" in funcargs:
-                msg = 'No default account is set so "--account" argument is required to use "{}" subcommand.'.format(
-                    args.command
-                )
+                msg = f'No default account is set so "--account" argument is required to use "{args.command}" subcommand.'
                 self.out.fail(msg)
             kwargs = dict(bot=bot, args=args, out=self.out)
             for key in list(kwargs.keys()):
@@ -115,7 +123,7 @@ class CmdlineOutput:
         self.tw.line(message, **kwargs)
 
     def fail(self, message) -> None:
-        self.tw.line("FAIL: {}".format(message), red=True)
+        self.tw.line(f"FAIL: {message}", red=True)
         raise SystemExit(1)
 
     def ok_finish(self, message, **kwargs) -> None:

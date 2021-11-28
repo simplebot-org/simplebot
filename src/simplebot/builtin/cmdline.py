@@ -100,9 +100,9 @@ class ListAccountsAction(argparse.Action):
         def_addr = get_default_account()
         for addr, path in get_accounts():
             if def_addr == addr:
-                parser.out.line("(default) {}: {}".format(addr, path))
+                parser.out.line(f"(default) {addr}: {path}")
             else:
-                parser.out.line("{}: {}".format(addr, path))
+                parser.out.line(f"{addr}: {path}")
         sys.exit(0)
 
 
@@ -115,7 +115,7 @@ class DefaultAccountAction(argparse.Action):
         addr = values[0]
         if not os.path.exists(get_account_path(addr)):
             parser.out.fail(
-                'Unknown account "{}", add it first with "simplebot init"'.format(addr)
+                f'Unknown account "{addr}", add it first with "simplebot init"'
             )
 
         set_default_account(addr)
@@ -143,12 +143,12 @@ class Init:
 
     def run(self, bot, args, out) -> None:
         if "@" not in args.emailaddr:
-            out.fail("invalid email address: {!r}".format(args.emailaddr))
+            out.fail(f"invalid email address: {args.emailaddr!r}")
         success = bot.perform_configure_address(
             args.emailaddr, args.password, **dict(args.config)
         )
         if not success:
-            out.fail("failed to configure with: {}".format(args.emailaddr))
+            out.fail(f"failed to configure with: {args.emailaddr}")
 
 
 class Info:
@@ -159,7 +159,7 @@ class Info:
             out.fail("account not configured, use 'simplebot init'")
 
         for key, val in bot.account.get_info().items():
-            out.line("{:30s}: {}".format(key, val))
+            out.line(f"{key:30s}: {val}")
 
 
 class Serve:
@@ -167,7 +167,7 @@ class Serve:
 
     def run(self, bot, out) -> None:
         if not bot.is_configured():
-            out.fail("account not configured: {}".format(bot.account.db_path))
+            out.fail(f"account not configured: {bot.account.db_path}")
 
         bot.start()
         bot.account.wait_shutdown()
@@ -208,7 +208,7 @@ class PluginCmd:
             self._del(bot, args._del, out)
         else:
             for name, plugin in bot.plugins.items():
-                out.line("{:25s}: {}".format(name, plugin))
+                out.line(f"{name:25s}: {plugin}")
 
     def _add(self, bot, pymodules, out) -> None:
         existing = list(
@@ -217,7 +217,7 @@ class PluginCmd:
         for pymodule in pymodules:
             assert "," not in pymodule
             if not os.path.exists(pymodule):
-                out.fail("{} does not exist".format(pymodule))
+                out.fail(f"{pymodule} does not exist")
             path = os.path.abspath(pymodule)
             existing.append(path)
 
@@ -237,7 +237,7 @@ class PluginCmd:
                     remaining.append(p)
 
         bot.set(self.db_key, "\n".join(remaining))
-        out.line("removed {} module(s)".format(len(existing) - len(remaining)))
+        out.line(f"removed {len(existing) - len(remaining)} module(s)")
 
 
 class set_avatar:

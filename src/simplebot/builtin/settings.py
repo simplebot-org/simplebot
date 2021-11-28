@@ -57,7 +57,7 @@ class DB:
     def _get(self, bot, scope, key, out) -> None:
         res = bot.get(key, scope=scope)
         if res is None:
-            out.fail("key {}/{} does not exist".format(scope, key))
+            out.fail(f"key {scope}/{key} does not exist")
         else:
             out.line(res)
 
@@ -68,19 +68,19 @@ class DB:
     def _list(self, bot, scope, out) -> None:
         for key, res in bot.list_settings(scope):
             if "\n" in res:
-                out.line("{}:".format(key))
+                out.line(f"{key}:")
                 for line in res.split("\n"):
                     out.line("   " + line)
             else:
-                out.line("{}: {}".format(key, res))
+                out.line(f"{key}: {res}")
 
     def _del(self, bot, scope, key, out) -> None:
         res = bot.get(key, scope=scope)
         if res is None:
-            out.fail("key {}/{} does not exist".format(scope, key))
+            out.fail(f"key {scope}/{key} does not exist")
         else:
             bot.delete(key, scope=scope)
-            out.line("key '{}/{}' deleted".format(scope, key))
+            out.line(f"key {scope}/{key} deleted")
 
 
 @command_decorator(name="/set")
@@ -111,7 +111,7 @@ def cmd_set(bot, payload, message, replies) -> None:
         else:
             value = None if len(args) == 1 else args[1]
             old = bot.set(name, value and value.strip(), scope=addr)
-            text = "old: {0}={1!r}\nnew: {0}={2!r}".format(name, old, value)
+            text = f"old: {name}={old!r}\nnew: {name}={value!r}"
     replies.add(text=text)
 
 

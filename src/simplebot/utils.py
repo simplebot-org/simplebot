@@ -13,10 +13,10 @@ from deltachat.account import Account
 from deltachat.capi import ffi, lib
 from deltachat.cutil import as_dc_charpointer, from_optional_dc_charpointer
 from deltachat.events import EventThread, FFIEvent
-from deltachat.message import extract_addr  # type: ignore
-from PIL import Image  # type: ignore
-from PIL.ImageColor import getcolor, getrgb  # type: ignore
-from PIL.ImageOps import grayscale  # type: ignore
+from deltachat.message import extract_addr
+from PIL import Image
+from PIL.ImageColor import getcolor, getrgb
+from PIL.ImageOps import grayscale
 
 # disable Pillow debugging to stdout
 logging.getLogger("PIL").setLevel(logging.ERROR)
@@ -75,7 +75,7 @@ def set_default_account(addr: str) -> None:
     config = configparser.ConfigParser()
     config["DEFAULT"]["default_account"] = addr
     path = os.path.join(get_config_folder(), "global.cfg")
-    with open(path, "w") as configfile:
+    with open(path, "w", encoding="utf-8") as configfile:
         config.write(configfile)
 
 
@@ -95,7 +95,7 @@ def get_default_account() -> str:
 def image_tint(path: str, tint: str) -> Image:
     src = Image.open(path)
     if src.mode not in ("RGB", "RGBA"):
-        raise TypeError("Unsupported source image mode: {}".format(src.mode))
+        raise TypeError(f"Unsupported source image mode: {src.mode}")
     src.load()
 
     tr, tg, tb = getrgb(tint)
@@ -129,7 +129,7 @@ def image_tint(path: str, tint: str) -> Image:
 
 def parse_system_title_changed(text: str, title: str) -> Optional[tuple]:
     text = text.lower()
-    regex = r'group name changed from "(.+)" to "{}" by (.+).'.format(re.escape(title))
+    regex = fr'group name changed from "(.+)" to "{re.escape(title)}" by (.+).'
     m = re.match(regex, text)
     if m:
         old_title, actor = m.groups()
@@ -181,9 +181,7 @@ class BotEventThread(EventThread):
                     account=self, ffi_event=ffi_event
                 )
                 for name, kwargs in self._map_ffi_event(ffi_event):
-                    self.account.log(
-                        "calling hook name={} kwargs={}".format(name, kwargs)
-                    )
+                    self.account.log(f"calling hook name={name} kwargs={kwargs}")
                     hook = getattr(self.account._pm.hook, name)
                     hook(**kwargs)
             except Exception as err:
@@ -194,7 +192,9 @@ class BotEventThread(EventThread):
 class BotAccount(Account):
     """Class patching deltachat.account.Account."""
 
-    def __init__(self, db_path: str, os_name: str, logger: logging.Logger) -> None:
+    def __init__(  # noqa
+        self, db_path: str, os_name: str, logger: logging.Logger
+    ) -> None:
         """initialize account object.
 
         :param db_path: a path to the account database. The database
@@ -217,7 +217,7 @@ class BotAccount(Account):
             lib.dc_context_unref,
         )
         if self._dc_context == ffi.NULL:
-            raise ValueError("Could not dc_context_new: {} {}".format(os_name, db_path))
+            raise ValueError(f"Could not dc_context_new: {os_name} {db_path}")
 
         self._shutdown_event = Event()
         self._event_thread = BotEventThread(self, logger)

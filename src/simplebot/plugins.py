@@ -12,13 +12,13 @@ class Plugins:
 
     def add_module(self, name, module) -> None:
         """add a named simplebot plugin python module."""
-        self.logger.debug("registering plugin {!r}".format(name))
+        self.logger.debug(f"registering plugin {name!r}")
         self._pm.register(plugin=module, name=name)
         self._pm.check_pending()
 
     def remove(self, name) -> None:
         """remove a named simplebot plugin."""
-        self.logger.debug("removing plugin {!r}".format(name))
+        self.logger.debug(f"removing plugin {name!r}")
         self._pm.unregister(name=name)
 
     def dict(self) -> dict:

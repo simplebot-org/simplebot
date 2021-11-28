@@ -56,7 +56,7 @@ class DBManager:
         return [(row["keyname"], row["value"]) for row in rows]
 
     @deltabot_hookimpl
-    def deltabot_shutdown(self, bot) -> None:
+    def deltabot_shutdown(self, bot) -> None:  # noqa
         self.db.close()
 
 

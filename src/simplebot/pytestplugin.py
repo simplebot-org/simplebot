@@ -142,11 +142,9 @@ def mocker(mock_bot):
                 msg=msg,
             )
             if not l:
-                raise ValueError("no reply for message {!r}".format(text))
+                raise ValueError(f"no reply for message {text!r}")
             if len(l) > 1:
-                raise ValueError(
-                    "more than one reply for {!r}, replies={}".format(text, l)
-                )
+                raise ValueError(f"more than one reply for {text!r}, replies={l}")
             return l[0]
 
         def get_replies(
@@ -211,7 +209,7 @@ class BotTester:
     @account_hookimpl
     def ac_incoming_message(self, message):
         message.get_sender_contact().create_chat()
-        print("queuing ac_incoming message {}".format(message))
+        print(f"queuing ac_incoming message {message}")
         self._replies.put(message)
 
     def send_command(self, text):
@@ -220,7 +218,7 @@ class BotTester:
 
     def get_next_incoming(self):
         reply = self._replies.get(timeout=30)
-        print("get_next_incoming got reply text: {}".format(reply.text))
+        print(f"get_next_incoming got reply text: {reply.text}")
         return reply
 
 
@@ -233,7 +231,7 @@ def plugin_manager():
 def examples(request):
     p = request.fspath.dirpath().dirpath().join("examples")
     if not p.exists():
-        pytest.skip("could not locate examples dir at {}".format(p))
+        pytest.skip(f"could not locate examples dir at {p}")
     return p
 
 
@@ -242,7 +240,7 @@ class CmdlineRunner:
         self._rootargs = ["simplebot"]
 
     def set_basedir(self, account_dir):
-        self._rootargs.append("--account={}".format(account_dir))
+        self._rootargs.append(f"--account={account_dir}")
 
     def invoke(self, args):
         # create a new plugin manager for each command line invocation
@@ -273,7 +271,7 @@ class CmdlineRunner:
         res = self.invoke(args)
         if res.exit_code != 0:
             print(res.output)
-            raise Exception("cmd exited with %d: %s" % (res.exit_code, args))
+            raise Exception(f"cmd exited with {res.exit_code}: {args}")
         return _perform_match(res.output, fnl)
 
     def run_fail(self, args, fnl=None, code=None):
@@ -282,9 +280,7 @@ class CmdlineRunner:
         if res.exit_code == 0 or (code is not None and res.exit_code != code):
             print(res.output)
             raise Exception(
-                "got exit code {!r}, expected {!r}, output: {}".format(
-                    res.exit_code, code, res.output
-                )
+                f"got exit code {res.exit_code!r}, expected {code!r}, output: {res.output}"
             )
         return _perform_match(res.output, fnl)
 

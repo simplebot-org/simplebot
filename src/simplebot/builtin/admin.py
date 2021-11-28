@@ -18,7 +18,7 @@ class ban:
 
     def run(self, bot, args, out) -> None:
         ban_addr(bot, args.addr)
-        out.line("Banned: {}".format(args.addr))
+        out.line(f"Banned: {args.addr}")
 
 
 class unban:
@@ -29,7 +29,7 @@ class unban:
 
     def run(self, bot, args, out) -> None:
         unban_addr(bot, args.addr)
-        out.line("Unbanned: {}".format(args.addr))
+        out.line(f"Unbanned: {args.addr}")
 
 
 class list_banned:
@@ -78,9 +78,8 @@ class AdminCmd:
         del_admin(bot, addr)
 
     def _list(self, bot, out) -> None:
-        out.line(
-            "Administrators:\n{}".format(bot.get(self.db_key, default="(Empty list)"))
-        )
+        admins = bot.get(self.db_key, default="(Empty list)")
+        out.line(f"Administrators:\n{admins}")
 
 
 @command_decorator(name="/ban", admin=True)
@@ -93,7 +92,7 @@ def cmd_ban(command, replies) -> None:
     """
     if "@" in command.payload:
         ban_addr(command.bot, command.payload)
-        replies.add(text="Banned: {}".format(command.payload))
+        replies.add(text=f"Banned: {command.payload}")
     else:
         replies.add(text=get_banned_list(command.bot))
 
@@ -106,7 +105,7 @@ def cmd_unban(command, replies) -> None:
     /unban foo@example.com
     """
     unban_addr(command.bot, command.payload)
-    replies.add(text="Unbanned: {}".format(command.payload))
+    replies.add(text=f"Unbanned: {command.payload}")
 
 
 def ban_addr(bot, addr: str) -> None:
@@ -125,7 +124,8 @@ def get_banned_list(bot) -> str:
     addrs = []
     for contact in bot.account.get_blocked_contacts():
         addrs.append(contact.addr)
-    return "Banned addresses:\n{}".format("\n".join(addrs) or "(Empty list)")
+    banned = "\n".join(addrs) or "(Empty list)"
+    return f"Banned addresses:\n{banned}"
 
 
 def get_admins(bot) -> list:
