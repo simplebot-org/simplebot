@@ -129,7 +129,7 @@ def image_tint(path: str, tint: str) -> Image:
 
 def parse_system_title_changed(text: str, title: str) -> Optional[tuple]:
     text = text.lower()
-    regex = fr'group name changed from "(.+)" to "{re.escape(title)}" by (.+).'
+    regex = rf'group name changed from "(.+)" to "{re.escape(title)}" by (.+).'
     m = re.match(regex, text)
     if m:
         old_title, actor = m.groups()
