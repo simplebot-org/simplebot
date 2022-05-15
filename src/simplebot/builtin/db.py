@@ -24,15 +24,15 @@ class DBManager:
                 "CREATE TABLE IF NOT EXISTS config"
                 " (keyname TEXT PRIMARY KEY,value TEXT)"
             )
-            self.db.execute("CREATE TABLE IF NOT EXISTS msgs (id INTEGER PRIMARY KEY)")
+            self.db.execute("CREATE TABLE IF NOT EXISTS msgs (msg TEXT PRIMARY KEY)")
 
-    def put_msg(self, msg_id: int) -> None:
+    def put_msg(self, msg: str) -> None:
         with self.db:
-            self.db.execute("INSERT INTO msgs VALUES (?)", (msg_id,))
+            self.db.execute("INSERT INTO msgs VALUES (?)", (msg,))
 
-    def pop_msg(self, msg_id: int) -> None:
+    def pop_msg(self, msg: str) -> None:
         with self.db:
-            self.db.execute("DELETE FROM msgs WHERE id=?", (msg_id,))
+            self.db.execute("DELETE FROM msgs WHERE msg=?", (msg,))
 
     def get_msgs(self) -> list:
         return [r[0] for r in self.db.execute("SELECT * FROM msgs").fetchall()]
