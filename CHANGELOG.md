@@ -1,5 +1,11 @@
 # Changelog
 
+
+## [Unreleased]
+
+- added support for message processing via webxdc interfaces, requests must have the form: `{payload: {simplebot: {text: "/help"}}}`, only "text" and "html" messages supported for now
+- breaking change: message IDs queue table modified to support special incoming webxdc messages
+
 ## [2.4.0]
 
 - fixed to be compatible with `deltachat>=1.66.0`

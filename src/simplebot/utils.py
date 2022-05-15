@@ -4,6 +4,7 @@ import os
 import re
 from tempfile import NamedTemporaryFile
 from threading import Event
+from types import SimpleNamespace
 from typing import List, Optional, Tuple
 from urllib.parse import quote, unquote
 
@@ -13,7 +14,7 @@ from deltachat.account import Account
 from deltachat.capi import ffi, lib
 from deltachat.cutil import as_dc_charpointer, from_optional_dc_charpointer
 from deltachat.events import EventThread, FFIEvent
-from deltachat.message import extract_addr
+from deltachat.message import Message, extract_addr
 from PIL import Image
 from PIL.ImageColor import getcolor, getrgb
 from PIL.ImageOps import grayscale
@@ -129,7 +130,7 @@ def image_tint(path: str, tint: str) -> Image:
 
 def parse_system_title_changed(text: str, title: str) -> Optional[tuple]:
     text = text.lower()
-    regex = fr'group name changed from "(.+)" to "{re.escape(title)}" by (.+).'
+    regex = rf'group name changed from "(.+)" to "{re.escape(title)}" by (.+).'
     m = re.match(regex, text)
     if m:
         old_title, actor = m.groups()
@@ -224,3 +225,26 @@ class BotAccount(Account):
         self._configkeys = self.get_config("sys.config_keys").split()
         hook = hookspec.Global._get_plugin_manager().hook
         hook.dc_account_init(account=self)
+
+
+class StatusUpdateMessage:
+    def __init__(self, instance: Message, data: dict) -> None:
+        self._webxdc_instance = instance
+        self._serial = data["serial"]
+        self._dc_msg = instance._dc_msg
+        self.id = "UNKNOWN"
+        self.chat = instance.chat
+        self.account = instance.account
+        self.error = ""
+        self.filename = ""
+        self.text = data.get("text") or ""
+        self.html = data.get("html") or ""
+
+    def quote(self) -> None:
+        return None
+
+    def has_html(self) -> bool:
+        return False
+
+    def get_sender_contact(self):
+        return SimpleNamespace(addr="UNKNOWN", name="UNKNOWN")

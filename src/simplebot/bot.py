@@ -1,3 +1,4 @@
+import json
 import os
 import threading
 from tempfile import NamedTemporaryFile
@@ -8,6 +9,7 @@ import py
 from deltachat import Account, Chat, Contact, Message, account_hookimpl
 from deltachat.capi import lib
 from deltachat.cutil import from_dc_charpointer
+from deltachat.events import FFIEvent
 from deltachat.message import parse_system_add_remove
 from deltachat.tracker import ConfigureTracker
 
@@ -18,6 +20,7 @@ from .filters import Filters, _filters
 from .plugins import Plugins, get_global_plugin_manager
 from .templates import help_template
 from .utils import (
+    StatusUpdateMessage,
     parse_system_image_changed,
     parse_system_title_changed,
     set_builtin_avatar,
@@ -451,45 +454,77 @@ class CheckAll:
     def perform(self) -> None:
         logger = self.bot.logger
         logger.debug("CheckAll perform-loop start")
-        for msg_id in self.db.get_msgs():
+        for msg_str in self.db.get_msgs():
             try:
-                message = self.bot.account.get_message_by_id(msg_id)
-                sender = message.get_sender_contact()
-                if sender != self.bot.self_contact:
-                    message.mark_seen()
-                    encrinfo = from_dc_charpointer(
-                        lib.dc_get_contact_encrinfo(
-                            self.bot.account._dc_context,
-                            sender.id,
-                        )
-                    )
-                    can_encrypt = encrinfo.splitlines()[0].lower() != "no encryption."
+                try:
+                    msg_id = int(msg_str)
+                except ValueError:
+                    msg_id = 0
+                if msg_id:
+                    self.process_msg_id(msg_id)
                 else:
-                    can_encrypt = True
-                if message.is_encrypted() or can_encrypt:
-                    replies = Replies(message, logger=logger)
-                    logger.info("processing incoming fresh message id=%s", message.id)
-                    if message.is_system_message():
-                        self.handle_system_message(message, replies)
-                    elif not message.get_sender_contact().is_blocked():
-                        if message.is_bot():
-                            self.bot.plugins.hook.deltabot_incoming_bot_message(
-                                message=message, bot=self.bot, replies=replies
-                            )
-                        else:
-                            self.bot.plugins.hook.deltabot_incoming_message(
-                                message=message, bot=self.bot, replies=replies
-                            )
-                    replies.send_reply_messages()
-                else:
-                    logger.info(
-                        "ignoring message (id=%s) without autocrypt support", msg_id
-                    )
-                logger.info("processing message id=%s FINISHED", msg_id)
+                    self.process_status_update(json.loads(msg_str))
             except Exception as ex:
-                logger.exception("processing message=%s failed: %s", msg_id, ex)
-            self.db.pop_msg(msg_id)
+                logger.exception("processing message=%s failed: %s", msg_str, ex)
+            self.db.pop_msg(msg_str)
         logger.debug("CheckAll perform-loop finish")
+
+    def process_status_update(self, data: dict) -> None:
+        logger = self.bot.logger
+        logger.info(
+            "processing incoming status update (msg=%s, serial=%s)",
+            data["msg_id"],
+            data["serial"],
+        )
+
+        message = StatusUpdateMessage(
+            self.bot.account.get_message_by_id(data["msg_id"]), data
+        )
+        replies = Replies(message, logger=logger)
+        self.bot.plugins.hook.deltabot_incoming_message(
+            message=message, bot=self.bot, replies=replies
+        )
+        replies.send_reply_messages()
+
+        logger.info(
+            "processing status update (msg=%s, serial=%s) FINISHED",
+            data["msg_id"],
+            data["serial"],
+        )
+
+    def process_msg_id(self, msg_id: int) -> None:
+        logger = self.bot.logger
+        message = self.bot.account.get_message_by_id(msg_id)
+        sender = message.get_sender_contact()
+        if sender != self.bot.self_contact:
+            message.mark_seen()
+            encrinfo = from_dc_charpointer(
+                lib.dc_get_contact_encrinfo(
+                    self.bot.account._dc_context,
+                    sender.id,
+                )
+            )
+            can_encrypt = encrinfo.splitlines()[0].lower() != "no encryption."
+        else:
+            can_encrypt = True
+        if message.is_encrypted() or can_encrypt:
+            replies = Replies(message, logger=logger)
+            logger.info("processing incoming fresh message id=%s", message.id)
+            if message.is_system_message():
+                self.handle_system_message(message, replies)
+            elif not message.get_sender_contact().is_blocked():
+                if message.is_bot():
+                    self.bot.plugins.hook.deltabot_incoming_bot_message(
+                        message=message, bot=self.bot, replies=replies
+                    )
+                else:
+                    self.bot.plugins.hook.deltabot_incoming_message(
+                        message=message, bot=self.bot, replies=replies
+                    )
+            replies.send_reply_messages()
+        else:
+            logger.info("ignoring message (id=%s) without autocrypt support", msg_id)
+        logger.info("processing message=%s FINISHED", msg_id)
 
     def handle_system_message(self, message: Message, replies: Replies) -> None:
         logger = self.bot.logger
@@ -606,3 +641,28 @@ class IncomingEventHandler:
         self.logger.debug(
             "message id=%s chat=%s delivered to smtp", message.id, message.chat.id
         )
+
+    @account_hookimpl
+    def ac_process_ffi_event(self, ffi_event: FFIEvent) -> None:
+        if ffi_event.name == "DC_EVENT_WEBXDC_STATUS_UPDATE":
+            msg_id = ffi_event.data1
+            serial = ffi_event.data2
+            updates = from_dc_charpointer(
+                lib.dc_get_webxdc_status_updates(
+                    self.bot.account._dc_context,
+                    msg_id,
+                    serial - 1,
+                )
+            )
+            update = json.loads(updates)[0]
+            assert update["serial"] == serial
+
+            if isinstance(update["payload"], dict) and "simplebot" in update["payload"]:
+                req = update["payload"]["simplebot"]
+                text = req.get("text")
+                self.logger.debug(
+                    f"incoming status update, msg={msg_id} serial={serial} text={text[:50]!r}"
+                )
+                data = dict(msg_id=ffi_event.data1, request=req, serial=serial)
+                self.db.put_msg(json.dumps(data))
+                self._needs_check.set()
