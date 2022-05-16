@@ -469,16 +469,18 @@ class CheckAll:
             self.db.pop_msg(msg_str)
         logger.debug("CheckAll perform-loop finish")
 
-    def process_status_update(self, data: dict) -> None:
+    def process_status_update(self, update: dict) -> None:
         logger = self.bot.logger
         logger.info(
             "processing incoming status update (msg=%s, serial=%s)",
-            data["msg_id"],
-            data["serial"],
+            update["msg_id"],
+            update["serial"],
         )
 
         message = StatusUpdateMessage(
-            self.bot.account.get_message_by_id(data["msg_id"]), data
+            self.bot.account.get_message_by_id(update["msg_id"]),
+            update["serial"],
+            update["data"],
         )
         replies = Replies(message, logger=logger)
         self.bot.plugins.hook.deltabot_incoming_message(
@@ -488,8 +490,8 @@ class CheckAll:
 
         logger.info(
             "processing status update (msg=%s, serial=%s) FINISHED",
-            data["msg_id"],
-            data["serial"],
+            update["msg_id"],
+            update["serial"],
         )
 
     def process_msg_id(self, msg_id: int) -> None:
@@ -658,11 +660,12 @@ class IncomingEventHandler:
             assert update["serial"] == serial
 
             if isinstance(update["payload"], dict) and "simplebot" in update["payload"]:
-                req = update["payload"]["simplebot"]
-                text = req.get("text")
+                data = update["payload"]["simplebot"]
+                text = (data.get("text") or "")[:50]
                 self.logger.debug(
-                    f"incoming status update, msg={msg_id} serial={serial} text={text[:50]!r}"
+                    f"incoming status update, msg={msg_id} serial={serial} text={text!r}"
                 )
-                data = dict(msg_id=ffi_event.data1, request=req, serial=serial)
-                self.db.put_msg(json.dumps(data))
+                self.db.put_msg(
+                    json.dumps(dict(msg_id=msg_id, data=data, serial=serial))
+                )
                 self._needs_check.set()

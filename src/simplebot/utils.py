@@ -228,9 +228,9 @@ class BotAccount(Account):
 
 
 class StatusUpdateMessage:
-    def __init__(self, instance: Message, data: dict) -> None:
+    def __init__(self, instance: Message, serial: int, data: dict) -> None:
         self._webxdc_instance = instance
-        self._serial = data["serial"]
+        self._serial = serial
         self._dc_msg = instance._dc_msg
         self.id = "UNKNOWN"
         self.chat = instance.chat
