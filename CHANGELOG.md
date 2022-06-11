@@ -1,44 +1,44 @@
 # Changelog
 
 
-## [Unreleased]
+## [v3.0.0]
 
 - added support for message processing via webxdc interfaces, requests must have the form: `{payload: {simplebot: {text: "/help"}}}`, only "text" and "html" messages supported for now
 - breaking change: message IDs queue table modified to support special incoming webxdc messages
 - adapt simplebot's pytest plugin to deltachat's new pytest plugin API
 
-## [2.4.0]
+## [v2.4.0]
 
 - fixed to be compatible with `deltachat>=1.66.0`
 - commands, filters and plugins are now sorted alphabetically in the help.
 - allow to set custom configuration values (ex. custom servers and ports) in `init` subcommand to support servers with not standard configurations.
 - added `Dockerfile` to repo to help setting up the bot (thanks @lerdem)
 
-## [2.3.0]
+## [v2.3.0]
 
 - close "bytefile" (passed to `Replies.add`) after reading the content.
 - use a custom event thread to prevent dead `EventThread`.
 - honor `--stdlog` value in log file.
 - if filter returns `True`, stop message processing without exceptions.
 
-## [2.2.1]
+## [v2.2.1]
 
 - fixed bug while processing member added/removed events from self.
 
-## [2.2.0]
+## [v2.2.0]
 
 - show shield badge in commands/filters for bot administrators.
 - make commands case insensitive, now `/Help` is equivalent to `/help`.
 
-## [2.1.1]
+## [v2.1.1]
 
 - mark messages as read before processing them.
 
-## [2.1.0]
+## [v2.1.0]
 
 - mark messages as read so MDN work, if enabled.
 
-## [2.0.0]
+## [v2.0.0]
 
 - ignore messages from other bots using the new Delta Chat API. Added `deltabot_incoming_bot_message` hook to process messages from bots.
 - allow to get account configuration values with `set_config` command.
@@ -51,15 +51,15 @@
 - **breaking change:** improved command and filter registration.
 - **breaking change:** changed configuration folder to `~/.simplebot`
 
-## [1.1.1]
+## [v1.1.1]
 
 - fix bug in `simplebot.utils.get_default_account()` (#72)
 
-## [1.1.0]
+## [v1.1.0]
 
 - Improved pytestplugin to allow simulating incoming messages with encryption errors (#68)
 
-## [1.0.1]
+## [v1.0.1]
 
 - **From upstream:** major rewrite of deltabot to use new deltachat core python bindings
   which are pluginized themselves.
@@ -77,29 +77,29 @@
 - Added default status message.
 - Improved code readability with type hints.
 
-## 0.10.0
+## v0.10.0
 
 - initial release
 
 
-[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v2.4.0...HEAD
+[v3.0.0]: https://github.com/simplebot-org/simplebot/compare/v2.4.0...v3.0.0
 
-[2.4.0]: https://github.com/simplebot-org/simplebot/compare/v2.3.0...v2.4.0
+[v2.4.0]: https://github.com/simplebot-org/simplebot/compare/v2.3.0...v2.4.0
 
-[2.3.0]: https://github.com/simplebot-org/simplebot/compare/v2.2.1...v2.3.0
+[v2.3.0]: https://github.com/simplebot-org/simplebot/compare/v2.2.1...v2.3.0
 
-[2.2.1]: https://github.com/simplebot-org/simplebot/compare/v2.2.0...v2.2.1
+[v2.2.1]: https://github.com/simplebot-org/simplebot/compare/v2.2.0...v2.2.1
 
-[2.2.0]: https://github.com/simplebot-org/simplebot/compare/v2.1.1...v2.2.0
+[v2.2.0]: https://github.com/simplebot-org/simplebot/compare/v2.1.1...v2.2.0
 
-[2.1.1]: https://github.com/simplebot-org/simplebot/compare/v2.1.0...v2.1.1
+[v2.1.1]: https://github.com/simplebot-org/simplebot/compare/v2.1.0...v2.1.1
 
-[2.1.0]: https://github.com/simplebot-org/simplebot/compare/v2.0.0...v2.1.0
+[v2.1.0]: https://github.com/simplebot-org/simplebot/compare/v2.0.0...v2.1.0
 
-[2.0.0]: https://github.com/simplebot-org/simplebot/compare/v1.1.1...v2.0.0
+[v2.0.0]: https://github.com/simplebot-org/simplebot/compare/v1.1.1...v2.0.0
 
-[1.1.1]: https://github.com/simplebot-org/simplebot/compare/v1.1.0...v1.1.1
+[v1.1.1]: https://github.com/simplebot-org/simplebot/compare/v1.1.0...v1.1.1
 
-[1.1.0]: https://github.com/simplebot-org/simplebot/compare/v1.0.1...v1.1.0
+[v1.1.0]: https://github.com/simplebot-org/simplebot/compare/v1.0.1...v1.1.0
 
-[1.0.1]: https://github.com/simplebot-org/simplebot/compare/v0.10.0...v1.0.1
+[v1.0.1]: https://github.com/simplebot-org/simplebot/compare/v0.10.0...v1.0.1
