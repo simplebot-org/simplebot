@@ -27,7 +27,7 @@ def test_version(cmd):
 
 
 class TestSettings:
-    def test_get_set_list(self, mycmd, session_liveconfig_producer):
+    def test_get_set_list(self, mycmd):
         mycmd.run_fail(["db", "--get", "hello"])
         mycmd.run_fail(["db", "--set", "hello", "world"])
         mycmd.run_ok(["db", "--set", "global/hello", "world"])
@@ -51,56 +51,6 @@ class TestSettings:
         )
         out = mycmd.run_ok(["db", "--list"])
         assert "hello" not in out
-
-
-class TestInit:
-    def test_ok_then_info(self, mycmd, session_liveconfig_producer):
-        session_liveconfig = session_liveconfig_producer()
-        if not session_liveconfig:
-            pytest.skip("no temporary accounts")
-        config = session_liveconfig.get(0)
-        mycmd.run_ok(
-            ["--stdlog=info", "init", config["addr"], config["mail_pw"]],
-            """
-            *deltabot*INFO*Success*
-        """,
-        )
-        mycmd.run_ok(
-            ["info"],
-            """
-            *database_version*
-        """,
-        )
-
-    def test_fail_then_ok(self, mycmd, session_liveconfig_producer):
-        session_liveconfig = session_liveconfig_producer()
-        if not session_liveconfig:
-            pytest.skip("no temporary accounts")
-        config = session_liveconfig.get(0)
-        mycmd.run_fail(
-            ["--stdlog", "info", "init", config["addr"], "Wrongpw"],
-            """
-            *deltabot*ERR*
-        """,
-        )
-        mycmd.run_ok(
-            ["--std=info", "init", config["addr"], config["mail_pw"]],
-            """
-            *deltabot*INFO*Success*
-        """,
-        )
-
-    def test_serve(self, mycmd, session_liveconfig_producer, monkeypatch):
-        import deltachat
-
-        session_liveconfig = session_liveconfig_producer()
-        if not session_liveconfig:
-            pytest.skip("no temporary accounts")
-        config = session_liveconfig.get(0)
-        mycmd.run_ok(["--std=info", "init", config["addr"], config["mail_pw"]], "")
-        monkeypatch.setattr(deltachat.account.Account, "wait_shutdown", lambda x: 0 / 0)
-        with pytest.raises(ZeroDivisionError):
-            mycmd.run_ok(["--show-ffi", "serve"], "")
 
 
 class TestPluginManagement:
