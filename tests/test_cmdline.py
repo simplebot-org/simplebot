@@ -27,7 +27,7 @@ def test_version(cmd):
 
 
 class TestSettings:
-    def test_get_set_list(self, mycmd, session_liveconfig):
+    def test_get_set_list(self, mycmd, session_liveconfig_producer):
         mycmd.run_fail(["db", "--get", "hello"])
         mycmd.run_fail(["db", "--set", "hello", "world"])
         mycmd.run_ok(["db", "--set", "global/hello", "world"])
@@ -54,7 +54,8 @@ class TestSettings:
 
 
 class TestInit:
-    def test_ok_then_info(self, mycmd, session_liveconfig):
+    def test_ok_then_info(self, mycmd, session_liveconfig_producer):
+        session_liveconfig = session_liveconfig_producer()
         if not session_liveconfig:
             pytest.skip("no temporary accounts")
         config = session_liveconfig.get(0)
@@ -71,7 +72,8 @@ class TestInit:
         """,
         )
 
-    def test_fail_then_ok(self, mycmd, session_liveconfig):
+    def test_fail_then_ok(self, mycmd, session_liveconfig_producer):
+        session_liveconfig = session_liveconfig_producer()
         if not session_liveconfig:
             pytest.skip("no temporary accounts")
         config = session_liveconfig.get(0)
@@ -88,9 +90,10 @@ class TestInit:
         """,
         )
 
-    def test_serve(self, mycmd, session_liveconfig, monkeypatch):
+    def test_serve(self, mycmd, session_liveconfig_producer, monkeypatch):
         import deltachat
 
+        session_liveconfig = session_liveconfig_producer()
         if not session_liveconfig:
             pytest.skip("no temporary accounts")
         config = session_liveconfig.get(0)
