@@ -24,6 +24,9 @@ class DBManager:
                 "CREATE TABLE IF NOT EXISTS config"
                 " (keyname TEXT PRIMARY KEY,value TEXT)"
             )
+            self.db.execute(
+                "DROP TABLE IF EXISTS msgs"  # migration from version <= 2.4.0
+            )
             self.db.execute("CREATE TABLE IF NOT EXISTS msgs (msg TEXT PRIMARY KEY)")
 
     def put_msg(self, msg: str) -> None:
