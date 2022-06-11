@@ -19,13 +19,13 @@ from .plugins import make_plugin_manager
 
 @pytest.fixture
 def mock_stopped_bot(acfactory, request):
-    account = acfactory.get_configured_offline_account()
+    account = acfactory.get_pseudo_configured_account()
     return make_bot(request, account, request.module, False)
 
 
 @pytest.fixture
 def mock_bot(acfactory, request):
-    account = acfactory.get_configured_offline_account()
+    account = acfactory.get_pseudo_configured_account()
     return make_bot(request, account, request.module)
 
 

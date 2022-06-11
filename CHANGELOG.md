@@ -5,6 +5,7 @@
 
 - added support for message processing via webxdc interfaces, requests must have the form: `{payload: {simplebot: {text: "/help"}}}`, only "text" and "html" messages supported for now
 - breaking change: message IDs queue table modified to support special incoming webxdc messages
+- adapt simplebot's pytest plugin to deltachat's new pytest plugin API
 
 ## [2.4.0]
 
