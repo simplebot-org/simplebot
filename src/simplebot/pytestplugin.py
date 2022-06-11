@@ -187,7 +187,7 @@ def mocker(mock_bot):
 
 @pytest.fixture
 def bot_tester(acfactory, request):
-    ac1, ac2 = acfactory.get_two_online_accounts()
+    ac1, ac2 = acfactory.get_online_accounts(2)
     bot = make_bot(request, ac2, request.module)
     return BotTester(ac1, bot)
 
