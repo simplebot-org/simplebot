@@ -1,4 +1,4 @@
-deltachat==1.86.0
+deltachat==1.87.0
 py==1.11.0
 Pillow==9.1.1
 Jinja2==3.1.2
