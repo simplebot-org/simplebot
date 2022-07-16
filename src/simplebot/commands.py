@@ -92,7 +92,7 @@ class Commands:
         ):
             reply = f"unknown command {orig_cmd_name!r}"
             self.logger.warn(reply)
-            if not message.chat.is_group():
+            if not message.chat.is_multiuser():
                 replies.add(text=reply)
             return True
 

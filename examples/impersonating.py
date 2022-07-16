@@ -16,7 +16,7 @@ def deltabot_init(bot):
 @simplebot.filter
 def filter_messages(bot, message, replies):
     """Send me any message in private and I will reply with the same message but impersonating another username."""
-    if not message.chat.is_group() and message.text:
+    if not message.chat.is_multiuser() and message.text:
         sender = message.get_sender_contact()
         name = bot.get("name", scope=sender.addr) or sender.name
         replies.add(text=message.text, sender=name)

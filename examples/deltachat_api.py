@@ -46,8 +46,8 @@ def message_info(message, replies):
     lines.append("Chat:")
     lines.append("Name: {}".format(chat.get_name()))
     lines.append("ID: {}".format(chat.id))
-    lines.append("Type: {}".format("group" if chat.is_group() else "private"))
-    if chat.is_group():
+    lines.append("Type: {}".format("group" if chat.is_multiuser() else "private"))
+    if chat.is_multiuser():
         lines.append("Member Count: {}".format(len(chat.get_contacts())))
 
     replies.add(text="\n".join(lines))
