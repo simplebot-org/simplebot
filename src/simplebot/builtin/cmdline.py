@@ -2,8 +2,11 @@ import argparse
 import os
 import sys
 
+from deltachat.tracker import ImexFailed
+
 from ..hookspec import deltabot_hookimpl
 from ..utils import (
+    abspath,
     get_account_path,
     get_accounts,
     get_builtin_avatars,
@@ -18,6 +21,8 @@ def deltabot_init_parser(parser) -> None:
     from .. import __version__ as simplebot_version
 
     parser.add_subcommand(Init)
+    parser.add_subcommand(ImportCmd)
+    parser.add_subcommand(ExportCmd)
     parser.add_subcommand(Info)
     parser.add_subcommand(Serve)
     parser.add_subcommand(PluginCmd)
@@ -149,6 +154,71 @@ class Init:
         )
         if not success:
             out.fail(f"failed to configure with: {args.emailaddr}")
+
+
+class ImportCmd:
+    """import keys or full backup."""
+
+    name = "import"
+
+    def add_arguments(self, parser) -> None:
+        parser.add_argument(
+            "path",
+            help="path to a backup file or path to a directory containing keys to import.",
+            type=abspath,
+        )
+
+    def run(self, bot, args, out) -> None:
+        if os.path.isdir(args.path):
+            try:
+                bot.account.import_self_keys(args.path)
+                out.line("Keys imported successfully.")
+            except ImexFailed:
+                out.fail(f"no valid keys found in {args.path!r}")
+        elif os.path.isfile(args.path):
+            if bot.account.is_configured():
+                out.fail("can't import backup into an already configured account")
+            else:
+                try:
+                    bot.account.import_all(args.path)
+                    print("Backup imported successfully")
+                except ImexFailed:
+                    out.fail(f"invalid backup file {args.path!r}")
+        else:
+            out.fail(f"file doesn't exists {args.path!r}")
+
+
+class ExportCmd:
+    """export full backup or keys."""
+
+    name = "export"
+
+    def add_arguments(self, parser) -> None:
+        parser.add_argument(
+            "--keys-only",
+            "-k",
+            action="store_true",
+            help="export only the public and private keys",
+        )
+        parser.add_argument(
+            "folder",
+            help="path to the directory where the files should be saved, if not given, current working directory is used.",
+            nargs="?",
+            default=os.curdir,
+            type=abspath,
+        )
+
+    def run(self, bot, args, out) -> None:
+        try:
+            if args.keys_only:
+                paths = bot.account.export_self_keys(args.folder)
+            else:
+                paths = [bot.account.export_all(args.folder)]
+            out.line("Exported files:")
+            for path in paths:
+                out.line(path)
+        except ImexFailed:
+            out.fail(f"failed to export to {args.folder!r}")
 
 
 class Info:

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v3.2.0]
+
+- added support for importing/exporting backups and keys
+
 ## [v3.1.0]
 
 - updated to make use of new deltachat API
@@ -84,6 +88,10 @@
 
 - initial release
 
+
+[v3.2.0]: https://github.com/simplebot-org/simplebot/compare/v3.1.0...v3.2.0
+
+[v3.1.0]: https://github.com/simplebot-org/simplebot/compare/v3.0.0...v3.1.0
 
 [v3.0.0]: https://github.com/simplebot-org/simplebot/compare/v2.4.0...v3.0.0
 

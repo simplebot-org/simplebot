@@ -23,6 +23,10 @@ from PIL.ImageOps import grayscale
 logging.getLogger("PIL").setLevel(logging.ERROR)
 
 
+def abspath(path: str) -> str:
+    return os.path.abspath(os.path.expanduser(path))
+
+
 def set_builtin_avatar(bot, name: str = "adaptive-default") -> bool:
     ext = ".png"
     path = os.path.join(
