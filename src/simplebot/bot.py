@@ -649,14 +649,8 @@ class IncomingEventHandler:
         if ffi_event.name == "DC_EVENT_WEBXDC_STATUS_UPDATE":
             msg_id = ffi_event.data1
             serial = ffi_event.data2
-            updates = from_dc_charpointer(
-                lib.dc_get_webxdc_status_updates(
-                    self.bot.account._dc_context,
-                    msg_id,
-                    serial - 1,
-                )
-            )
-            update = json.loads(updates)[0]
+            msg = self.bot.account.get_message_by_id(msg_id)
+            update = msg.get_status_updates(serial - 1)[0]
             assert update["serial"] == serial
 
             if isinstance(update["payload"], dict) and "simplebot" in update["payload"]:
