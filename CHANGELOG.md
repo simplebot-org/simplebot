@@ -1,5 +1,8 @@
 # Changelog
 
+## [v3.1.0]
+
+- updated to make use of new deltachat API
 
 ## [v3.0.0]
 
