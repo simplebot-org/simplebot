@@ -25,6 +25,8 @@ To test unreleased version:
 pip install git+https://github.com/simplebot-org/simplebot
 ```
 
+> **⚠️ NOTE:** If Delta Chat Python bindings package is not available for your platform you will need to compile and install the bindings manually, check [deltachat documentation](https://github.com/deltachat/deltachat-core-rust/blob/master/python/README.rst) for more info.
+
 ### Build with docker
 ```bash
 # building image
@@ -34,9 +36,6 @@ docker build -t simplebot .
 docker run -it -v /home/bot_volume:/root/.simplebot simplebot bash
 ```
 In container bash you can do same bot running as in [quick start section](#quick-start-running-a-botplugins)
-
-> **⚠️ NOTE:** If Delta Chat Python bindings package is not available for your platform you will need to compile and install the bindings manually, check [deltachat documentation](https://github.com/deltachat/deltachat-core-rust/blob/master/python/README.rst) for more info.
-
 
 ## Quick Start: Running a bot+plugins
 
