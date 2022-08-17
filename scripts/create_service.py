@@ -16,6 +16,9 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=5
+## Restart every 24h:
+#WatchdogSec=86400
+#WatchdogSignal=SIGKILL
 User={user}
 ExecStart={cmd}
 
