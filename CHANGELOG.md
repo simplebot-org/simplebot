@@ -1,5 +1,9 @@
 # Changelog
 
+## [v3.3.0]
+
+- added `hidden` argument to the command and filter declarations hooks, to hide them from the bot's help message
+
 ## [v3.2.0]
 
 - added support for importing/exporting backups and keys

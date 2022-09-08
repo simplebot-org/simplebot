@@ -424,14 +424,14 @@ class DeltaBot:
         cmds = []
         has_prefs = bool(bot.get_preferences())
         for c in self.commands._cmd_defs.values():
-            if not c.admin or is_admin:
+            if not c.hidden and (not c.admin or is_admin):
                 if c.cmd != "/set" or has_prefs:
                     cmds.append(c)
         cmds.sort(key=lambda c: c.cmd)
 
         filters = []
         for f in self.filters._filter_defs.values():
-            if not f.admin or is_admin:
+            if not f.hidden and (not f.admin or is_admin):
                 filters.append(f)
         filters.sort(key=lambda f: f.name)
 

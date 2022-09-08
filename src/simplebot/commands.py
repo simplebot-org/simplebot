@@ -25,6 +25,7 @@ class Commands:
         name: str = None,
         help: str = None,  # noqa
         admin: bool = False,
+        hidden: bool = False,
     ) -> None:
         """register a command function that acts on each incoming non-system message.
 
@@ -51,7 +52,13 @@ class Commands:
                 )
 
         cmd_def = CommandDef(
-            name, short=short, long=long, func=func, args=args, admin=admin
+            name,
+            short=short,
+            long=long,
+            func=func,
+            args=args,
+            admin=admin,
+            hidden=hidden,
         )
         self._cmd_defs[name.lower()] = cmd_def
         self.logger.debug(f"registered new command {name!r}")
@@ -120,7 +127,14 @@ class CommandDef:
     """Definition of a '/COMMAND' with args."""
 
     def __init__(
-        self, cmd: str, short: str, long: str, func: Callable, args: list, admin=False
+        self,
+        cmd: str,
+        short: str,
+        long: str,
+        func: Callable,
+        args: list,
+        admin=False,
+        hidden=False,
     ) -> None:
         if cmd[0] != CMD_PREFIX:
             raise ValueError(f"cmd {cmd!r} must start with {CMD_PREFIX!r}")
@@ -130,6 +144,7 @@ class CommandDef:
         self.func = func
         self.args = args
         self.admin = admin
+        self.hidden = hidden
 
     def __eq__(self, c) -> bool:
         return c.__dict__ == self.__dict__

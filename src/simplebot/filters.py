@@ -21,6 +21,7 @@ class Filters:
         tryfirst: bool = False,
         trylast: bool = False,
         admin: bool = False,
+        hidden: bool = False,
     ) -> None:
         """register a filter function that acts on each incoming non-system message.
         :param func: function can accept 'bot', 'message' and 'replies' arguments.
@@ -47,6 +48,7 @@ class Filters:
             args=args,
             priority=prio,
             admin=admin,
+            hidden=hidden,
         )
         if name in self._filter_defs:
             raise ValueError(f"filter {name!r} already registered")
@@ -76,7 +78,7 @@ class Filters:
 class FilterDef:
     """Definition of a Filter that acts on incoming messages."""
 
-    def __init__(self, name, short, long, func, args, priority, admin) -> None:
+    def __init__(self, name, short, long, func, args, priority, admin, hidden) -> None:
         self.name = name
         self.short = short
         self.long = long
@@ -84,6 +86,7 @@ class FilterDef:
         self.args = args
         self.priority = priority
         self.admin = admin
+        self.hidden = hidden
 
     def __eq__(self, c) -> bool:
         return c.__dict__ == self.__dict__
