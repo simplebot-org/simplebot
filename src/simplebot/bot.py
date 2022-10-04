@@ -612,8 +612,7 @@ class IncomingEventHandler:
 
     @account_hookimpl
     def ac_incoming_message(self, message: Message) -> None:
-        # we always accept incoming messages to remove the need  for
-        # bot authors to having to deal with deaddrop/contact requests.
+        # accept contact request, just in case "bot" setting is disabled
         message.create_chat()
         self.logger.debug(
             f"incoming message from {message.get_sender_contact().addr} id={message.id} chat={message.chat.id} text={message.text[:50]!r}"
