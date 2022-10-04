@@ -1,5 +1,9 @@
 # Changelog
 
+## [v4.0.0]
+
+- adapted to deltachat API breaking changes introduced in 1.94.0
+
 ## [v3.3.0]
 
 - added `hidden` argument to the command and filter declarations hooks, to hide them from the bot's help message
