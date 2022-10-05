@@ -3,6 +3,7 @@
 ## [v4.0.0]
 
 - adapted to deltachat API breaking changes introduced in 1.94.0
+- improve detection of group title changes
 
 ## [v3.3.0]
 
@@ -96,31 +97,18 @@
 
 - initial release
 
-
+[v4.0.0]: https://github.com/simplebot-org/simplebot/compare/v3.3.0...v4.0.0
 [v3.3.0]: https://github.com/simplebot-org/simplebot/compare/v3.2.0...v3.3.0
-
 [v3.2.0]: https://github.com/simplebot-org/simplebot/compare/v3.1.0...v3.2.0
-
 [v3.1.0]: https://github.com/simplebot-org/simplebot/compare/v3.0.0...v3.1.0
-
 [v3.0.0]: https://github.com/simplebot-org/simplebot/compare/v2.4.0...v3.0.0
-
 [v2.4.0]: https://github.com/simplebot-org/simplebot/compare/v2.3.0...v2.4.0
-
 [v2.3.0]: https://github.com/simplebot-org/simplebot/compare/v2.2.1...v2.3.0
-
 [v2.2.1]: https://github.com/simplebot-org/simplebot/compare/v2.2.0...v2.2.1
-
 [v2.2.0]: https://github.com/simplebot-org/simplebot/compare/v2.1.1...v2.2.0
-
 [v2.1.1]: https://github.com/simplebot-org/simplebot/compare/v2.1.0...v2.1.1
-
 [v2.1.0]: https://github.com/simplebot-org/simplebot/compare/v2.0.0...v2.1.0
-
 [v2.0.0]: https://github.com/simplebot-org/simplebot/compare/v1.1.1...v2.0.0
-
 [v1.1.1]: https://github.com/simplebot-org/simplebot/compare/v1.1.0...v1.1.1
-
 [v1.1.0]: https://github.com/simplebot-org/simplebot/compare/v1.0.1...v1.1.0
-
 [v1.0.1]: https://github.com/simplebot-org/simplebot/compare/v0.10.0...v1.0.1

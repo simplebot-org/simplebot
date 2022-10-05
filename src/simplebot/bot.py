@@ -545,8 +545,8 @@ class CheckAll:
             )
             return
 
-        res = parse_system_title_changed(message.text, message.chat.get_name())
-        if res is not None:
+        res = parse_system_title_changed(message.text)
+        if res:
             old_title, actor = res
             logger.debug("calling hook deltabot_title_changed")
             self.bot.plugins.hook.deltabot_title_changed(
