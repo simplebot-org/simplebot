@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- allow classic email if email interaction is changed to "all"
+- allow classic email
 
 ## [v4.0.0]
 
