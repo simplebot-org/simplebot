@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- allow classic email if email interaction is changed to "all"
+
 ## [v4.0.0]
 
 - adapted to deltachat API breaking changes introduced in 1.94.0
@@ -97,6 +101,7 @@
 
 - initial release
 
+[Unreleased]: https://github.com/simplebot-org/simplebot/compare/v4.0.0...HEAD
 [v4.0.0]: https://github.com/simplebot-org/simplebot/compare/v3.3.0...v4.0.0
 [v3.3.0]: https://github.com/simplebot-org/simplebot/compare/v3.2.0...v3.3.0
 [v3.2.0]: https://github.com/simplebot-org/simplebot/compare/v3.1.0...v3.2.0
