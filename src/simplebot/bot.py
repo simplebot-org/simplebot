@@ -369,6 +369,7 @@ class DeltaBot:
             # set some useful bot defaults on the account
             delete_server_after=1,
             delete_device_after=2592000,
+            save_mime_headers=1,
             e2ee_enabled=1,
             sentbox_watch=0,
             mvbox_move=0,
@@ -507,6 +508,9 @@ class CheckAll:
                 )
             )
             can_encrypt = encrinfo.splitlines()[0].lower() != "no encryption."
+            can_encrypt = can_encrypt or "Chat-Version" not in (
+                message.get_mime_headers() or dict()
+            )
         else:
             can_encrypt = True
         if message.is_encrypted() or can_encrypt:
