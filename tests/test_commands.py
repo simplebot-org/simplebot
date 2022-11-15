@@ -6,7 +6,7 @@ from simplebot.commands import parse_command_docstring
 
 def test_parse_command_docstring():
     with pytest.raises(ValueError):
-        parse_command_docstring(lambda: None, args=[])
+        parse_command_docstring(lambda: None, None, args=[])
 
     def func(replies, command):
         """short description.
@@ -14,7 +14,9 @@ def test_parse_command_docstring():
         long description.
         """
 
-    short, long, args = parse_command_docstring(func, args="command replies".split())
+    short, long, args = parse_command_docstring(
+        func, func.__doc__, args="command replies".split()
+    )
     assert short == "short description."
     assert long == "long description."
     assert len(args) == 2
