@@ -34,10 +34,10 @@ class Filters:
         :param admin: if True the filter will activate for bot administrators only.
         """
         name = name or f"{func.__module__}.{func.__name__}"
-        if help is not None:
-            func.__doc__ = help
+        if help is None:
+            help = func.__doc__
         short, long, args = parse_command_docstring(
-            func, args=["message", "replies", "bot"]
+            func, help, args=["message", "replies", "bot"]
         )
         prio = 0 - tryfirst + trylast
         filter_def = FilterDef(

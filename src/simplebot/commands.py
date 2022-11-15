@@ -35,10 +35,10 @@ class Commands:
         :param admin: if True the command will be available for bot administrators only.
         """
         name = name or CMD_PREFIX + func.__name__
-        if help is not None:
-            func.__doc__ = help
+        if help is None:
+            help = func.__doc__
         short, long, args = parse_command_docstring(
-            func, args=["command", "replies", "bot", "payload", "args", "message"]
+            func, help, args=["command", "replies", "bot", "payload", "args", "message"]
         )
         for cand_name in iter_underscore_subparts(name.lower()):
             if cand_name in self._cmd_defs:
@@ -170,8 +170,7 @@ class IncomingCommand:
         return f"<IncomingCommand {self.cmd_def.cmd!r} payload={self.payload!r} msg={self.message.id}>"
 
 
-def parse_command_docstring(func, args) -> tuple:
-    description = func.__doc__
+def parse_command_docstring(func: Callable, description: str, args: list) -> tuple:
     if not description:
         raise ValueError(f"{func!r} needs to have a docstring")
     funcargs = set(inspect.getargs(func.__code__).args)

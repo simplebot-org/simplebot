@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - allow classic email
+- fix bug on registering function command with custom description
 
 ## [v4.0.0]
 
