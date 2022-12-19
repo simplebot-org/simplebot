@@ -86,7 +86,7 @@ def get_default_account() -> str:
     if not def_account:
         accounts = get_accounts()
         if len(accounts) == 1:
-            def_account = accounts[0][1]
+            def_account = accounts[0][0]
     return def_account
 
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## [v4.1.1]
+
+- fix bug in default account detection when there is only one account in ~/.simplebot/accounts
+
 ## [v4.1.0]
 
 - allow classic email
@@ -102,6 +106,7 @@
 
 - initial release
 
+[v4.1.1]: https://github.com/simplebot-org/simplebot/compare/v4.1.0...v4.1.1
 [v4.1.0]: https://github.com/simplebot-org/simplebot/compare/v4.0.0...v4.1.0
 [v4.0.0]: https://github.com/simplebot-org/simplebot/compare/v3.3.0...v4.0.0
 [v3.3.0]: https://github.com/simplebot-org/simplebot/compare/v3.2.0...v3.3.0
