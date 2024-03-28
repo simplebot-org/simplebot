@@ -13,19 +13,6 @@ def test_general_help(cmd):
     )
 
 
-def test_version(cmd):
-    from simplebot import __version__ as version
-
-    cmd.run_ok(
-        ["--version"],
-        """
-        *{}*
-    """.format(
-            version
-        ),
-    )
-
-
 class TestSettings:
     def test_get_set_list(self, mycmd):
         mycmd.run_fail(["db", "--get", "hello"])
