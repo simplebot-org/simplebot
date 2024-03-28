@@ -1,5 +1,5 @@
 -r requirements.txt
 -r requirements-test.txt
-black==23.1.0
+black==24.3.0
 flake8==5.0.4
 isort==5.13.2
