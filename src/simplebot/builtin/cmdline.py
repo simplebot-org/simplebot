@@ -53,8 +53,8 @@ def deltabot_init_parser(parser) -> None:
         version=simplebot_version,
         help="show program's version number and exit.",
     )
-    path = (
-        lambda p: get_account_path(p)
+    path = lambda p: (
+        get_account_path(p)
         if os.path.exists(get_account_path(p))
         else os.path.abspath(os.path.expanduser(p))
     )
