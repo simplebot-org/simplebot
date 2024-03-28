@@ -57,7 +57,7 @@ if __name__ == "__main__":
             [pytest11]
             simplebot.pytestplugin=simplebot.pytestplugin
         """,
-        python_requires=">=3.6",
+        python_requires=">=3.8",
         install_requires=load_requirements("requirements/requirements.txt"),
         extras_require={
             "test": load_requirements("requirements/requirements-test.txt"),
