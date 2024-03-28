@@ -11,7 +11,6 @@ from deltachat.capi import lib
 from deltachat.cutil import from_dc_charpointer
 from deltachat.events import FFIEvent
 from deltachat.message import parse_system_add_remove
-from deltachat.tracker import ConfigureTracker
 
 from .builtin.admin import add_admin, del_admin, get_admins
 from .builtin.cmdline import PluginCmd
@@ -377,19 +376,17 @@ class DeltaBot:
         )
         self.account.update_config(configs)
 
-        tracker = ConfigureTracker(self.account)
-        with self.account.temp_plugin(tracker) as configtracker:
-            self.account.configure()
-            try:
-                configtracker.wait_finish()
-            except configtracker.ConfigureFailed as ex:
-                success = False
-                self.logger.error("Failed to configure: %s", ex)
-            else:
-                set_builtin_avatar(self)
-                success = True
-                self.logger.info("Successfully configured %s", email)
-            return success
+        configtracker = self.account.configure()
+        try:
+            configtracker.wait_finish()
+        except configtracker.ConfigureFailed as ex:
+            success = False
+            self.logger.error("Failed to configure: %s", ex)
+        else:
+            set_builtin_avatar(self)
+            success = True
+            self.logger.info("Successfully configured %s", email)
+        return success
 
     #
     # start/wait/shutdown API

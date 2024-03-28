@@ -282,6 +282,8 @@ intersphinx_mapping = {"http://docs.python.org/": None}
 
 # autodoc options
 autodoc_member_order = "bysource"
+
+
 # always document __init__ functions
 def skip(app, what, name, obj, skip, options):
     return skip
