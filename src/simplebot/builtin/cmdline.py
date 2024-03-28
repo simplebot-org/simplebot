@@ -18,8 +18,6 @@ from ..utils import (
 
 @deltabot_hookimpl
 def deltabot_init_parser(parser) -> None:
-    from .. import __version__ as simplebot_version
-
     parser.add_subcommand(Init)
     parser.add_subcommand(ImportCmd)
     parser.add_subcommand(ExportCmd)
