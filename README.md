@@ -1,3 +1,5 @@
+> **⚠️ IMPORTANT:** This project is no longer heavily maintained you should use instead: https://github.com/deltachat-bot/deltabot-cli-py
+
 <p align="center"><img height="180" width="180" src="https://github.com/simplebot-org/simplebot/raw/master/artwork/Bot.svg"></p>
 <h1 align="center">SimpleBot</h1>
 
@@ -100,7 +102,5 @@ messages that are sent to it.
 
 
 ## Credits
-
-SimpleBot is based on [deltabot](https://github.com/deltachat-bot/deltabot)
 
 SimpleBot logo was created by Cuban designer "Dann".
