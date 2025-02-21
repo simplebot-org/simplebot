@@ -1,6 +1,6 @@
-> **⚠️ IMPORTANT:** This project is no longer heavily maintained you should use instead: https://github.com/deltachat-bot/deltabot-cli-py
+> **⚠️ IMPORTANT:** This project is no longer actively maintained you should use instead: https://github.com/deltachat-bot/deltabot-cli-py
 
-<p align="center"><img height="180" width="180" src="https://github.com/simplebot-org/simplebot/raw/master/artwork/Bot.svg"></p>
+<p align="center"><img height="150" width="150" src="https://github.com/simplebot-org/simplebot/raw/master/artwork/Bot.svg"></p>
 <h1 align="center">SimpleBot</h1>
 
 [![Latest Release](https://img.shields.io/pypi/v/simplebot.svg)](https://pypi.org/project/simplebot)
