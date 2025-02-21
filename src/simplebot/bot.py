@@ -8,7 +8,6 @@ import deltachat as dc
 import py
 from deltachat import Account, Chat, Contact, Message, account_hookimpl
 from deltachat.capi import lib
-from deltachat.cutil import from_dc_charpointer
 from deltachat.events import FFIEvent
 from deltachat.message import parse_system_add_remove
 
@@ -496,35 +495,20 @@ class CheckAll:
         sender = message.get_sender_contact()
         if sender != self.bot.self_contact:
             message.mark_seen()
-            encrinfo = from_dc_charpointer(
-                lib.dc_get_contact_encrinfo(
-                    self.bot.account._dc_context,
-                    sender.id,
+        replies = Replies(message, logger=logger)
+        logger.info("processing incoming fresh message id=%s", message.id)
+        if message.is_system_message():
+            self.handle_system_message(message, replies)
+        elif not message.get_sender_contact().is_blocked():
+            if message.is_bot():
+                self.bot.plugins.hook.deltabot_incoming_bot_message(
+                    message=message, bot=self.bot, replies=replies
                 )
-            )
-            can_encrypt = encrinfo.splitlines()[0].lower() != "no encryption."
-            can_encrypt = can_encrypt or "Chat-Version" not in (
-                message.get_mime_headers() or dict()
-            )
-        else:
-            can_encrypt = True
-        if message.is_encrypted() or can_encrypt:
-            replies = Replies(message, logger=logger)
-            logger.info("processing incoming fresh message id=%s", message.id)
-            if message.is_system_message():
-                self.handle_system_message(message, replies)
-            elif not message.get_sender_contact().is_blocked():
-                if message.is_bot():
-                    self.bot.plugins.hook.deltabot_incoming_bot_message(
-                        message=message, bot=self.bot, replies=replies
-                    )
-                else:
-                    self.bot.plugins.hook.deltabot_incoming_message(
-                        message=message, bot=self.bot, replies=replies
-                    )
-            replies.send_reply_messages()
-        else:
-            logger.info("ignoring message (id=%s) without autocrypt support", msg_id)
+            else:
+                self.bot.plugins.hook.deltabot_incoming_message(
+                    message=message, bot=self.bot, replies=replies
+                )
+        replies.send_reply_messages()
         logger.info("processing message=%s FINISHED", msg_id)
 
     def handle_system_message(self, message: Message, replies: Replies) -> None:
